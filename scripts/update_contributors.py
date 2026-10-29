@@ -15,7 +15,7 @@ END = '<!-- CONTRIBUTORS:END -->'
 
 
 def main():
-    repo = os.environ.get('GITHUB_REPOSITORY', 'muzzammil763/Rafeeq')
+    repo = os.environ.get('GITHUB_REPOSITORY', 'teamsazen/Rafeeq')
     pages = json.loads(subprocess.check_output([
         'gh', 'api', '--paginate', '--slurp',
         f'repos/{repo}/contributors?per_page=100',

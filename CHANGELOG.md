@@ -6,7 +6,7 @@ Recorded Android release notes, newest build first. Historical entries come from
 
 ### Fixed
 
-- Refresh the home prayer card at midnight and when the app resumes, keeping prayer details, sky visuals, and the Hijri date current. ([#2](https://github.com/muzzammil763/Rafeeq/pull/2))
+- Refresh the home prayer card at midnight and when the app resumes, keeping prayer details, sky visuals, and the Hijri date current. ([#2](https://github.com/teamsazen/Rafeeq/pull/2))
 - Improve selected-card text contrast in the dark theme.
 
 ## Android build history
