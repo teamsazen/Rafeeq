@@ -63,3 +63,4 @@ app.*.map.json
 
 # Social post plan (local only)
 /LINKEDIN-POSTS.md
+/marketing/
