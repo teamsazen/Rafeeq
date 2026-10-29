@@ -38,5 +38,13 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    # Pods with an explicit older minimum (such as FirebaseSessions) must
+    # compile for the app's minimum too, so they can import PromisesSwift.
+    target.build_configurations.each do |config|
+      deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if deployment_target.nil? || Gem::Version.new(deployment_target) < Gem::Version.new('16.6')
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.6'
+      end
+    end
   end
 end
