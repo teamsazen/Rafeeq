@@ -147,7 +147,7 @@ class _LegalScreenState extends State<LegalScreen> {
                         ),
                       ),
                       child: Text(
-                        'satechdev18@gmail.com',
+                        'teamsazen@gmail.com',
                         textDirection: TextDirection.ltr,
                         textAlign: TextAlign.center,
                         style: TextStyle(

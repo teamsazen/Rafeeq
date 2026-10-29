@@ -64,12 +64,12 @@ void main() {
         expect(find.text(title), findsOneWidget);
         expect(find.byType(SelectionArea), findsOneWidget);
         await tester.scrollUntilVisible(
-          find.text('satechdev18@gmail.com'),
+          find.text('teamsazen@gmail.com'),
           600,
           scrollable: find.byType(Scrollable).first,
           maxScrolls: 70,
         );
-        expect(find.text('satechdev18@gmail.com'), findsOneWidget);
+        expect(find.text('teamsazen@gmail.com'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }
