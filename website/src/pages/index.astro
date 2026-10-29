@@ -1,796 +1,150 @@
 ---
 import Base from '../layouts/Base.astro';
-import Phone from '../components/Phone.astro';
-import Wordmark from '../components/Wordmark.astro';
+import Shot from '../components/Shot.astro';
 import StoreButtons from '../components/StoreButtons.astro';
 import { site } from '../data/site';
+import { readdirSync, existsSync } from 'node:fs';
+import { playIcon, check, star } from '../data/icons';
 
-import home from '../assets/screens/home.png';
-import quran from '../assets/screens/quran.png';
-import ayahPicture from '../assets/screens/ayah-picture.png';
-import prayerTimes from '../assets/screens/prayer-times.png';
-import namazGuide from '../assets/screens/namaz-guide.png';
-import qibla from '../assets/screens/qibla.png';
-import theme from '../assets/screens/theme.png';
-
-const trust = [
-  { label: 'Free for life, In Sha Allah', icon: 'M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z' },
-  { label: 'No ads, ever', icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14' },
-  { label: 'Open source', icon: 'M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16' },
-  { label: 'English & اردو', icon: 'M3 5h12M9 3v2M5 9c1.5 4 4.5 6.5 8 7.5M13 5c-1 5-4.5 9-9 11M14 21l4-9 4 9M15.5 18h5' },
+// The feature guide: [id, tab title, screen, text, facts].
+const features: [string, string, string, string, string[]][] = [
+  ['home', 'Home', 'home', 'Open Rafeeq to the Hijri date, a live countdown to the next prayer under a sky that follows the time of day, and one-tap shortcuts to the Qur’an, Namaz, Qibla, the calendar, Allah’s Names and Ayah Pictures.', ['Next prayer countdown', 'Hijri date', 'Jumu’ah and Eid greetings']],
+  ['quran', 'The Qur’an', 'reader', 'Every surah with its Arabic, an English or Urdu translation, and recitations from renowned qaris. Set the Arabic and the translation to their own sizes, and keep listening with the mini-player.', ['English and Urdu translations', 'Choice of reciter', 'Search and bookmarks']],
+  ['prayer', 'Prayer times', 'prayer', 'Accurate times for your location, calculated on your phone, with an adhan or a gentle reminder for each salah. Rafeeq also shows the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.', ['Works offline', 'Hanafi or Shafi Asr', 'Choice of calculation method']],
+  ['qibla', 'Qibla', 'qibla', 'A real-time compass points you to the Kaaba in Makkah and tells you exactly how far to turn, from wherever you are.', ['Live compass', 'Turn left or right']],
+  ['namaz', 'Namaz & Wudu', 'namaz', 'A complete guide to salah, from Takbeer to Tasleem, with the Arabic and its meaning, and a step-by-step Wudu guide before you begin. Made for new Muslims, children and anyone coming back.', ['Every step in Arabic', 'With its meaning', 'Wudu guide']],
+  ['ayah', 'Ayah pictures', 'ayah', 'Turn any ayah into a clean picture with its Arabic and translation, in an English or Urdu layout, ready to save or send to the people you love.', ['Arabic and translation', 'Urdu layout']],
+  ['hijri', 'Hijri calendar', 'hijri', 'The Islamic month at a glance next to the Gregorian dates, with a Hijri correction for your local moon sighting.', ['Hijri and Gregorian', 'Moon sighting correction']],
+  ['names', 'Asma ul Husna', 'names', 'The 99 Beautiful Names of Allah, each with its meaning, to read and reflect upon.', ['99 Names', 'With meanings']],
+  ['urdu', 'English & اردو', 'language', 'Every screen of Rafeeq is in English and Urdu, with Urdu set in proper Nastaleeq. Switch languages any time in Settings.', ['Full Urdu', 'Nastaleeq type']],
+  ['theme', 'Light & dark', 'theme', 'Rafeeq follows your phone in light or dark, or keeps the theme you choose. This page does the same: every screenshot here matches your own setting.', ['Light, System, Dark']],
 ];
 
-const more = [
-  {
-    title: 'Hijri & Ramadan calendars',
-    body: 'The Islamic date at a glance, Ramadan timings, and a Hijri correction for your local moon sighting.',
-    icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M14.5 13.5a2.5 2.5 0 1 0 2 4 3 3 0 0 1-2-4z',
-  },
-  {
-    title: 'Asma ul Husna',
-    body: 'The 99 Beautiful Names of Allah, each with its meaning, to read and reflect upon.',
-    icon: 'M12 2l2.6 4.4L19 4.8l-1.6 4.6L22 12l-4.6 2.6L19 19.2l-4.4-1.6L12 22l-2.6-4.4L5 19.2l1.6-4.6L2 12l4.6-2.6L5 4.8l4.4 1.6z',
-  },
-  {
-    title: 'Daily duas',
-    body: 'Categorised supplications for the moments of everyday life, with translation.',
-    icon: 'M7 11V6.5a1.5 1.5 0 0 1 3 0V11M10 10V5a1.5 1.5 0 0 1 3 0v5M13 10V6a1.5 1.5 0 0 1 3 0v6c0 4-2.5 8-7 8-3 0-4.5-2-5.5-4L2 12.5a1.5 1.5 0 0 1 2.6-1.4L7 14',
-  },
-  {
-    title: '16-line mushaf',
-    body: 'Read in the familiar 16-line Qur’an layout, page by page, alongside the ayah-by-ayah view.',
-    icon: 'M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2zM12 6v14',
-  },
-  {
-    title: 'Search & bookmarks',
-    body: 'Find any ayah in seconds and keep a Bookmarks tab of the ones you return to.',
-    icon: 'M6 3h12v18l-6-4-6 4zM10 9h4',
-  },
-  {
-    title: 'Your choice of reciter',
-    body: 'Listen to renowned qaris, with a mini-player that keeps going in the background.',
-    icon: 'M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v6H4zM17 14h3v6h-3z',
-  },
-];
-
-const faq = [
-  {
-    q: 'Is Rafeeq really free?',
-    a: 'Yes. Rafeeq is free for everyone, with no ads, and we intend to keep it that way for its entire lifetime, In Sha Allah.',
-  },
-  {
-    q: 'How are prayer times calculated?',
-    a: 'On your phone, from your location, using established calculation methods. You can choose the method, the Asr juristic method (Hanafi or Shafi), and a high-latitude rule, and adjust the Hijri date for your local moon sighting.',
-  },
-  {
-    q: 'Does it work without internet?',
-    a: 'The Qur’an text ships with the app and prayer times are calculated on your device, so both keep working offline once your location is set. Recitations stream from the internet.',
-  },
-  {
-    q: 'What data does Rafeeq use?',
-    a: 'Your location is used to calculate prayer times and the Qibla direction. Release builds use Firebase Analytics and Crashlytics to understand usage and fix crashes. See our Privacy Policy for details.',
-  },
-  {
-    q: 'Is there an iPhone version?',
-    a: 'Rafeeq is available on Google Play today, and the App Store version is coming soon, In Sha Allah.',
-  },
-  {
-    q: 'How can I help?',
-    a: 'Make dua for us, share Rafeeq with family and friends, request a feature or report a bug. Rafeeq is open source, so developers are welcome to contribute on GitHub too.',
-  },
-];
+// The Play Store screenshots, made by npm run images from screens/store/.
+const store = existsSync('public/img/store') ? readdirSync('public/img/store').filter((f) => /^\d+\.webp$/.test(f)).sort() : [];
 ---
 
 <Base>
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-copy reveal">
-        <p class="arabic bismillah" lang="ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
-        <span class="eyebrow">Your Muslim companion</span>
-        <h1 class="display hero-title">
-          Your faith,<br />close at <span class="underline-mark">hand.</span>
-        </h1>
-        <p class="lead">
-          The Holy Qur’an, accurate prayer times, Qibla, the Hijri calendar and your daily duas,
-          gathered in one calm, beautiful app.
-        </p>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <h1 id="hero-title">Your All In One Muslim Companion</h1>
+        <p class="lead">The Qur’an, prayer times, Qibla and more, in one calm app. Free, with no ads, in English and Urdu.</p>
         <StoreButtons />
-        <p class="fine">Free for everyone · No ads · English & Urdu</p>
+        <a class="watch" href="#qibla" data-play><span class="watch__icon" set:html={playIcon} />Watch the Qibla in action</a>
       </div>
-      <div class="hero-stage reveal" style="--delay: 0.12s">
-        <div class="mihrab pattern" aria-hidden="true"></div>
-        <Phone class="hp hp-left" src={prayerTimes} alt="Prayer times and reminders" sizes="(max-width: 720px) 40vw, 230px" />
-        <Phone class="hp hp-right" src={ayahPicture} alt="Ayah picture maker with an ayah from Al-Baqarah" sizes="(max-width: 720px) 40vw, 230px" />
-        <Phone class="hp hp-center" src={quran} alt="Quran reader with Arabic text and Urdu translation" eager sizes="(max-width: 720px) 52vw, 290px" />
-      </div>
+
+      <figure class="fan" data-fan>
+        <div class="fan__phone fan__phone--l" tabindex="0"><Shot kind="phones" name="prayer" sizes="(max-width: 40rem) 42vw, 300px" alt="Today’s prayer times for Jhelum with the forbidden times around sunrise, noon and sunset" /></div>
+        <div class="fan__phone fan__phone--c" tabindex="0"><Shot kind="phones" name="home" eager sizes="(max-width: 40rem) 46vw, 320px" alt="The Rafeeq home screen: the Hijri date, a countdown to the next prayer under a sky that follows the time of day, and the Explore shortcuts" /></div>
+        <div class="fan__phone fan__phone--r" tabindex="0"><Shot kind="phones" name="reader" sizes="(max-width: 40rem) 42vw, 300px" alt="Reading Surah Al-Baqarah in Arabic with its Urdu translation" /></div>
+        <svg class="fan__star fan__star--a" viewBox="0 0 52 52" aria-hidden="true" set:html={star} />
+        <svg class="fan__star fan__star--b" viewBox="0 0 52 52" aria-hidden="true" set:html={star} />
+      </figure>
     </div>
   </section>
 
-  <!-- Trust strip -->
-  <section class="trust">
-    <div class="container trust-row">
-      {
-        trust.map((item, i) => (
-          <div class="trust-item reveal" style={`--delay:${i * 0.06}s`}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d={item.icon} />
-            </svg>
-            {item.label}
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section id="features" class="section">
-    <div class="container head reveal">
-      <span class="eyebrow">Features</span>
-      <h2 class="display h2">Everything for your day,<br />in one place.</h2>
-    </div>
-
-    <div id="f-home" class="container feature">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={home} alt="Rafeeq home with the next prayer countdown and Explore shortcuts" style="--w: clamp(230px, 27vw, 320px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">Home</span>
-        <h3 class="display h3">Assalamu alaikum.</h3>
-        <p>Open Rafeeq and see the Hijri date, the time until the next prayer under a live sky, and one-tap shortcuts to the Qur’an, Namaz, Qibla, the calendar, Allah’s Names and Ayah Pictures.</p>
-        <ul class="ticks">
-          <li>Live countdown to the next prayer</li>
-          <li>Greets Jumu’ah, Eid and special days</li>
-          <li>Everything one tap away</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="quran" class="container feature flip">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={quran} alt="Quran reader with translation and audio controls" style="--w: clamp(210px, 24vw, 290px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">The Holy Qur’an</span>
-        <h3 class="display h3">Read, listen, reflect.</h3>
-        <p>Every surah with translation, beautiful Arabic typography, and recitations from renowned qaris. Tune font sizes, translation and reciter until it reads just right.</p>
-        <ul class="ticks">
-          <li>Translations in English and Urdu</li>
-          <li>Background mini-player for recitations</li>
-          <li>Search, bookmarks and sharing</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="f-prayer" class="container feature">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={prayerTimes} alt="Prayer times with reminders for each salah" style="--w: clamp(210px, 25vw, 300px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">Prayer times</span>
-        <h3 class="display h3">Never miss a salah.</h3>
-        <p>Accurate times for your location, with an adhan or gentle reminder for each prayer. Rafeeq also marks the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.</p>
-        <ul class="ticks">
-          <li>Calculated on your device</li>
-          <li>Hanafi or Shafi Asr, any method</li>
-          <li>Notifications with adhan sounds</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="f-qibla" class="container feature flip">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={qibla} alt="Qibla compass and direction guidance" style="--w: clamp(230px, 27vw, 320px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">Qibla</span>
-        <h3 class="display h3">Face the Kaaba, anywhere.</h3>
-        <p>A clear, real-time compass points you towards the Kaaba in Makkah and tells you exactly how far to turn, with a short guide to calibrate your phone.</p>
-      </div>
-    </div>
-
-    <div id="f-namaz" class="container feature">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={namazGuide} alt="Complete Namaz guide with Takbeer, Sana and Ta’awwuz" style="--w: clamp(210px, 25vw, 300px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">Namaz & Wudu</span>
-        <h3 class="display h3">Learn to pray, step by step.</h3>
-        <p>A complete guide to salah, from Takbeer to Tasleem, with the Arabic, its meaning, and a step-by-step Wudu guide before you begin. Ideal for new Muslims and children.</p>
-      </div>
-    </div>
-
-    <div id="f-ayah" class="container feature flip">
-      <div class="feature-stage reveal">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={ayahPicture} alt="Ayah picture maker with options for Arabic, translation and Urdu mode" style="--w: clamp(210px, 25vw, 300px)" />
-      </div>
-      <div class="feature-copy reveal" style="--delay: 0.08s">
-        <span class="eyebrow">Ayah pictures</span>
-        <h3 class="display h3">Share the words of Allah.</h3>
-        <p>Turn any ayah into an elegant picture with its Arabic and translation, in English or Urdu layout, ready to save or send to the people you love.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- More features band -->
-  <section id="more" class="band pattern">
+  <section class="section" id="features" aria-labelledby="features-title">
     <div class="container">
-      <div class="band-head reveal">
-        <span class="eyebrow on-dark">And much more</span>
-        <h2 class="display h2">A companion for<br /><span class="gold">every moment.</span></h2>
+      <div class="head">
+        <h2 id="features-title">Everything in the app</h2>
+        <p>Each part of Rafeeq, and what it does. The screenshots follow your light or dark setting.</p>
       </div>
-      <div class="more-grid">
-        {
-          more.map((item, i) => (
-            <div class="m-card reveal" style={`--delay:${(i % 3) * 0.06}s`}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d={item.icon} />
-              </svg>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- Language and theme -->
-  <section class="section">
-    <div class="container theme-grid">
-      <div class="reveal">
-        <span class="eyebrow">Made for you</span>
-        <h2 class="display h2">In your language,<br />in your light.</h2>
-        <p class="lead">Rafeeq is fully translated into Urdu with proper Nastaleeq typography, and follows your phone in light or dark, or the theme you choose.</p>
-        <div class="langs">
-          <div class="card lang">
-            <span class="lang-big">Rafeeq</span>
-            <span>English</span>
-          </div>
-          <div class="card lang">
-            <span class="lang-big urdu" lang="ur">رفیق</span>
-            <span>اردو</span>
-          </div>
+      <div class="guide" data-guide>
+        <div class="guide__tabs" role="tablist" aria-label="App features" hidden>
+          {features.map(([id, title], i) => <button type="button" role="tab" id={`t-${id}`} aria-controls={`f-${id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i ? -1 : 0}>{title}</button>)}
+        </div>
+        <div class="guide__panels">
+          {features.map(([id, title, shot, text, facts]) => (
+            <section class="panel card card--lattice" role="tabpanel" id={`f-${id}`} aria-labelledby={`t-${id}`}>
+              <figure class="screen"><Shot kind="phones" name={shot} sizes="(max-width: 40rem) 70vw, 300px" alt={`${title} in the app`} /></figure>
+              <div class="panel__text">
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <ul class="facts">{facts.map((f) => <li>{f}</li>)}</ul>
+              </div>
+            </section>
+          ))}
         </div>
       </div>
-      <div class="theme-stage reveal" style="--delay: 0.08s">
-        <div class="arch pattern" aria-hidden="true"></div>
-        <Phone src={theme} alt="App settings with light, system and dark theme options" style="--w: clamp(230px, 27vw, 320px)" />
+    </div>
+  </section>
+
+  <section class="section" id="qibla" aria-labelledby="qibla-title">
+    <div class="container trailer">
+      <div class="player card" data-player>
+        <video preload="none" playsinline controls muted poster="/img/qibla/poster.webp" width="720" height="900" aria-label="Rafeeq's Qibla compass turning to face the Kaaba, 9 seconds, no sound">
+          <source src="/img/qibla/qibla-720.mp4" type="video/mp4" />
+        </video>
+        <button class="player__start" type="button" aria-label="Play the 9-second Qibla video" hidden><span set:html={playIcon} /></button>
+      </div>
+      <div class="trailer__text">
+        <h2 id="qibla-title">Which way is the Kaaba?</h2>
+        <p class="lead">Turn until the Kaaba sits at the top, and you are facing the Qibla. Nine seconds, no sound.</p>
+        <dl class="figures">
+          <div><dt>Surahs, with translation</dt><dd>114</dd></div>
+          <div><dt>Names of Allah</dt><dd>99</dd></div>
+          <div><dt>Languages</dt><dd>2</dd></div>
+          <div><dt>Ads, now and always</dt><dd>0</dd></div>
+        </dl>
       </div>
     </div>
   </section>
 
-  <!-- Open source -->
-  <section id="open-source" class="section soft">
-    <div class="container os-grid">
-      <div class="reveal">
-        <span class="eyebrow">Open source</span>
-        <h2 class="display h2">Built by two brothers,<br />for the Ummah.</h2>
-        <p class="lead">Rafeeq began as a simple idea: bring a Muslim’s daily essentials together in one place. Two brothers, both software developers, have been building it ever since, whenever life leaves them time.</p>
-        <div class="os-actions">
-          <a class="btn btn-primary" href={site.githubUrl} rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z" /></svg>
-            <span>View on GitHub</span>
-          </a>
-          <a class="btn btn-ghost" href={site.feedbackUrl} rel="noopener">Request a feature</a>
-          <a class="btn btn-ghost" href={site.issuesUrl} rel="noopener">Report a bug</a>
+  {store.length > 0 && (
+    <section class="section" id="screenshots" aria-labelledby="store-title">
+      <div class="container">
+        <div class="head">
+          <h2 id="store-title">On Google Play</h2>
+          <p>The screenshots from Rafeeq’s Play Store listing. Scroll sideways to see them all.</p>
         </div>
       </div>
-      <div class="os-cards">
-        {
-          [
-            ['Free for life', 'No price, no ads, no paywall. If support is ever offered, it will only go towards keeping Rafeeq running and improving.'],
-            ['In the open', 'Every line of code is public, so anyone can see how Rafeeq works and help make it better.'],
-            ['We listen', 'Request a feature, report a bug or share an idea. We read every message.'],
-          ].map(([title, body], i) => (
-            <div class="card p-card reveal" style={`--delay:${i * 0.06}s`}>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </div>
-          ))
-        }
+      <div class="container">
+        <div class="strip" tabindex="0" role="group" aria-label={`Rafeeq on Google Play, ${store.length} screenshots`}>
+          {store.map((f, i) => {
+            const n = f.replace('.webp', '');
+            return <img src={`/img/store/${n}-sm.webp`} srcset={`/img/store/${n}-sm.webp 1x, /img/store/${n}.webp 2x`} height="500" loading="lazy" decoding="async" alt={`Play Store screenshot ${i + 1} of ${store.length}`} />;
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="open-title">
+    <div class="container">
+      <div class="card card--lattice private">
+        <div>
+          <h2 id="open-title">Free, open, and made with care</h2>
+          <div class="private__links">
+            <a class="link" href={site.githubUrl} rel="noopener">See the code on GitHub</a>
+            <a class="link" href={site.privacyUrl}>Read the privacy policy</a>
+          </div>
+        </div>
+        <ul>
+          <li><Fragment set:html={check} /><span>Free for everyone: no ads, no paywall, no premium tier.</span></li>
+          <li><Fragment set:html={check} /><span>Open source, so anyone can see how it works.</span></li>
+          <li><Fragment set:html={check} /><span>The Qur’an and prayer times work offline.</span></li>
+          <li><Fragment set:html={check} /><span>Your location is used for prayer times and the Qibla.</span></li>
+        </ul>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section id="faq" class="section">
-    <div class="container faq-grid">
-      <div class="head reveal">
-        <span class="eyebrow">FAQ</span>
-        <h2 class="display h2">Questions,<br />answered.</h2>
-        <p class="lead">Something else? Email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
-      </div>
-      <div class="faq">
-        {
-          faq.map((item) => (
-            <details class="card qa reveal">
-              <summary>
-                {item.q}
-                <span class="plus" aria-hidden="true" />
-              </summary>
-              <p>
-                {item.a}
-                {item.q.startsWith('What data') && (
-                  <>
-                    {' '}
-                    <a href={site.privacyUrl} rel="noopener">Read the Privacy Policy</a>.
-                  </>
-                )}
-              </p>
-            </details>
-          ))
-        }
+  <section class="section" id="get" aria-labelledby="get-title">
+    <div class="container">
+      <div class="card card--lattice close">
+        <div>
+          <h2 id="get-title">Take Rafeeq with you</h2>
+          <p class="lead">Free on Google Play. The iPhone app is on its way, In Sha Allah.</p>
+          <StoreButtons />
+        </div>
+        <figure class="screen"><Shot kind="phones" name="recite" sizes="280px" alt="Reading Surah Al-Baqarah with its Urdu translation while Abdullah Basfar recites" /></figure>
       </div>
     </div>
   </section>
 
-  <!-- Final call to action -->
-  <section class="container final reveal">
-    <div class="final-card pattern">
-      <Wordmark height={84} />
-      <h2 class="display h2">Take Rafeeq<br />with you.</h2>
-      <p>Your Qur’an, your prayers and your Qibla, wherever you are.</p>
-      <StoreButtons invert />
-    </div>
-  </section>
 </Base>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    document.querySelectorAll<HTMLAnchorElement>('.menu .sheet a').forEach((link) => {
-      link.addEventListener('click', () => link.closest('details')?.removeAttribute('open'));
-    });
-  });
+  import '../scripts/landing';
 </script>
-
-<style>
-  .fine {
-    font-size: 14px;
-    color: var(--muted);
-    margin: 14px 0 0;
-  }
-
-  /* Hero */
-  .hero {
-    padding: clamp(36px, 6vw, 84px) 0 40px;
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 48px;
-    align-items: center;
-  }
-  .bismillah {
-    font-size: clamp(22px, 2.6vw, 28px);
-    color: var(--teal);
-    margin: 0 0 10px;
-    text-align: left;
-    direction: rtl;
-    display: block;
-  }
-  .hero-title {
-    font-size: clamp(44px, 6.6vw, 84px);
-    margin: 14px 0 20px;
-  }
-  .hero-copy .lead {
-    margin: 0 0 28px;
-    max-width: 32ch;
-  }
-  .hero-stage {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    justify-content: center;
-    padding: 24px 0 32px;
-  }
-  .mihrab {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 8%;
-    width: min(100%, 470px);
-    translate: -50% 0;
-    border-radius: 999px 999px 32px 32px;
-    background: var(--teal-deep);
-    overflow: hidden;
-    --pattern: rgba(252, 230, 188, 0.16);
-  }
-  .mihrab::after {
-    content: '';
-    position: absolute;
-    inset: 14px;
-    border-radius: 999px 999px 22px 22px;
-    border: 1.5px solid rgba(252, 230, 188, 0.35);
-  }
-  .hero-stage :global(.hp-center) {
-    --w: clamp(220px, 22vw, 290px);
-    position: relative;
-    z-index: 2;
-    margin-top: 56px;
-  }
-  .hero-stage :global(.hp-left),
-  .hero-stage :global(.hp-right) {
-    --w: clamp(165px, 16.5vw, 222px);
-    position: absolute;
-    left: 50%;
-    top: 22%;
-    z-index: 1;
-  }
-  .hero-stage :global(.hp-left) {
-    transform: translateX(-130%) rotate(-9deg);
-  }
-  .hero-stage :global(.hp-right) {
-    transform: translateX(30%) rotate(9deg);
-  }
-
-  /* Trust */
-  .trust {
-    padding: 8px 0 24px;
-  }
-  .trust-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--card);
-    font-weight: 600;
-    font-size: 15px;
-  }
-  .trust-item svg {
-    width: 22px;
-    height: 22px;
-    fill: none;
-    stroke: var(--teal);
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex: none;
-  }
-
-  /* Sections */
-  .section {
-    padding: clamp(64px, 9vw, 120px) 0;
-  }
-  .section.soft {
-    background: var(--soft);
-  }
-  .head {
-    margin-bottom: 48px;
-  }
-  .h2 {
-    font-size: clamp(34px, 4.8vw, 58px);
-    margin: 14px 0 16px;
-  }
-  .h3 {
-    font-size: clamp(30px, 3.4vw, 44px);
-    margin: 12px 0 14px;
-  }
-
-  .feature {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(32px, 6vw, 80px);
-    align-items: center;
-    margin-bottom: clamp(56px, 8vw, 104px);
-  }
-  .feature.flip .feature-stage {
-    order: 2;
-  }
-  .feature-copy p {
-    color: var(--muted);
-    font-size: 18px;
-    max-width: 44ch;
-  }
-  .feature-stage {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    padding: 32px 0;
-  }
-
-  /* Mihrab-arch backdrop behind each phone. */
-  .arch {
-    position: absolute;
-    left: 50%;
-    width: min(100%, 420px);
-    translate: -50% 0;
-    background: var(--cream);
-    overflow: hidden;
-  }
-  .arch {
-    top: 0;
-    bottom: 12%;
-    border-radius: 999px 999px 28px 28px;
-  }
-  .arch::after {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border-radius: 999px 999px 18px 18px;
-    border: 1.5px solid color-mix(in srgb, var(--gold) 40%, transparent);
-  }
-  .feature-stage > :global(.phone) {
-    position: relative;
-    z-index: 1;
-  }
-
-  .ticks {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0 0;
-    display: grid;
-    gap: 10px;
-  }
-  .ticks li {
-    position: relative;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    font-weight: 500;
-  }
-  .ticks li::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    flex: none;
-    background: var(--teal);
-    clip-path: polygon(50% 0, 63% 21%, 85% 15%, 79% 37%, 100% 50%, 79% 63%, 85% 85%, 63% 79%, 50% 100%, 37% 79%, 15% 85%, 21% 63%, 0 50%, 21% 37%, 15% 15%, 37% 21%);
-  }
-
-  /* More band */
-  .band {
-    background: var(--teal-deep);
-    color: #f4eedf;
-    padding: clamp(64px, 9vw, 120px) 0;
-    overflow: hidden;
-    --pattern: rgba(252, 230, 188, 0.06);
-  }
-  .on-dark {
-    color: #e2c07e;
-  }
-  .gold {
-    color: #fce6bc;
-    font-style: italic;
-  }
-  .band-head {
-    margin-bottom: 44px;
-  }
-  .more-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  .m-card {
-    padding: 26px;
-    border-radius: var(--radius);
-    background: rgba(252, 230, 188, 0.05);
-    border: 1px solid rgba(252, 230, 188, 0.14);
-    backdrop-filter: blur(2px);
-  }
-  .m-card svg {
-    width: 30px;
-    height: 30px;
-    fill: none;
-    stroke: #e2c07e;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .m-card h3 {
-    margin: 16px 0 6px;
-    font-size: 19px;
-  }
-  .m-card p {
-    margin: 0;
-    color: #b9c8c3;
-    font-size: 16px;
-  }
-
-  /* Language and theme */
-  .theme-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    align-items: center;
-  }
-  .theme-stage {
-    padding: 32px 0;
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    justify-content: center;
-  }
-  .theme-stage > :global(.phone) {
-    position: relative;
-    z-index: 1;
-  }
-  .langs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 28px;
-    max-width: 420px;
-  }
-  .lang {
-    padding: 20px;
-    display: grid;
-    gap: 2px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-  .lang-big {
-    font-family: var(--display);
-    font-size: 32px;
-    color: var(--teal);
-    line-height: 1.4;
-  }
-  .lang-big.urdu {
-    font-family: var(--arabic);
-    font-size: 34px;
-  }
-
-  /* Open source */
-  .os-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 48px;
-    align-items: center;
-  }
-  .os-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 28px;
-  }
-  .os-cards {
-    display: grid;
-    gap: 12px;
-  }
-  .p-card {
-    padding: 24px;
-  }
-  .p-card h3 {
-    margin: 0 0 6px;
-    font-size: 18px;
-    color: var(--teal);
-  }
-  .p-card p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 16px;
-  }
-
-  /* FAQ */
-  .faq-grid {
-    display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 48px;
-    align-items: start;
-  }
-  .faq {
-    display: grid;
-    gap: 10px;
-  }
-  .qa {
-    padding: 0 22px;
-  }
-  .qa summary {
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 0;
-    font-weight: 600;
-    font-size: 17px;
-    cursor: pointer;
-  }
-  .qa summary::-webkit-details-marker {
-    display: none;
-  }
-  .plus {
-    width: 14px;
-    height: 14px;
-    position: relative;
-    flex: none;
-  }
-  .plus::before,
-  .plus::after {
-    content: '';
-    position: absolute;
-    inset: 6px 0;
-    background: var(--teal);
-    border-radius: 2px;
-    transition: transform 0.3s ease;
-  }
-  .plus::after {
-    transform: rotate(90deg);
-  }
-  .qa[open] .plus::after {
-    transform: rotate(0deg);
-  }
-  .qa p {
-    margin: 0 0 20px;
-    color: var(--muted);
-  }
-
-  /* Final CTA */
-  .final {
-    padding-bottom: 40px;
-  }
-  .final-card {
-    display: grid;
-    justify-items: center;
-    text-align: center;
-    gap: 6px;
-    padding: clamp(56px, 8vw, 104px) 24px;
-    border-radius: 999px 999px 40px 40px;
-    background: #033736;
-    color: #fce6bc;
-    overflow: hidden;
-    --pattern: rgba(252, 230, 188, 0.1);
-  }
-  .final-card .h2 {
-    color: #fffefa;
-  }
-  .final-card p {
-    margin: 0 0 22px;
-    color: #b9c8c3;
-  }
-
-  @media (max-width: 960px) {
-    .hero-grid,
-    .feature,
-    .theme-grid,
-    .os-grid,
-    .faq-grid {
-      grid-template-columns: 1fr;
-    }
-    .feature.flip .feature-stage {
-      order: 0;
-    }
-    .trust-row {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .more-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  @media (max-width: 560px) {
-    /* One whole phone on small screens instead of three clipped ones. */
-    .hero-stage :global(.hp-left),
-    .hero-stage :global(.hp-right) {
-      display: none;
-    }
-    .mihrab {
-      width: 86%;
-    }
-    .more-grid {
-      grid-template-columns: 1fr;
-    }
-    .trust-item {
-      font-size: 14px;
-      padding: 14px;
-    }
-    .final-card {
-      border-radius: 200px 200px 32px 32px;
-    }
-  }
-</style>

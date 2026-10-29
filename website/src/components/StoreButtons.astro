@@ -1,42 +1,9 @@
 ---
+// Store badges drawn like the official ones: black, a grey hairline, white type.
 import { site } from '../data/site';
-interface Props {
-  invert?: boolean;
-}
-const { invert = false } = Astro.props;
+import { playSvg, appleSvg } from '../data/icons';
 ---
-
-<div class:list={['stores', { invert }]}>
-  <a class="play-store" href={site.playStoreUrl} rel="noopener" aria-label="Get Rafeeq on Google Play">
-    <img src="/google-play-badge.png" alt="Get it on Google Play" width="646" height="250" />
-  </a>
-  <span class="btn btn-ghost soon" aria-disabled="true">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.3.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.8-1.1-2.8-4.2zM14 5.1c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"></path>
-    </svg>
-    <span><small>Coming soon to the</small>App Store</span>
-  </span>
+<div class="stores">
+  <a class="store" href={site.playStoreUrl} rel="noopener"><span class="store__icon" set:html={playSvg} /><span class="store__text"><small>Get it on</small><strong>Google Play</strong></span></a>
+  <span class="store store--soon" role="img" aria-label="App Store, coming soon"><span class="store__icon" set:html={appleSvg} /><span class="store__text"><small>Coming soon on the</small><strong>App Store</strong></span></span>
 </div>
-
-<style>
-  .stores {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-  .play-store { display: inline-flex; flex: none; border-radius: 10px; }
-  .play-store img { display: block; width: 206px; height: auto; }
-  .play-store:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
-  .soon {
-    cursor: default;
-  }
-  .soon:hover {
-    transform: none;
-  }
-  .invert .btn-ghost {
-    background: transparent;
-    color: #fce6bc;
-    border-color: rgba(252, 230, 188, 0.3);
-  }
-</style>

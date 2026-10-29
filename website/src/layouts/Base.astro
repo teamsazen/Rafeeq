@@ -1,21 +1,16 @@
 ---
 import '@fontsource-variable/fraunces/full.css';
 import '@fontsource/amiri/arabic-400.css';
-import '@fontsource/amiri/arabic-700.css';
 import '../styles/global.css';
-import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import Companion from '../components/Companion.astro';
-import { companion } from '../data/companion';
 import { site } from '../data/site';
 
 interface Props {
   title?: string;
-  showCompanion?: boolean;
   description?: string;
 }
-const { title, description = site.description, showCompanion = true } = Astro.props;
+const { title, description = site.description } = Astro.props;
 const fullTitle = title ? `${title} · Rafeeq` : `Rafeeq · ${site.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -28,10 +23,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/favicon.png" type="image/png" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#FFFEFA" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111212" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.png" sizes="64x64" type="image/png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#fffefa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#011918" media="(prefers-color-scheme: dark)" />
     <meta name="google-play-app" content="app-id=com.satechdev.rafeeqapp" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Rafeeq" />
@@ -52,7 +49,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       downloadUrl: site.playStoreUrl,
     })} />
     <script is:inline>document.documentElement.classList.add('js');</script>
-    <ClientRouter />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -61,45 +57,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer />
-    {showCompanion && <Companion script={companion} />}
-    <script>
-      // Fade sections in as they enter the viewport; re-armed after each
-      // client-side navigation.
-      function armReveal() {
-        const items = document.querySelectorAll('.reveal:not(.is-visible)');
-        if (!('IntersectionObserver' in window)) {
-          items.forEach((el) => el.classList.add('is-visible'));
-          return;
-        }
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            }
-          },
-          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
-        );
-        items.forEach((el) => observer.observe(el));
-      }
-      document.addEventListener('astro:page-load', armReveal);
-    </script>
-    <style is:global>
-      .skip {
-        position: absolute;
-        left: -999px;
-        top: 8px;
-        padding: 10px 16px;
-        background: var(--primary-bg);
-        color: var(--primary-fg);
-        border-radius: 10px;
-        z-index: 100;
-      }
-      .skip:focus {
-        left: 8px;
-      }
-    </style>
+    <slot name="after" />
   </body>
 </html>

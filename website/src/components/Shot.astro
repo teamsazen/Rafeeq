@@ -1,0 +1,19 @@
+---
+// An app screenshot that matches the page's theme: the light screenshot in a
+// light theme, the dark one in a dark theme (public/img, from npm run images).
+interface Props {
+  name: string;
+  kind?: 'screens' | 'phones';
+  alt: string;
+  sizes: string;
+  eager?: boolean;
+}
+const { name, kind = 'screens', alt, sizes, eager = false } = Astro.props;
+const [w, h, sw] = kind === 'phones' ? [720, 1469, 360] : [600, 1305, 300];
+const set = (theme: string) => `/img/${kind}/${theme}/${name}-sm.webp ${sw}w, /img/${kind}/${theme}/${name}.webp ${w}w`;
+---
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset={set('dark')} sizes={sizes} />
+  <img src={`/img/${kind}/light/${name}.webp`} srcset={set('light')} sizes={sizes} width={w} height={h} alt={alt}
+    loading={eager ? undefined : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
+</picture>

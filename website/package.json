@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler pages deploy dist --project-name rafeeq --branch main"
+    "deploy": "astro build && wrangler pages deploy dist --project-name rafeeq --branch main",
+    "images": "node scripts/images.mjs"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.3.0",
