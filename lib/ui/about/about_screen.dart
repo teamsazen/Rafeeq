@@ -100,8 +100,179 @@ class _AboutScreenState extends State<AboutScreen> {
               ],
               const SizedBox(height: 24),
               _ClosingStatement(palette: palette),
+              const SizedBox(height: 32),
+              _MoreFromUs(palette: palette),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+const _otherApps = [
+  (name: '99 Names', icon: 'asmaul_husna', package: 'com.muzamil.asmaulhusna'),
+  (
+    name: 'Quran Khatam Tracker',
+    icon: 'quran_khatam_tracker',
+    package: 'com.quran.khatam.tracker',
+  ),
+  (name: 'SalahLog', icon: 'salah_log', package: 'com.track_prayer'),
+  (name: 'Budget AI', icon: 'budget_ai', package: 'com.budgetai.android'),
+  (name: 'FM Crafts', icon: 'fm_crafts', package: 'com.fmcrafts.fmcrafts'),
+  (name: 'Exit Rush', icon: 'exit_rush', package: 'com.sazen.exit.rush'),
+];
+
+class _MoreFromUs extends StatelessWidget {
+  const _MoreFromUs({required this.palette});
+
+  final SettingsPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget heading(String title) => Padding(
+      padding: const EdgeInsetsDirectional.only(start: 4, bottom: 12),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: palette.title,
+          fontFamily: localizedFontFamily(context),
+          fontSize: 17,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+
+    Widget group(List<Widget> children) => Material(
+      color: palette.card,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: children),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        heading(context.loc.settingsSectionOtherApps),
+        group([
+          for (var index = 0; index < _otherApps.length; index++) ...[
+            _ExternalLinkTile(
+              title: _otherApps[index].name,
+              subtitle: context.loc.otherAppsSubtitle,
+              icon: _otherApps[index].icon,
+              uri: Uri.https('play.google.com', '/store/apps/details', {
+                'id': _otherApps[index].package,
+              }),
+              palette: palette,
+            ),
+            if (index != _otherApps.length - 1)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 80, end: 16),
+                child: Divider(
+                  height: 1,
+                  color: palette.subtitle.withValues(alpha: .12),
+                ),
+              ),
+          ],
+        ]),
+        const SizedBox(height: 24),
+        heading(context.loc.aboutWebsiteTitle),
+        group([
+          _ExternalLinkTile(
+            title: 'Sazen',
+            subtitle: 'teamsazen.com',
+            icon: 'sazen',
+            uri: Uri.https('teamsazen.com'),
+            palette: palette,
+          ),
+        ]),
+      ],
+    );
+  }
+}
+
+class _ExternalLinkTile extends StatelessWidget {
+  const _ExternalLinkTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.uri,
+    required this.palette,
+  });
+
+  final String title;
+  final String subtitle;
+  final String icon;
+  final Uri uri;
+  final SettingsPalette palette;
+
+  Future<void> _open(BuildContext context) async {
+    try {
+      if (await launchUrl(uri, mode: LaunchMode.externalApplication)) return;
+    } catch (_) {
+      // Show the same actionable feedback when no external handler is available.
+    }
+    if (context.mounted) {
+      showRafeeqToast(
+        context,
+        context.loc.aboutLinkOpenError,
+        type: RafeeqToastType.error,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => _open(context),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/other_apps/$icon.webp',
+                width: 48,
+                height: 48,
+                cacheWidth: 192,
+                fit: BoxFit.cover,
+                excludeFromSemantics: true,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(
+                      color: palette.title,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'GoogleSans',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    textDirection: icon == 'sazen' ? TextDirection.ltr : null,
+                    style: TextStyle(
+                      color: palette.subtitle,
+                      fontSize: 13,
+                      fontFamily: icon == 'sazen'
+                          ? 'GoogleSans'
+                          : localizedFontFamily(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Icon(Icons.open_in_new_rounded, size: 18, color: palette.accent),
+          ],
         ),
       ),
     );

@@ -1140,7 +1140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionAppInfo => 'App info';
 
   @override
-  String get settingsSectionOtherApps => 'Our other apps';
+  String get settingsSectionOtherApps => 'Our other apps and games';
 
   @override
   String get settingsSectionPrayer => 'Prayer & Calendar';
@@ -1540,4 +1540,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get waitingForLocation => 'Waiting for location...';
+
+  @override
+  String get aboutWebsiteTitle => 'Our website';
+
+  @override
+  String get aboutLinkOpenError =>
+      'Could not open this link. Please try again.';
 }

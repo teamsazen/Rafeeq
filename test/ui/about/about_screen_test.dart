@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rafeeq/core/navigation/app_routes.dart';
@@ -63,11 +64,97 @@ void main() {
     );
     expect(closing, findsOneWidget);
 
-    // The page ends with the closing statement; the WhatsApp section is gone.
+    // The story retains its closing statement before the discovery links.
     expect(find.text('Join WhatsApp Channel'), findsNothing);
     expect(find.text('Stay connected with Rafeeq'), findsNothing);
     expect(find.byType(SvgPicture), findsNothing);
   });
+
+  testWidgets('opens the new app, game and website from About', (tester) async {
+    final opened = <String>[];
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+      call,
+    ) async {
+      if (call.method == 'launch') {
+        final args = call.arguments as Map;
+        opened.add(args['url'] as String);
+        expect(args['useSafariVC'], isFalse);
+        expect(args['useWebView'], isFalse);
+        return true;
+      }
+      return false;
+    });
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        channel,
+        null,
+      ),
+    );
+    await pumpAbout(tester, const Locale('en'));
+    for (final title in ['SalahLog', 'Exit Rush', 'teamsazen.com']) {
+      await tester.scrollUntilVisible(
+        find.text(title),
+        300,
+        scrollable: find.byType(Scrollable),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(title));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(title));
+      await tester.pumpAndSettle();
+    }
+    expect(opened, [
+      'https://play.google.com/store/apps/details?id=com.track_prayer',
+      'https://play.google.com/store/apps/details?id=com.sazen.exit.rush',
+      'https://teamsazen.com',
+    ]);
+  });
+
+  for (final locale in [const Locale('en'), const Locale('ur')]) {
+    for (final brightness in Brightness.values) {
+      testWidgets(
+        'discovery cards fit narrow ${locale.languageCode} $brightness with large text',
+        (tester) async {
+          await tester.binding.setSurfaceSize(const Size(320, 700));
+          addTearDown(() => tester.binding.setSurfaceSize(null));
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              theme: ThemeData(brightness: brightness),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(1.5)),
+                child: child!,
+              ),
+              initialRoute: AppRoutes.about,
+              onGenerateRoute: AppRoutes.onGenerateRoute,
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.scrollUntilVisible(
+            find.text('SalahLog'),
+            300,
+            scrollable: find.byType(Scrollable),
+          );
+          expect(tester.takeException(), isNull);
+          await tester.scrollUntilVisible(
+            find.text('teamsazen.com'),
+            300,
+            scrollable: find.byType(Scrollable),
+          );
+          expect(tester.takeException(), isNull);
+          final loc = AppLocalizations.of(
+            tester.element(find.byType(Scaffold)),
+          )!;
+          expect(find.text(loc.aboutWebsiteTitle), findsOneWidget);
+        },
+      );
+    }
+  }
 
   testWidgets('localizes the About page in Urdu', (tester) async {
     await pumpAbout(tester, const Locale('ur'));

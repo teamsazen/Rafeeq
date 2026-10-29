@@ -1142,7 +1142,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get settingsSectionAppInfo => 'ایپ کی معلومات';
 
   @override
-  String get settingsSectionOtherApps => 'ہماری دیگر ایپس';
+  String get settingsSectionOtherApps => 'ہماری دیگر ایپس اور گیمز';
 
   @override
   String get settingsSectionPrayer => 'نماز اور کیلنڈر';
@@ -1535,4 +1535,11 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get waitingForLocation => 'مقام کا انتظار ہے...';
+
+  @override
+  String get aboutWebsiteTitle => 'ہماری ویب سائٹ';
+
+  @override
+  String get aboutLinkOpenError =>
+      'یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔';
 }

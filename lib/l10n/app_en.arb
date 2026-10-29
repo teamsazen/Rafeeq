@@ -372,7 +372,7 @@
   "settings": "Settings",
   "settingsResetSuccess": "Settings reset to default",
   "settingsSectionAppInfo": "App info",
-  "settingsSectionOtherApps": "Our other apps",
+  "settingsSectionOtherApps": "Our other apps and games",
   "settingsSectionPrayer": "Prayer & Calendar",
   "settingsSectionSupport": "Support Rafeeq",
   "share": "Share",
@@ -512,5 +512,7 @@
   "volumeControl": "VOLUME CONTROL",
   "volumeNotification": "Notification Volume",
   "volumeNotificationDesc": "Standard notification volume level",
-  "waitingForLocation": "Waiting for location..."
+  "waitingForLocation": "Waiting for location...",
+  "aboutWebsiteTitle": "Our website",
+  "aboutLinkOpenError": "Could not open this link. Please try again."
 }

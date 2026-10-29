@@ -351,7 +351,7 @@
   "settings": "ترتیبات",
   "settingsResetSuccess": "سیٹنگز طے شدہ پر ری سیٹ ہو گئیں",
   "settingsSectionAppInfo": "ایپ کی معلومات",
-  "settingsSectionOtherApps": "ہماری دیگر ایپس",
+  "settingsSectionOtherApps": "ہماری دیگر ایپس اور گیمز",
   "settingsSectionPrayer": "نماز اور کیلنڈر",
   "settingsSectionSupport": "رفیق کا ساتھ دیں",
   "share": "شیئر کریں",
@@ -477,5 +477,7 @@
   "volumeControl": "وولیم کنٹرول",
   "volumeNotification": "اطلاع وولیم",
   "volumeNotificationDesc": "معیاری اطلاع وولیم لیول",
-  "waitingForLocation": "مقام کا انتظار ہے..."
+  "waitingForLocation": "مقام کا انتظار ہے...",
+  "aboutWebsiteTitle": "ہماری ویب سائٹ",
+  "aboutLinkOpenError": "یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔"
 }

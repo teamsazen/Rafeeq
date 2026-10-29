@@ -42,6 +42,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('Our other apps and games'), findsNothing);
+    expect(find.text('99 Names'), findsNothing);
+
     double top(String text) => tester.getTopLeft(find.text(text).first).dy;
 
     // Each section title sits above its first tile, and sections follow the
@@ -55,11 +58,6 @@ void main() {
       'Support Rafeeq',
       'Report an issue',
       'Contribute',
-      'Our other apps',
-      '99 Names',
-      'Quran Khatam Tracker',
-      'Budget AI',
-      'FM Crafts',
       'App info',
       'Licenses',
       'About',

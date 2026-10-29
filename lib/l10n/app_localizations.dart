@@ -2213,7 +2213,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSectionOtherApps.
   ///
   /// In en, this message translates to:
-  /// **'Our other apps'**
+  /// **'Our other apps and games'**
   String get settingsSectionOtherApps;
 
   /// No description provided for @settingsSectionPrayer.
@@ -2971,6 +2971,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waiting for location...'**
   String get waitingForLocation;
+
+  /// No description provided for @aboutWebsiteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Our website'**
+  String get aboutWebsiteTitle;
+
+  /// No description provided for @aboutLinkOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this link. Please try again.'**
+  String get aboutLinkOpenError;
 }
 
 class _AppLocalizationsDelegate
