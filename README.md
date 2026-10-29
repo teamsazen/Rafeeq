@@ -148,7 +148,7 @@ Thank you to everyone who contributes to Rafeeq! Listed by commit contributions,
 
 <!-- CONTRIBUTORS:START -->
 <p>
-  <a href="https://github.com/muzzammil763"><img src=".github/readme/contributors/98111211.png" alt="muzzammil763" title="muzzammil763" width="64" height="64"></a>
+  <a href="https://github.com/teamsazen"><img src=".github/readme/contributors/98111211.png" alt="teamsazen" title="teamsazen" width="64" height="64"></a>
   <a href="https://github.com/abdushakoor12"><img src=".github/readme/contributors/60779242.png" alt="abdushakoor12" title="abdushakoor12" width="64" height="64"></a>
 </p>
 <!-- CONTRIBUTORS:END -->
