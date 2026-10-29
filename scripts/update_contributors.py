@@ -12,6 +12,24 @@ from PIL import Image, ImageDraw, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 START = '<!-- CONTRIBUTORS:START -->'
 END = '<!-- CONTRIBUTORS:END -->'
+SIZE = 256        # working size; saved at half for crisp 64px display on 2x screens
+RING = 10         # ring width at SIZE
+GAP = 8           # transparent gap between ring and photo, so a dark photo
+                  # never merges into a dark ring
+RINGS = {'dark': (255, 255, 255, 255), 'light': (0, 0, 0, 255)}
+
+
+def ringed(photo, colour):
+    """Circular photo inside a ring of `colour`, transparent around it."""
+    out = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
+    ImageDraw.Draw(out).ellipse((0, 0, SIZE - 1, SIZE - 1), outline=colour, width=RING)
+    inset = RING + GAP
+    inner = SIZE - 2 * inset
+    face = ImageOps.fit(photo, (inner, inner))
+    mask = Image.new('L', (inner, inner), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, inner - 1, inner - 1), fill=255)
+    out.paste(face, (inset, inset), mask)
+    return out.resize((SIZE // 2, SIZE // 2), Image.Resampling.LANCZOS)
 
 
 def main():
@@ -32,22 +50,29 @@ def main():
     output = ROOT / '.github/readme/contributors'
     output.mkdir(parents=True, exist_ok=True)
     lines = ['<p>']
+    written = set()
+    base = '.github/readme/contributors'
     for user in contributors:
         login = html.escape(user['login'], quote=True)
-        filename = f"{int(user['id'])}.png"
-        # Render transparency into the image: GitHub strips border-radius CSS.
+        uid = int(user['id'])
+        # Render the circle and ring into the image: GitHub strips CSS. One
+        # file per theme, picked by <picture>.
         with urlopen(user['avatar_url'], timeout=30) as response:
-            avatar = ImageOps.fit(Image.open(io.BytesIO(response.read())).convert('RGBA'), (256, 256))
-        mask = Image.new('L', (256, 256), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, 255, 255), fill=255)
-        avatar.putalpha(mask)
-        avatar.resize((128, 128), Image.Resampling.LANCZOS).save(output / filename)
+            photo = Image.open(io.BytesIO(response.read())).convert('RGBA')
+        for theme, colour in RINGS.items():
+            name = f'{uid}-{theme}.png'
+            ringed(photo, colour).save(output / name)
+            written.add(name)
         lines.append(
-            f'  <a href="https://github.com/{login}"><img '
-            f'src=".github/readme/contributors/{filename}" '
-            f'alt="{login}" title="{login}" width="64" height="64"></a>'
+            f'  <a href="https://github.com/{login}"><picture>'
+            f'<source media="(prefers-color-scheme: dark)" srcset="{base}/{uid}-dark.png">'
+            f'<img src="{base}/{uid}-light.png" alt="{login}" title="{login}" '
+            f'width="64" height="64"></picture></a>'
         )
     lines.append('</p>')
+    for stale in output.glob('*.png'):
+        if stale.name not in written:
+            stale.unlink()
     readme.write_text(before + START + '\n' + '\n'.join(lines) + '\n' + END + after)
     print(f'Updated {len(contributors)} contributors in descending contribution order.')
 
