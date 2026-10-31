@@ -115,7 +115,7 @@ flutter test
 
 The landing page at [rafeeq.teamsazen.com](https://rafeeq.teamsazen.com) lives in [`website/`](website). It is a static [Astro](https://astro.build) site hosted on Cloudflare Pages.
 
-A small guide character walks visitors through the page as they scroll. Its lines live in [`website/src/data/companion.ts`](website/src/data/companion.ts) and the character itself in [`website/src/components/Companion.astro`](website/src/components/Companion.astro).
+It uses the Sazen studio design shared with [teamsazen.com](https://teamsazen.com) and [exitrush.teamsazen.com](https://exitrush.teamsazen.com): a floating glass header, full-width sections, Plus Jakarta Sans (self-hosted), Rafeeq's ivory, teal and gold in light mode and pure black in dark mode, with the app screenshots following the same setting. Page copy lives in [`website/src/pages/index.astro`](website/src/pages/index.astro), styles in [`website/src/styles/global.css`](website/src/styles/global.css) and motion (Lenis smooth scroll, reveals, the hero coverflow) in [`website/src/scripts/site.js`](website/src/scripts/site.js). The footer links back to the studio at teamsazen.com.
 
 ```bash
 cd website

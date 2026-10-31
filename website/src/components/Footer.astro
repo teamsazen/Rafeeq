@@ -1,15 +1,27 @@
 ---
-import { site } from '../data/site';
+// Dark footer with a giant wordmark (as on teamsazen.com) and a link back to the studio.
+import { nav, site } from '../data/site';
 ---
-<footer class="footer">
-  <div class="container footer__grid">
-    <p>Built by two brothers, for the Ummah. Rafeeq is free, with no ads, and open source under the MIT License. &copy; {new Date().getFullYear()}.</p>
-    <ul>
-      <li><a href={site.privacyUrl}>Privacy</a></li>
-      <li><a href={site.termsUrl}>Terms</a></li>
-      <li><a href={site.githubUrl} rel="noopener">GitHub</a></li>
-      <li><a href={`mailto:${site.email}`}>Email</a></li>
-      <li><a href={site.playStoreUrl} rel="noopener">Google Play</a></li>
-    </ul>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-brand">
+      <a class="brand" href="/"><img src="/img/logo.png" width="32" height="32" alt="" />Rafeeq</a>
+      <p>Built by two brothers, for the Ummah. Rafeeq is free, with no ads, and open source under the MIT License. Made by <a href={site.studioUrl}>Sazen</a>.</p>
+    </div>
+    <nav aria-label="The app">
+      <h4>The app</h4>
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      <a href={site.playStoreUrl} rel="noopener">Google Play</a>
+    </nav>
+    <nav aria-label="More">
+      <h4>More</h4>
+      <a href={site.privacyUrl}>Privacy Policy</a>
+      <a href={site.termsUrl}>Terms</a>
+      <a href={site.githubUrl} rel="noopener">GitHub</a>
+      <a href={`mailto:${site.email}`}>Email us</a>
+      <a href={site.studioUrl}>More apps from Sazen</a>
+    </nav>
+    <div class="wordmark" data-fit aria-hidden="true">{[...'RAFEEQ'].map((letter) => <span>{letter}</span>)}</div>
+    <p class="copy"><span>&copy; {new Date().getFullYear()} Rafeeq</span><span>Made by <a href={site.studioUrl}>Sazen</a></span></p>
   </div>
 </footer>

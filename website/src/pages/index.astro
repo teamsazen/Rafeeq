@@ -4,20 +4,49 @@ import Shot from '../components/Shot.astro';
 import StoreButtons from '../components/StoreButtons.astro';
 import { site } from '../data/site';
 import { readdirSync, existsSync } from 'node:fs';
-import { playIcon, check, star } from '../data/icons';
+import { icons, chevron, star } from '../data/icons';
 
-// The feature guide: [id, tab title, screen, text, facts].
-const features: [string, string, string, string, string[]][] = [
-  ['home', 'Home', 'home', 'Open Rafeeq to the Hijri date, a live countdown to the next prayer under a sky that follows the time of day, and one-tap shortcuts to the Qur’an, Namaz, Qibla, the calendar, Allah’s Names and Ayah Pictures.', ['Next prayer countdown', 'Hijri date', 'Jumu’ah and Eid greetings']],
-  ['quran', 'The Qur’an', 'reader', 'Every surah with its Arabic, an English or Urdu translation, and recitations from renowned qaris. Set the Arabic and the translation to their own sizes, and keep listening with the mini-player.', ['English and Urdu translations', 'Choice of reciter', 'Search and bookmarks']],
-  ['prayer', 'Prayer times', 'prayer', 'Accurate times for your location, calculated on your phone, with an adhan or a gentle reminder for each salah. Rafeeq also shows the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.', ['Works offline', 'Hanafi or Shafi Asr', 'Choice of calculation method']],
-  ['qibla', 'Qibla', 'qibla', 'A real-time compass points you to the Kaaba in Makkah and tells you exactly how far to turn, from wherever you are.', ['Live compass', 'Turn left or right']],
-  ['namaz', 'Namaz & Wudu', 'namaz', 'A complete guide to salah, from Takbeer to Tasleem, with the Arabic and its meaning, and a step-by-step Wudu guide before you begin. Made for new Muslims, children and anyone coming back.', ['Every step in Arabic', 'With its meaning', 'Wudu guide']],
-  ['ayah', 'Ayah pictures', 'ayah', 'Turn any ayah into a clean picture with its Arabic and translation, in an English or Urdu layout, ready to save or send to the people you love.', ['Arabic and translation', 'Urdu layout']],
-  ['hijri', 'Hijri calendar', 'hijri', 'The Islamic month at a glance next to the Gregorian dates, with a Hijri correction for your local moon sighting.', ['Hijri and Gregorian', 'Moon sighting correction']],
-  ['names', 'Asma ul Husna', 'names', 'The 99 Beautiful Names of Allah, each with its meaning, to read and reflect upon.', ['99 Names', 'With meanings']],
-  ['urdu', 'English & اردو', 'language', 'Every screen of Rafeeq is in English and Urdu, with Urdu set in proper Nastaleeq. Switch languages any time in Settings.', ['Full Urdu', 'Nastaleeq type']],
-  ['theme', 'Light & dark', 'theme', 'Rafeeq follows your phone in light or dark, or keeps the theme you choose. This page does the same: every screenshot here matches your own setting.', ['Light, System, Dark']],
+// Hero coverflow: [screen, label, caption, alt]. Captions restate the feature texts below.
+const slides: [string, string, string, string][] = [
+  ['prayer', 'Prayer times', 'Accurate times for your location', 'Today’s prayer times for Jhelum with the forbidden times around sunrise, noon and sunset'],
+  ['home', 'Home', 'The next prayer, under a sky that follows the day', 'The Rafeeq home screen: the Hijri date, a countdown to the next prayer under a sky that follows the time of day, and the Explore shortcuts'],
+  ['reader', 'The Qur’an', 'Arabic with an English or Urdu translation', 'Reading Surah Al-Baqarah in Arabic with its Urdu translation'],
+  ['qibla', 'Qibla', 'A live compass that points to the Kaaba', 'The Qibla compass in the app'],
+  ['namaz', 'Namaz & Wudu', 'Every step of salah, with its meaning', 'The Namaz guide in the app'],
+  ['names', 'Asma ul Husna', 'The 99 Names of Allah, with meanings', 'Asma ul Husna in the app'],
+  ['hijri', 'Hijri calendar', 'The Islamic month next to the Gregorian dates', 'The Hijri calendar in the app'],
+  ['ayah', 'Ayah pictures', 'Any ayah as a picture to save or send', 'Ayah pictures in the app'],
+  ['surahs', 'The Qur’an', 'All 114 surahs', 'The list of surahs in the app'],
+];
+const active = 1;
+// Coverflow placement for a slide d steps from the active one (kept in sync with site.js).
+const place = (raw: number) => {
+  const n = slides.length;
+  const d = ((raw % n) + n + 4) % n - 4;
+  const a = Math.abs(d);
+  return { x: [0, .78, 1.45, 1.95, 2.3][a] * Math.sign(d), ry: -d * 16, s: [1, .84, .7, .6, .5][a], o: [1, .92, .5, 0, 0][a], z: 10 - a, far: a >= 2 };
+};
+
+const marquee = ['The Qur’an', 'Prayer times', 'Qibla', 'Namaz & Wudu', 'Hijri calendar', 'Ayah pictures', 'Asma ul Husna', 'English & Urdu'];
+
+// The rest of the app, short versions of each feature's own text.
+const features: [keyof typeof icons, string, string][] = [
+  ['home', 'Home', 'The Hijri date and a live countdown to the next prayer, with one-tap shortcuts to the Qur’an, Namaz, Qibla and more.'],
+  ['namaz', 'Namaz & Wudu', 'Every step of salah from Takbeer to Tasleem, with the Arabic and its meaning, and a step-by-step Wudu guide.'],
+  ['hijri', 'Hijri calendar', 'The Islamic month next to the Gregorian dates, with a correction for your local moon sighting.'],
+  ['names', 'Asma ul Husna', 'The 99 Beautiful Names of Allah, each with its meaning, to read and reflect upon.'],
+  ['language', 'English & اردو', 'Every screen in English and Urdu, with Urdu set in proper Nastaleeq. Switch any time in Settings.'],
+  ['theme', 'Light & dark', 'Rafeeq follows your phone or keeps the theme you choose. This page does the same.'],
+];
+
+const faq: [string, string][] = [
+  ['Is Rafeeq free?', 'Yes. Rafeeq is free for everyone: no ads, no paywall and no premium tier.'],
+  ['Does it work offline?', 'The Qur’an and prayer times work offline. Prayer times are calculated on your phone.'],
+  ['How are prayer times calculated?', 'On your phone, for your location, with a choice of calculation method and Hanafi or Shafi Asr. Rafeeq also shows the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.'],
+  ['Which languages does it speak?', 'Every screen of Rafeeq is in English and Urdu, with Urdu set in proper Nastaleeq. The Qur’an has English and Urdu translations.'],
+  ['What does Rafeeq do with my location?', 'Your location is used for prayer times and the Qibla. The privacy policy explains the rest.'],
+  ['Is there an iPhone app?', 'The iPhone app is on its way, In Sha Allah. Rafeeq is on Google Play today.'],
+  ['Is Rafeeq open source?', 'Yes, under the MIT License, so anyone can see how it works on GitHub.'],
 ];
 
 // The Play Store screenshots, made by npm run images from screens/store/.
@@ -25,126 +54,210 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
 ---
 
 <Base>
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="container hero__grid">
-      <div class="hero__text">
-        <h1 id="hero-title">Your All In One Muslim Companion</h1>
-        <p class="lead">The Qur’an, prayer times, Qibla and more, in one calm app. Free, with no ads, in English and Urdu.</p>
-        <StoreButtons />
-        <a class="watch" href="#qibla" data-play><span class="watch__icon" set:html={playIcon} />Watch the Qibla in action</a>
-      </div>
-
-      <figure class="fan" data-fan>
-        <div class="fan__phone fan__phone--l" tabindex="0"><Shot kind="phones" name="prayer" sizes="(max-width: 40rem) 42vw, 300px" alt="Today’s prayer times for Jhelum with the forbidden times around sunrise, noon and sunset" /></div>
-        <div class="fan__phone fan__phone--c" tabindex="0"><Shot kind="phones" name="home" eager sizes="(max-width: 40rem) 46vw, 320px" alt="The Rafeeq home screen: the Hijri date, a countdown to the next prayer under a sky that follows the time of day, and the Explore shortcuts" /></div>
-        <div class="fan__phone fan__phone--r" tabindex="0"><Shot kind="phones" name="reader" sizes="(max-width: 40rem) 42vw, 300px" alt="Reading Surah Al-Baqarah in Arabic with its Urdu translation" /></div>
-        <svg class="fan__star fan__star--a" viewBox="0 0 52 52" aria-hidden="true" set:html={star} />
-        <svg class="fan__star fan__star--b" viewBox="0 0 52 52" aria-hidden="true" set:html={star} />
-      </figure>
-    </div>
-  </section>
-
-  <section class="section" id="features" aria-labelledby="features-title">
-    <div class="container">
-      <div class="head">
-        <h2 id="features-title">Everything in the app</h2>
-        <p>Each part of Rafeeq, and what it does. The screenshots follow your light or dark setting.</p>
-      </div>
-      <div class="guide" data-guide>
-        <div class="guide__tabs" role="tablist" aria-label="App features" hidden>
-          {features.map(([id, title], i) => <button type="button" role="tab" id={`t-${id}`} aria-controls={`f-${id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i ? -1 : 0}>{title}</button>)}
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-top">
+        <div class="hero-copy">
+          <p class="tag">Free Muslim companion · Android</p>
+          <h1>Your all-in-one<br><span class="hl">Muslim companion.</span></h1>
         </div>
-        <div class="guide__panels">
-          {features.map(([id, title, shot, text, facts]) => (
-            <section class="panel card card--lattice" role="tabpanel" id={`f-${id}`} aria-labelledby={`t-${id}`}>
-              <figure class="screen"><Shot kind="phones" name={shot} sizes="(max-width: 40rem) 70vw, 300px" alt={`${title} in the app`} /></figure>
-              <div class="panel__text">
-                <h3>{title}</h3>
-                <p>{text}</p>
-                <ul class="facts">{facts.map((f) => <li>{f}</li>)}</ul>
+        <div class="hero-side">
+          <p class="lead">The Qur’an, prayer times, Qibla and more, in one calm app. Free, with no ads, in English and Urdu.</p>
+          <StoreButtons />
+          <ul class="ticks"><li>No ads</li><li>English &amp; Urdu</li><li>Open source</li></ul>
+        </div>
+      </div>
+
+      <div class="show" data-show data-active={active} aria-roledescription="carousel" aria-label="Rafeeq screens">
+        <div class="show-stars" aria-hidden="true"><svg viewBox="0 0 52 52" set:html={star} /><svg viewBox="0 0 52 52" set:html={star} /></div>
+        <div class="show-ghost" aria-hidden="true"><span>{slides[active][1]}</span></div>
+        <div class="show-stage">
+          {slides.map(([name, , , alt], i) => {
+            const p = place(i - active);
+            return (
+              <div class:list={['slide', { 'is-active': i === active }]} data-far={p.far ? '' : undefined} style={`--x:${p.x};--ry:${p.ry}deg;--s:${p.s};--o:${p.o};z-index:${p.z}`}>
+                <Shot kind="phones" name={name} sizes="(max-width: 700px) 42vw, 300px" eager={!p.far} alt={alt} />
               </div>
-            </section>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="qibla" aria-labelledby="qibla-title">
-    <div class="container trailer">
-      <div class="player card" data-player>
-        <video preload="none" playsinline controls muted poster="/img/qibla/poster.webp" width="720" height="900" aria-label="Rafeeq's Qibla compass turning to face the Kaaba, 9 seconds, no sound">
-          <source src="/img/qibla/qibla-720.mp4" type="video/mp4" />
-        </video>
-        <button class="player__start" type="button" aria-label="Play the 9-second Qibla video" hidden><span set:html={playIcon} /></button>
-      </div>
-      <div class="trailer__text">
-        <h2 id="qibla-title">Which way is the Kaaba?</h2>
-        <p class="lead">Turn until the Kaaba sits at the top, and you are facing the Qibla. Nine seconds, no sound.</p>
-        <dl class="figures">
-          <div><dt>Surahs, with translation</dt><dd>114</dd></div>
-          <div><dt>Names of Allah</dt><dd>99</dd></div>
-          <div><dt>Languages</dt><dd>2</dd></div>
-          <div><dt>Ads, now and always</dt><dd>0</dd></div>
-        </dl>
-      </div>
-    </div>
-  </section>
-
-  {store.length > 0 && (
-    <section class="section" id="screenshots" aria-labelledby="store-title">
-      <div class="container">
-        <div class="head">
-          <h2 id="store-title">On Google Play</h2>
-          <p>The screenshots from Rafeeq’s Play Store listing. Scroll sideways to see them all.</p>
-        </div>
-      </div>
-      <div class="container">
-        <div class="strip" tabindex="0" role="group" aria-label={`Rafeeq on Google Play, ${store.length} screenshots`}>
-          {store.map((f, i) => {
-            const n = f.replace('.webp', '');
-            return <img src={`/img/store/${n}-sm.webp`} srcset={`/img/store/${n}-sm.webp 1x, /img/store/${n}.webp 2x`} height="500" loading="lazy" decoding="async" alt={`Play Store screenshot ${i + 1} of ${store.length}`} />;
+            );
           })}
         </div>
-      </div>
-    </section>
-  )}
-
-  <section class="section" aria-labelledby="open-title">
-    <div class="container">
-      <div class="card card--lattice private">
-        <div>
-          <h2 id="open-title">Free, open, and made with care</h2>
-          <div class="private__links">
-            <a class="link" href={site.githubUrl} rel="noopener">See the code on GitHub</a>
-            <a class="link" href={site.privacyUrl}>Read the privacy policy</a>
+        <div class="show-bar">
+          <div class="show-info" aria-live="polite">
+            {slides.map(([, label, caption], i) => <div class="info" hidden={i !== active}><p class="eyebrow">{label}</p><p class="info-cap">{caption}</p></div>)}
+          </div>
+          <div class="show-ctrl">
+            <span class="show-count"><b data-count>{String(active + 1).padStart(2, '0')}</b> / {String(slides.length).padStart(2, '0')}</span>
+            <button type="button" class="round-lg" data-prev aria-label="Previous screen"><Fragment set:html={chevron('left')} /></button>
+            <button type="button" class="round-lg" data-next aria-label="Next screen"><Fragment set:html={chevron('right')} /></button>
+            <span class="show-progress" aria-hidden="true"><i></i></span>
           </div>
         </div>
-        <ul>
-          <li><Fragment set:html={check} /><span>Free for everyone: no ads, no paywall, no premium tier.</span></li>
-          <li><Fragment set:html={check} /><span>Open source, so anyone can see how it works.</span></li>
-          <li><Fragment set:html={check} /><span>The Qur’an and prayer times work offline.</span></li>
-          <li><Fragment set:html={check} /><span>Your location is used for prayer times and the Qibla.</span></li>
+      </div>
+
+      <dl class="stats">
+        <div><dt>114</dt><dd>Surahs, with translation</dd></div>
+        <div><dt>99</dt><dd>Names of Allah</dd></div>
+        <div><dt>2</dt><dd>Languages</dd></div>
+        <div><dt>0</dt><dd>Ads, now and always</dd></div>
+      </dl>
+    </div>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">{[...marquee, ...marquee].map((item) => <span>{item}</span>)}</div>
+    </div>
+  </section>
+
+  <section class="duo" id="features">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">What’s inside</p>
+        <h2>Your day,<br>from Fajr to Isha.</h2>
+      </div>
+      <div class="duo-grid">
+        <article class="tile">
+          <div class="tile-copy">
+            <h3>Prayer times</h3>
+            <p>Accurate times for your location, calculated on your phone, with an adhan or a gentle reminder for each salah. Rafeeq also shows the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.</p>
+            <a class="more" href="#qibla">Find the Qibla</a>
+          </div>
+          <div class="peek"><Shot kind="phones" name="prayer" sizes="(max-width: 600px) 56vw, 280px" alt="Today’s prayer times with the forbidden times around sunrise, noon and sunset" /></div>
+        </article>
+        <article class="tile tile-gold">
+          <div class="tile-copy">
+            <h3>Ayah pictures</h3>
+            <p>Turn any ayah into a clean picture with its Arabic and translation, in an English or Urdu layout, ready to save or send to the people you love.</p>
+            <a class="more" href="#screens">See the screens</a>
+          </div>
+          <div class="peek"><Shot kind="phones" name="ayah" sizes="(max-width: 600px) 56vw, 280px" alt="An ayah turned into a picture with its Arabic and translation" /></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="row" id="quran">
+    <div class="wrap row-grid">
+      <div class="pair">
+        <Shot kind="phones" name="surahs" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="The list of surahs in the app" />
+        <Shot kind="phones" name="recite" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Reading Surah Al-Baqarah with its Urdu translation while Abdullah Basfar recites" />
+      </div>
+      <div class="row-copy">
+        <p class="eyebrow">The Qur’an</p>
+        <h2>Read it, hear it,<br>keep your place.</h2>
+        <p class="sub">Every surah with its Arabic, an English or Urdu translation, and recitations from renowned qaris. Set the Arabic and the translation to their own sizes, and keep listening with the mini-player.</p>
+        <ul class="facts">
+          <li><b>114</b> surahs, with translation</li>
+          <li><b>2</b> translations: English and Urdu</li>
+          <li>Choice of reciter</li>
+          <li>Search and bookmarks</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <section class="section" id="get" aria-labelledby="get-title">
-    <div class="container">
-      <div class="card card--lattice close">
-        <div>
-          <h2 id="get-title">Take Rafeeq with you</h2>
-          <p class="lead">Free on Google Play. The iPhone app is on its way, In Sha Allah.</p>
-          <StoreButtons />
-        </div>
-        <figure class="screen"><Shot kind="phones" name="recite" sizes="280px" alt="Reading Surah Al-Baqarah with its Urdu translation while Abdullah Basfar recites" /></figure>
+  <section class="adv">
+    <div class="wrap adv-grid">
+      <div class="head">
+        <p class="eyebrow">Everything in the app</p>
+        <h2>One calm app<br>for every day.</h2>
+        <p class="sub">Each part of Rafeeq, and what it does. The screenshots on this page follow your light or dark setting.</p>
+      </div>
+      <div class="adv-list">
+        {features.map(([icon, title, text]) => (
+          <article>
+            <span class="ico" set:html={icons[icon]} />
+            <h3>{title.includes('اردو') ? <>English &amp; <span class="ar" lang="ur">اردو</span></> : title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
-</Base>
+  <section class="qibla" id="qibla">
+    <div class="wrap">
+      <div class="qibla-card">
+        <div class="qibla-copy">
+          <p class="eyebrow">Qibla</p>
+          <h2>Which way<br>is the Kaaba?</h2>
+          <p class="sub">A real-time compass points you to the Kaaba in Makkah and tells you exactly how far to turn, from wherever you are.</p>
+          <ol class="steps">
+            <li><span class="n">1</span><div><h3>Live compass</h3><p>It points to the Kaaba in Makkah in real time.</p></div></li>
+            <li><span class="n">2</span><div><h3>Turn left or right</h3><p>Rafeeq tells you exactly how far to turn.</p></div></li>
+            <li><span class="n">3</span><div><h3>Face the Qibla</h3><p>Turn until the Kaaba sits at the top, and you are facing the Qibla.</p></div></li>
+          </ol>
+        </div>
+        <div class="qibla-video" title="Click to pause or play">
+          <video muted loop playsinline preload="none" poster="/img/qibla/poster.webp" width="720" height="900" aria-label="Rafeeq's Qibla compass turning to face the Kaaba, 9 seconds, no sound">
+            <source src="/img/qibla/qibla-720.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-  import '../scripts/landing';
-</script>
+  {store.length > 0 && (
+    <section class="gallery" id="screens">
+      <div class="wrap gallery-head">
+        <div class="head">
+          <p class="eyebrow">Google Play</p>
+          <h2>A closer look.</h2>
+          <p class="sub">The screenshots from Rafeeq’s Play Store listing.</p>
+        </div>
+        <div class="gal-nav">
+          <button type="button" class="round-lg" data-gal="-1" aria-label="Previous screenshots"><Fragment set:html={chevron('left')} /></button>
+          <button type="button" class="round-lg" data-gal="1" aria-label="Next screenshots"><Fragment set:html={chevron('right')} /></button>
+        </div>
+      </div>
+      <div class="gal-track" id="galTrack" tabindex="0" role="group" aria-label={`Rafeeq on Google Play, ${store.length} screenshots`}>
+        {store.map((f, i) => {
+          const n = f.replace('.webp', '');
+          return <img src={`/img/store/${n}-sm.webp`} srcset={`/img/store/${n}-sm.webp 1x, /img/store/${n}.webp 2x`} width="461" height="1000" loading="lazy" decoding="async" alt={`Play Store screenshot ${i + 1} of ${store.length}`} />;
+        })}
+      </div>
+    </section>
+  )}
+
+  <section class="spot" id="open">
+    <div class="wrap">
+      <div class="spot-card">
+        <div class="spot-copy">
+          <p class="eyebrow">Free and open</p>
+          <h2>Free, open,<br>and made with care.</h2>
+          <p class="sub">Built by two brothers, for the Ummah.</p>
+          <ul class="facts">
+            <li>Free for everyone: no ads, no paywall, no premium tier.</li>
+            <li>Open source, so anyone can see how it works.</li>
+            <li>The Qur’an and prayer times work offline.</li>
+            <li>Your location is used for prayer times and the Qibla.</li>
+          </ul>
+          <div class="links"><a href={site.githubUrl} rel="noopener">See the code on GitHub</a><a href={site.privacyUrl}>Read the privacy policy</a></div>
+        </div>
+        <div class="pair">
+          <Shot kind="phones" name="hijri" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="The Hijri calendar in the app" />
+          <Shot kind="phones" name="names" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Asma ul Husna in the app" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-s" id="faq">
+    <div class="wrap faq-grid">
+      <div class="head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions,<br>answered.</h2>
+        <p class="sub">Something else? <a href={`mailto:${site.email}`}>Email us</a> or read the <a href={site.privacyUrl}>privacy policy</a>.</p>
+      </div>
+      <div class="faq">
+        {faq.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <img class="icon" src="/img/logo.png" width="88" height="88" alt="" />
+      <h2>Take Rafeeq<br>with you.</h2>
+      <p class="lead">Free on Google Play. The iPhone app is on its way, In Sha Allah.</p>
+      <StoreButtons />
+    </div>
+  </section>
+</Base>

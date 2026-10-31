@@ -1,39 +1,56 @@
 ---
+// Privacy and terms in the Sazen legal layout: big title, contents list, readable column.
 import Base from './Base.astro';
 import content from '../../../assets/legal.json';
 import { site } from '../data/site';
 interface Props { kind: 'privacy' | 'terms' }
 const { kind } = Astro.props;
 const document = content[kind].en;
+const slug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const extra = kind === 'privacy' ? 'Service provider policies' : 'License and branding';
+const [first, ...rest] = document.title.split(' ');
 ---
 <Base title={document.title} description={`${document.title} for the Rafeeq app and website.`}>
-  <div class="doc">
-    <div class="container">
-      <article class="doc__sheet card card--lattice">
-        <h1>{document.title}</h1>
+  <div class="legal">
+    <div class="wrap">
+      <header class="legal-hero">
+        <a class="back" href="/">← Back to Rafeeq</a>
+        <h1>{first}<br><span class="ghost">{rest.join(' ')}</span></h1>
         <p class="updated">{document.updated}</p>
-        <nav class="doc__tabs" aria-label="Legal documents">
+        <nav class="doc-tabs" aria-label="Legal documents">
           <a href={site.privacyUrl} aria-current={kind === 'privacy' ? 'page' : undefined}>Privacy Policy</a>
           <a href={site.termsUrl} aria-current={kind === 'terms' ? 'page' : undefined}>Terms &amp; Conditions</a>
         </nav>
-        {document.sections.map((section) => (
-          <>
-            <h2>{section.title}</h2>
-            <p>{section.body}</p>
-          </>
-        ))}
-        {kind === 'privacy' && <>
-          <h2>Service provider policies</h2>
-          <ul>
-            <li><a href="https://firebase.google.com/support/privacy">Firebase privacy and security</a></li>
-            <li><a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
-            <li><a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a></li>
-            <li><a href="https://shorebird.dev/privacy">Shorebird Privacy Policy</a></li>
-          </ul>
-        </>}
-        {kind === 'terms' && <p><a href={`${site.githubUrl}/blob/main/LICENSE`}>MIT License</a> · <a href={`${site.githubUrl}/blob/main/BRANDING.md`}>Branding policy</a></p>}
-        <p class="short">Questions about Rafeeq? Email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
-      </article>
+      </header>
+      <div class="legal-grid">
+        <nav class="toc" aria-label="On this page">
+          <p>On this page</p>
+          {document.sections.map((section) => <a href={`#${slug(section.title)}`}>{section.title}</a>)}
+          <a href={`#${slug(extra)}`}>{extra}</a>
+        </nav>
+        <div class="legal-body">
+          {document.sections.map((section) => (
+            <section id={slug(section.title)}>
+              <h2>{section.title}</h2>
+              <p>{section.body}</p>
+            </section>
+          ))}
+          <section id={slug(extra)}>
+            <h2>{extra}</h2>
+            {kind === 'privacy' ? (
+              <ul>
+                <li><a href="https://firebase.google.com/support/privacy">Firebase privacy and security</a></li>
+                <li><a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+                <li><a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a></li>
+                <li><a href="https://shorebird.dev/privacy">Shorebird Privacy Policy</a></li>
+              </ul>
+            ) : (
+              <p><a href={`${site.githubUrl}/blob/main/LICENSE`}>MIT License</a> · <a href={`${site.githubUrl}/blob/main/BRANDING.md`}>Branding policy</a></p>
+            )}
+            <p>Questions about Rafeeq? Email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 </Base>

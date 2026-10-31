@@ -1,19 +1,17 @@
 ---
+// Floating glass pill (as on teamsazen.com): brand, section links, GitHub and Google Play.
 import { nav, site } from '../data/site';
 import { githubSvg, playSvg } from '../data/icons';
-import { existsSync } from 'node:fs';
-
-// Screenshots links to the Play Store banner, which shows only once its images exist.
-const links = nav.filter((item) => item.href !== '/#screenshots' || existsSync('public/img/store'));
 ---
-<header class="nav">
-  <div class="container nav__bar">
-    <a class="brand" href="/"><img src="/img/logo.png" width="34" height="34" alt="" /><span>Rafeeq</span></a>
-    <ul class="nav__links">
-      {links.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-      <li class="nav__play"><a class="btn btn--quiet nav__icon" href={site.playStoreUrl} rel="noopener" aria-label="Rafeeq on Google Play"><Fragment set:html={playSvg} /></a></li>
-      <li><a class="btn btn--quiet nav__github" href={site.githubUrl} rel="noopener" aria-label="Rafeeq on GitHub"><Fragment set:html={githubSvg} /><span>GitHub</span></a></li>
-      <li><a class="btn" href={site.playStoreUrl} rel="noopener">Get the app</a></li>
-    </ul>
-  </div>
+<header class="pill-wrap">
+  <nav class="navpill" aria-label="Main">
+    <a class="brand" href="/"><img src="/img/logo.png" width="32" height="32" alt="" />Rafeeq</a>
+    <div class="nav">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </div>
+    <div class="pill-end">
+      <a class="icon-btn" href={site.githubUrl} rel="noopener" aria-label="Rafeeq on GitHub" title="Rafeeq on GitHub"><Fragment set:html={githubSvg} /></a>
+      <a class="gp gp-nav" href={site.playStoreUrl} rel="noopener" aria-label="Get it on Google Play"><Fragment set:html={playSvg} /><span><small>Get it on</small><b>Google Play</b></span></a>
+    </div>
+  </nav>
 </header>

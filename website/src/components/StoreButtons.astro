@@ -1,9 +1,10 @@
 ---
 // Store badges drawn like the official ones: black, a grey hairline, white type.
+// The App Store one stays greyed until the iPhone app is out.
 import { site } from '../data/site';
 import { playSvg, appleSvg } from '../data/icons';
 ---
-<div class="stores">
-  <a class="store" href={site.playStoreUrl} rel="noopener"><span class="store__icon" set:html={playSvg} /><span class="store__text"><small>Get it on</small><strong>Google Play</strong></span></a>
-  <span class="store store--soon" role="img" aria-label="App Store, coming soon"><span class="store__icon" set:html={appleSvg} /><span class="store__text"><small>Coming soon on the</small><strong>App Store</strong></span></span>
+<div class="store-row">
+  <a class="gp" href={site.playStoreUrl} rel="noopener" aria-label="Get it on Google Play"><Fragment set:html={playSvg} /><span><small>Get it on</small><b>Google Play</b></span></a>
+  <span class="gp soon" role="img" aria-label="App Store, coming soon"><Fragment set:html={appleSvg} /><span><small>Coming soon on the</small><b>App Store</b></span></span>
 </div>

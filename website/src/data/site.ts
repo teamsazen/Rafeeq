@@ -10,10 +10,13 @@ export const site = {
   feedbackUrl: 'https://forms.gle/cDLne2RtGvfmqrJn9',
   privacyUrl: '/privacy',
   termsUrl: '/terms',
+  studioUrl: 'https://teamsazen.com',
 };
 
 export const nav = [
   { href: '/#features', label: 'Features' },
+  { href: '/#quran', label: 'Qur’an' },
   { href: '/#qibla', label: 'Qibla' },
-  { href: '/#screenshots', label: 'Screenshots' },
+  { href: '/#screens', label: 'Screens' },
+  { href: '/#faq', label: 'FAQ' },
 ];
