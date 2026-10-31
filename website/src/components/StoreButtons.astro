@@ -1,10 +1,8 @@
 ---
-// Store badges drawn like the official ones: black, a grey hairline, white type.
-// The App Store one stays greyed until the iPhone app is out.
+// Google Play badge drawn like the official one: black, a grey hairline, white type.
 import { site } from '../data/site';
-import { playSvg, appleSvg } from '../data/icons';
+import { playSvg } from '../data/icons';
 ---
 <div class="store-row">
   <a class="gp" href={site.playStoreUrl} rel="noopener" aria-label="Get it on Google Play"><Fragment set:html={playSvg} /><span><small>Get it on</small><b>Google Play</b></span></a>
-  <span class="gp soon" role="img" aria-label="App Store, coming soon"><Fragment set:html={appleSvg} /><span><small>Coming soon on the</small><b>App Store</b></span></span>
 </div>
