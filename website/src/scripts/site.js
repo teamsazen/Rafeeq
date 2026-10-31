@@ -1,5 +1,5 @@
-// Page motion (same as exitrush.teamsazen.com): smooth scroll, the header pill hides
-// while scrolling down, headlines reveal line by line, sections fade in, numbers
+// Page motion (same as exitrush.teamsazen.com): smooth scroll (the header pill always
+// stays in view), headlines reveal line by line, sections fade in, numbers
 // count up, cards tilt, phone pairs drift, the Qibla video plays only while on
 // screen, the hero coverflow advances and the screenshot gallery has arrow buttons.
 // Without JS (or with Reduce Motion) everything is simply visible.
@@ -15,16 +15,6 @@ if (!reduce) {
   const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 }
-
-// Header pill: tucks away while scrolling down, returns on the way up.
-const pill = document.querySelector('.pill-wrap');
-let lastY = scrollY;
-addEventListener('scroll', () => {
-  const y = scrollY;
-  if (pill && !reduce) pill.classList.toggle('hide', y > 240 && y > lastY + 2);
-  if (y < lastY - 2 || y < 240) pill?.classList.remove('hide');
-  lastY = y;
-}, { passive: true });
 
 // The Qibla video: plays while visible, pauses when not; a click pauses or resumes it.
 // Reduced motion keeps the poster until the visitor clicks.

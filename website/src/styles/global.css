@@ -98,7 +98,6 @@ a:hover { color: var(--accent-edge); }
   backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
   box-shadow: 0 10px 40px -18px rgba(0, 0, 0, .35); transition: transform .5s var(--ease);
 }
-.pill-wrap.hide .navpill { transform: translateY(calc(-100% - 20px)); }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 800; font-size: 17px; letter-spacing: -.02em; text-decoration: none; }
 .brand:hover { color: var(--ink); }
 .brand img { width: 32px; height: 32px; border-radius: 9px; }
