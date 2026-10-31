@@ -12,7 +12,8 @@ interface Props {
 }
 const { title, description = site.description } = Astro.props;
 const fullTitle = title ? `${title} · Rafeeq` : `Rafeeq · ${site.tagline}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+// Pages build to /path.html (build.format 'file') but Cloudflare serves them at /path.
+const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/', Astro.site);
 ---
 
 <!doctype html>
@@ -26,8 +27,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#FFFEFA" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
-    <link rel="icon" href="/favicon.png" sizes="64x64" type="image/png" />
+    <!-- Google shows a favicon only at a multiple of 48 px, so the PNGs come first. -->
+    <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/favicon-192.png" sizes="192x192" type="image/png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="google-play-app" content="app-id=com.satechdev.rafeeqapp" />
     <meta property="og:type" content="website" />
@@ -47,6 +51,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       description: site.description,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       downloadUrl: site.playStoreUrl,
+      publisher: { '@type': 'Organization', name: 'Sazen', url: site.studioUrl },
     })} />
     <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
