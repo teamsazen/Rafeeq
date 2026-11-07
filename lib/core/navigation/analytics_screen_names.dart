@@ -52,7 +52,7 @@ abstract final class AnalyticsScreenNames {
     AppRoutes.fontSelection: 'Font Selection Screen',
     AppRoutes.arabicFontSelection: 'Arabic Font Selection Screen',
     AppRoutes.sixteenLineQuran: 'Sixteen Line Quran Screen',
-    AppRoutes.sixteenLineQuranJuzIndex: 'Quran Juz Index Screen',
+    AppRoutes.sixteenLineQuranIndex: 'Sixteen Line Quran Index Screen',
     AppRoutes.namazPrayer: 'Namaz Prayer Screen',
     AppRoutes.namazPrayerDetail: 'Namaz Prayer Details Screen',
     AppRoutes.wuduProcedure: 'Wudu Procedure Screen',

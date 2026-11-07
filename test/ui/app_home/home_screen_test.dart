@@ -88,6 +88,8 @@ void main() {
                 const Scaffold(body: Text('Namaz destination')),
             AppRoutes.ayahPictureMaker: (_) =>
                 const Scaffold(body: Text('Ayah Picture destination')),
+            AppRoutes.sixteenLineQuran: (_) =>
+                const Scaffold(body: Text('16 Line Quran destination')),
           },
         ),
       ),
@@ -239,6 +241,48 @@ void main() {
     Navigator.of(tester.element(find.text('Ayah Picture destination'))).pop();
     await tester.pumpAndSettle();
     expect(find.text('NEW'), findsNothing);
+  });
+
+  testWidgets('16 Line Quran follows Ayah Picture with an unread dot', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpHome(tester);
+
+    final ayahPicture = find.byKey(const ValueKey('explore-card-Ayah Picture'));
+    final sixteenLine = find.byKey(
+      const ValueKey('explore-card-16 Line Quran'),
+    );
+    expect(sixteenLine, findsOneWidget);
+    // Next in the grid: same row to the right, or the start of the next row.
+    final ayahRect = tester.getRect(ayahPicture);
+    final sixteenRect = tester.getRect(sixteenLine);
+    expect(
+      sixteenRect.top > ayahRect.top || sixteenRect.left > ayahRect.left,
+      isTrue,
+    );
+    const dot = ValueKey('explore-card-dot-16 Line Quran');
+    expect(find.byKey(dot), findsOneWidget);
+
+    await tester.drag(find.byType(ListView).first, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.ancestor(
+        of: find.text('16 Line Quran'),
+        matching: find.byType(InkWell),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('16 Line Quran destination'), findsOneWidget);
+
+    Navigator.of(tester.element(find.text('16 Line Quran destination'))).pop();
+    await tester.pumpAndSettle();
+    expect(find.byKey(dot), findsNothing);
+
+    // Stays read on the next launch.
+    await pumpHome(tester, resetPreferences: false);
+    expect(find.byKey(dot), findsNothing);
   });
 
   testWidgets('shows the Urdu app name as plain text in Urdu', (tester) async {

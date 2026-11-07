@@ -70,6 +70,7 @@ class SettingsAppBar extends RafeeqAppBar {
     required super.palette,
     super.onBack,
     super.actions,
+    super.bottom,
   }) : super(showBackButton: true);
 }
 

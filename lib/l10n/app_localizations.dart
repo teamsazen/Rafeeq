@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Free for life, In Sha Allah'**
   String get aboutFreeTitle;
 
+  /// No description provided for @aboutLinkOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this link. Please try again.'**
+  String get aboutLinkOpenError;
+
   /// No description provided for @aboutPortfolioOpenError.
   ///
   /// In en, this message translates to:
@@ -199,6 +205,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'For the Ummah'**
   String get aboutUmmahTitle;
+
+  /// No description provided for @aboutWebsiteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Our website'**
+  String get aboutWebsiteTitle;
 
   /// No description provided for @allow.
   ///
@@ -2300,6 +2312,30 @@ abstract class AppLocalizations {
   /// **'Simple Mode'**
   String get simpleMode;
 
+  /// No description provided for @sixteenLineGoTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to'**
+  String get sixteenLineGoTo;
+
+  /// No description provided for @sixteenLineGoToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go'**
+  String get sixteenLineGoToPage;
+
+  /// No description provided for @sixteenLineGoToPageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Page number (1–{count})'**
+  String sixteenLineGoToPageHint(Object count);
+
+  /// No description provided for @sixteenLinePageNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page}'**
+  String sixteenLinePageNumber(Object page);
+
   /// No description provided for @sixteenLineQuran.
   ///
   /// In en, this message translates to:
@@ -2971,18 +3007,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waiting for location...'**
   String get waitingForLocation;
-
-  /// No description provided for @aboutWebsiteTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Our website'**
-  String get aboutWebsiteTitle;
-
-  /// No description provided for @aboutLinkOpenError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open this link. Please try again.'**
-  String get aboutLinkOpenError;
 }
 
 class _AppLocalizationsDelegate

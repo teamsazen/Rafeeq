@@ -44,6 +44,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutFreeTitle => 'Free for life, In Sha Allah';
 
   @override
+  String get aboutLinkOpenError =>
+      'Could not open this link. Please try again.';
+
+  @override
   String get aboutPortfolioOpenError => 'The portfolio could not be opened.';
 
   @override
@@ -65,6 +69,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutUmmahTitle => 'For the Ummah';
+
+  @override
+  String get aboutWebsiteTitle => 'Our website';
 
   @override
   String get allow => 'Allow';
@@ -1185,6 +1192,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get simpleMode => 'Simple Mode';
 
   @override
+  String get sixteenLineGoTo => 'Go to';
+
+  @override
+  String get sixteenLineGoToPage => 'Go';
+
+  @override
+  String sixteenLineGoToPageHint(Object count) {
+    return 'Page number (1–$count)';
+  }
+
+  @override
+  String sixteenLinePageNumber(Object page) {
+    return 'Page $page';
+  }
+
+  @override
   String get sixteenLineQuran => '16 Line Quran';
 
   @override
@@ -1540,11 +1563,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get waitingForLocation => 'Waiting for location...';
-
-  @override
-  String get aboutWebsiteTitle => 'Our website';
-
-  @override
-  String get aboutLinkOpenError =>
-      'Could not open this link. Please try again.';
 }

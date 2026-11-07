@@ -44,6 +44,10 @@ class AppLocalizationsUr extends AppLocalizations {
   String get aboutFreeTitle => 'ہمیشہ مفت، ان شاء اللہ';
 
   @override
+  String get aboutLinkOpenError =>
+      'یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔';
+
+  @override
   String get aboutPortfolioOpenError => 'پورٹ فولیو نہیں کھولا جا سکا۔';
 
   @override
@@ -65,6 +69,9 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get aboutUmmahTitle => 'امت کے لیے';
+
+  @override
+  String get aboutWebsiteTitle => 'ہماری ویب سائٹ';
 
   @override
   String get allow => 'اجازت دیں';
@@ -1188,6 +1195,22 @@ class AppLocalizationsUr extends AppLocalizations {
   String get simpleMode => 'سادہ موڈ';
 
   @override
+  String get sixteenLineGoTo => 'یہاں جائیں';
+
+  @override
+  String get sixteenLineGoToPage => 'جائیں';
+
+  @override
+  String sixteenLineGoToPageHint(Object count) {
+    return 'صفحہ نمبر (1–$count)';
+  }
+
+  @override
+  String sixteenLinePageNumber(Object page) {
+    return 'صفحہ $page';
+  }
+
+  @override
   String get sixteenLineQuran => '16 سطری قرآن';
 
   @override
@@ -1535,11 +1558,4 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get waitingForLocation => 'مقام کا انتظار ہے...';
-
-  @override
-  String get aboutWebsiteTitle => 'ہماری ویب سائٹ';
-
-  @override
-  String get aboutLinkOpenError =>
-      'یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔';
 }

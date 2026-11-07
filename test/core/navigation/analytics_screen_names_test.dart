@@ -40,7 +40,7 @@ void main() {
       AppRoutes.fontSelection,
       AppRoutes.arabicFontSelection,
       AppRoutes.sixteenLineQuran,
-      AppRoutes.sixteenLineQuranJuzIndex,
+      AppRoutes.sixteenLineQuranIndex,
       AppRoutes.namazPrayer,
       AppRoutes.namazPrayerDetail,
       AppRoutes.wuduProcedure,
