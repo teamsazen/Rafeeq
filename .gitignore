@@ -61,6 +61,9 @@ app.*.map.json
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
 
+# The IndoPak Nastaleeq font's licence does not allow sharing it
+/assets/fonts/IndoPakNastaleeqHanafi.ttf
+
 # Social post plan (local only)
 /LINKEDIN-POSTS.md
 /marketing/

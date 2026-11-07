@@ -98,6 +98,14 @@ flutter:
     - family: Jameel Noori Nastaleeq
       fonts:
         - asset: assets/fonts/JameelNooriNastaleeq.ttf
+    # Not committed: its licence does not allow sharing it. See
+    # "Getting Started" in README.md for how to add it or a stand-in.
+    - family: IndoPak Nastaleeq
+      fonts:
+        - asset: assets/fonts/IndoPakNastaleeqHanafi.ttf
+    - family: Surah Names
+      fonts:
+        - asset: assets/fonts/SurahNameV2.ttf
     - family: GoogleSans
       fonts:
         - asset: assets/fonts/GoogleSans-Regular.ttf
