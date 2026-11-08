@@ -25,7 +25,7 @@ import 'package:rafeeq/ui/quran/quran_details_screen.dart';
 import 'package:rafeeq/ui/quran/quran_view_settings.dart';
 import 'package:rafeeq/ui/quran/read_quran_home_screen.dart';
 import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_quran_screen.dart';
-import 'package:rafeeq/ui/quran/sixteen_line_quran/quran_juz_index_screen.dart';
+import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_quran_index_screen.dart';
 import 'package:rafeeq/ui/ramadan/ramadan_calendar_screen.dart';
 
 // ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class AppRoutes {
   static const fontSelection = '/quran/font-selection';
   static const arabicFontSelection = '/quran/arabic-font-selection';
   static const sixteenLineQuran = '/quran/sixteen-line-quran';
-  static const sixteenLineQuranJuzIndex = '/quran/sixteen-line-quran-juz-index';
+  static const sixteenLineQuranIndex = '/quran/sixteen-line-quran-index';
 
   // -- Daily Prayer / Namaz --
   static const namazPrayer = '/namaz-prayer';
@@ -118,17 +118,19 @@ class AppRoutes {
         return _build(settings, const ReadQuranHomeScreen());
 
       case sixteenLineQuran:
-        final args = settings.arguments as Map<String, dynamic>?;
         return _build(
           settings,
-          SixteenLineQuranScreen(
-            juzNumber: args?['juzNumber'] as int?,
-            startPage: args?['startPage'] as int? ?? 0,
-          ),
+          SixteenLineQuranScreen(initialPage: settings.arguments as int?),
         );
 
-      case sixteenLineQuranJuzIndex:
-        return _build(settings, const QuranJuzIndexScreen());
+      case sixteenLineQuranIndex:
+        // Pops with the chosen page, so the route must be typed for it.
+        return _build<int>(
+          settings,
+          SixteenLineQuranIndexScreen(
+            currentPage: settings.arguments as int? ?? 1,
+          ),
+        );
 
       case listenQuranHome:
         final args = settings.arguments as ListenQuranArgs;

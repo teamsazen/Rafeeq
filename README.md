@@ -95,6 +95,12 @@ Rafeeq uses Firebase only for Analytics and Crashlytics. The Firebase config fil
 - `android/app/google-services.json`
 - `ios/Runner/GoogleService-Info.plist`
 
+The 16 Line Quran is drawn with QuranWBW's IndoPak font, AlQuran Neo v5.x. Rafeeq has their written permission to use it, but not to share it, so it is not in this repository. Any font at its path lets the app build; the Quran text only shows correctly with the real one, which you can request from QuranWBW (quranwbw@gmail.com) for your own project:
+
+```bash
+cp assets/fonts/JameelNooriNastaleeq.ttf assets/fonts/AlQuranNeo5x3-Arabic.ttf
+```
+
 Then run the app:
 
 ```bash

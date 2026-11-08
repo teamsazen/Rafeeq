@@ -61,6 +61,9 @@ app.*.map.json
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
 
+# QuranWBW's IndoPak font: Rafeeq has permission to use it, not to share it
+/assets/fonts/AlQuranNeo5x3-Arabic.ttf
+
 # Social post plan (local only)
 /LINKEDIN-POSTS.md
 /marketing/

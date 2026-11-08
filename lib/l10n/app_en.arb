@@ -9,6 +9,7 @@
   "aboutDesignTitle": "Our design journey",
   "aboutFreeBody": "I want Rafeeq to remain free for everyone for its entire lifetime, In Sha Allah. In the future, we may add an optional way for Muslims to support the app's development and running costs. Any support will be used to maintain and improve Rafeeq; we do not intend to take anything from it for ourselves, In Sha Allah.",
   "aboutFreeTitle": "Free for life, In Sha Allah",
+  "aboutLinkOpenError": "Could not open this link. Please try again.",
   "aboutPortfolioOpenError": "The portfolio could not be opened.",
   "aboutSubtitle": "The story and purpose behind Rafeeq",
   "aboutTagline": "Your Muslim Companion",
@@ -16,6 +17,7 @@
   "aboutTogetherTitle": "Growing together",
   "aboutUmmahBody": "For me, Rafeeq is more than just another software project. My brother and I want to keep improving it for the Ummah of Prophet Muhammad (PBUH). I am deeply thankful to Allah Almighty for giving us the ability to work on something that may benefit other Muslims.",
   "aboutUmmahTitle": "For the Ummah",
+  "aboutWebsiteTitle": "Our website",
   "allow": "Allow",
   "allowLocation": "Allow Location",
   "allowLocationDescription": "Automatically updates prayer times.",
@@ -387,6 +389,11 @@
   "showTransliteration": "Show Transliteration",
   "showTransliterationSubtitle": "Show phonetic line under Arabic.",
   "simpleMode": "Simple Mode",
+  "sixteenLineCredit": "Quran text and font: IndoPak v5.4 by QuranWBW, used with their permission. Layout: QUL by Tarteel.",
+  "sixteenLineGoTo": "Go to",
+  "sixteenLineGoToPage": "Go",
+  "sixteenLineGoToPageHint": "Page number (1–{count})",
+  "sixteenLinePageNumber": "Page {page}",
   "sixteenLineQuran": "16 Line Quran",
   "sixteenLineQuranSubtitle": "Read 16 Line Tajweedi Quran",
   "sleepTimer": "Sleep Timer",
@@ -512,7 +519,5 @@
   "volumeControl": "VOLUME CONTROL",
   "volumeNotification": "Notification Volume",
   "volumeNotificationDesc": "Standard notification volume level",
-  "waitingForLocation": "Waiting for location...",
-  "aboutWebsiteTitle": "Our website",
-  "aboutLinkOpenError": "Could not open this link. Please try again."
+  "waitingForLocation": "Waiting for location..."
 }

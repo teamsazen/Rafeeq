@@ -9,6 +9,7 @@
   "aboutDesignTitle": "ہمارا ڈیزائن کا سفر",
   "aboutFreeBody": "میری خواہش ہے کہ رفیق ہمیشہ سب کے لیے مفت رہے، ان شاء اللہ۔ مستقبل میں ہم مسلمانوں کے لیے ایک اختیاری ذریعہ شامل کر سکتے ہیں جس سے وہ ایپ کی ڈیولپمنٹ اور جاری اخراجات میں تعاون کر سکیں۔ تمام تعاون رفیق کو برقرار رکھنے اور بہتر بنانے پر خرچ ہوگا؛ ہم اس میں سے اپنے لیے کچھ لینے کا ارادہ نہیں رکھتے، ان شاء اللہ۔",
   "aboutFreeTitle": "ہمیشہ مفت، ان شاء اللہ",
+  "aboutLinkOpenError": "یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔",
   "aboutPortfolioOpenError": "پورٹ فولیو نہیں کھولا جا سکا۔",
   "aboutSubtitle": "رفیق کے پیچھے موجود کہانی اور مقصد",
   "aboutTagline": "آپ کا مسلم ساتھی",
@@ -16,6 +17,7 @@
   "aboutTogetherTitle": "مل کر آگے بڑھنے کا سفر",
   "aboutUmmahBody": "میرے لیے رفیق صرف ایک اور سافٹ ویئر پروجیکٹ نہیں ہے۔ میرے بھائی اور میں اسے امتِ حضرت محمد صلی اللہ علیہ وسلم کے لیے مسلسل بہتر بنانا چاہتے ہیں۔ میں اللہ تعالیٰ کا دل سے شکر گزار ہوں کہ اس نے ہمیں ایک ایسے کام کی توفیق دی جو دوسرے مسلمانوں کے لیے فائدہ مند ہو سکتا ہے۔",
   "aboutUmmahTitle": "امت کے لیے",
+  "aboutWebsiteTitle": "ہماری ویب سائٹ",
   "allow": "اجازت دیں",
   "allowLocation": "مقام کی اجازت دیں",
   "allowLocationDescription": "نماز کے اوقات خودکار طور پر اپ ڈیٹ کرتا ہے۔",
@@ -366,6 +368,11 @@
   "showTransliteration": "تلفظ دکھائیں",
   "showTransliterationSubtitle": "عربی کے نیچے صوتی لائن دکھائیں۔",
   "simpleMode": "سادہ موڈ",
+  "sixteenLineCredit": "قرآن کا متن اور فونٹ: QuranWBW کا انڈو پاک v5.4، ان کی اجازت سے۔ ترتیب: Tarteel کی QUL۔",
+  "sixteenLineGoTo": "یہاں جائیں",
+  "sixteenLineGoToPage": "جائیں",
+  "sixteenLineGoToPageHint": "صفحہ نمبر (1–{count})",
+  "sixteenLinePageNumber": "صفحہ {page}",
   "sixteenLineQuran": "16 سطری قرآن",
   "sixteenLineQuranSubtitle": "16 سطری تجویدی قرآن پڑھیں",
   "sleepTimer": "نیند ٹائمر",
@@ -477,7 +484,5 @@
   "volumeControl": "وولیم کنٹرول",
   "volumeNotification": "اطلاع وولیم",
   "volumeNotificationDesc": "معیاری اطلاع وولیم لیول",
-  "waitingForLocation": "مقام کا انتظار ہے...",
-  "aboutWebsiteTitle": "ہماری ویب سائٹ",
-  "aboutLinkOpenError": "یہ لنک نہیں کھل سکا۔ براہ کرم دوبارہ کوشش کریں۔"
+  "waitingForLocation": "مقام کا انتظار ہے..."
 }

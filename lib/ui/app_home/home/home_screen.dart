@@ -39,10 +39,17 @@ export 'package:rafeeq/ui/app_home/home/settings_picker.dart'
 
 const _timePlaceholder = '--:-- --';
 const _ayahPictureOpenedKey = 'ayah_picture_opened_v1';
+const _sixteenLineQuranOpenedKey = 'sixteen_line_quran_opened_v1';
 
 final _showAyahPictureNewBadgeProvider = Provider<bool>((ref) {
   final preferences = ref.watch(sharedPreferencesProvider);
   return !(preferences.getBool(_ayahPictureOpenedKey) ?? false);
+});
+
+/// The 16 Line Quran card carries an unread dot until it is first opened.
+final _showSixteenLineQuranDotProvider = Provider<bool>((ref) {
+  final preferences = ref.watch(sharedPreferencesProvider);
+  return !(preferences.getBool(_sixteenLineQuranOpenedKey) ?? false);
 });
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -994,6 +1001,7 @@ class _ExploreGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showAyahPictureNewBadge = ref.watch(_showAyahPictureNewBadgeProvider);
+    final showSixteenLineQuranDot = ref.watch(_showSixteenLineQuranDotProvider);
     final items = [
       _ExploreItem(
         label: context.loc.quran,
@@ -1045,6 +1053,19 @@ class _ExploreGrid extends ConsumerWidget {
           await Navigator.of(context).pushNamed(AppRoutes.ayahPictureMaker);
         },
       ),
+      _ExploreItem(
+        label: context.loc.sixteenLineQuran,
+        icon: FlutterIslamicIcons.solidQuran,
+        showDot: showSixteenLineQuranDot,
+        onTap: () async {
+          await ref
+              .read(sharedPreferencesProvider)
+              .setBool(_sixteenLineQuranOpenedKey, true);
+          ref.invalidate(_showSixteenLineQuranDotProvider);
+          if (!context.mounted) return;
+          await Navigator.of(context).pushNamed(AppRoutes.sixteenLineQuran);
+        },
+      ),
     ];
 
     return LayoutBuilder(
@@ -1076,12 +1097,16 @@ class _ExploreItem {
     required this.icon,
     required this.onTap,
     this.badge,
+    this.showDot = false,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final String? badge;
+
+  /// A small red dot that marks a feature the user has not opened yet.
+  final bool showDot;
 }
 
 class _ExploreCard extends StatelessWidget {
@@ -1111,7 +1136,11 @@ class _ExploreCard extends StatelessWidget {
                       alignment: AlignmentDirectional.topStart,
                       child: Padding(
                         padding: EdgeInsetsDirectional.only(
-                          end: item.badge == null ? 0 : 28,
+                          end: item.badge != null
+                              ? 28
+                              : item.showDot
+                              ? 14
+                              : 0,
                         ),
                         child: Text(
                           item.label,
@@ -1141,6 +1170,21 @@ class _ExploreCard extends StatelessWidget {
             ),
           ),
         ),
+        if (item.showDot && item.badge == null)
+          PositionedDirectional(
+            top: 8,
+            end: 8,
+            child: Container(
+              key: ValueKey('explore-card-dot-${item.label}'),
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53935),
+                shape: BoxShape.circle,
+                border: Border.all(color: palette.card, width: 1.5),
+              ),
+            ),
+          ),
         if (item.badge case final badge?)
           Positioned(
             top: -4,
