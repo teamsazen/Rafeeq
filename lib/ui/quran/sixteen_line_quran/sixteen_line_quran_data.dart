@@ -6,7 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Text and layout of the IndoPak 16 line (Taj Company) mushaf.
 ///
-/// Built from the Quranic Universal Library (qul.tarteel.ai) downloads by
+/// The layout comes from the Quranic Universal Library (qul.tarteel.ai) and
+/// the text is QuranWBW's IndoPak v5.4, used with their permission. Built by
 /// `scripts/build_sixteen_line_quran.py`.
 const sixteenLineQuranAsset = 'assets/quran_16_line.json';
 
@@ -41,6 +42,7 @@ class SixteenLineQuran {
     required this.pages,
     required this.surahStartPages,
     required this.juzStartPages,
+    required this.bismillah,
   });
 
   /// Page n is `pages[n - 1]`.
@@ -51,6 +53,9 @@ class SixteenLineQuran {
 
   /// First page of juz n is `juzStartPages[n - 1]`.
   final List<int> juzStartPages;
+
+  /// The bismillah over each surah, word by word, as the text gives it.
+  final AyahLine bismillah;
 
   int get pageCount => pages.length;
 
@@ -95,6 +100,10 @@ class SixteenLineQuran {
       pages: pages,
       surahStartPages: (json['surahStart'] as List).cast<int>(),
       juzStartPages: (json['juzStart'] as List).cast<int>(),
+      bismillah: AyahLine(
+        (json['bismillah'] as List).cast<String>(),
+        centered: true,
+      ),
     );
   }
 }
@@ -107,7 +116,8 @@ final sixteenLineQuranProvider = FutureProvider<SixteenLineQuran>((ref) async {
   return compute(_parse, source);
 });
 
-/// Whether [word] ends an ayah. The script marks it with a private-use
-/// character from U+F500 on, which the font draws as the numbered ring.
+/// Whether [word] ends an ayah. The text marks it with a private-use
+/// character, U+F500 for ayah 1 up to U+F61D for ayah 286, which the font
+/// draws as the numbered ring. U+F61E is the bismillah's empty ring.
 bool isAyahEnd(String word) =>
-    word.runes.any((rune) => rune >= 0xF500 && rune <= 0xF6FF);
+    word.runes.any((rune) => rune >= 0xF500 && rune <= 0xF61E);

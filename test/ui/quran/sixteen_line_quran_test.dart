@@ -52,6 +52,12 @@ void main() {
           .where(isAyahEnd);
       expect(ayahEnds, hasLength(7));
     });
+
+    test('takes the bismillah from the text itself', () {
+      final fatiha = quran.pages.first.whereType<AyahLine>().first.words;
+      expect(quran.bismillah.words, fatiha.take(4).toList());
+      expect(quran.bismillah.words.where(isAyahEnd), isEmpty);
+    });
   });
 
   group('reader', () {

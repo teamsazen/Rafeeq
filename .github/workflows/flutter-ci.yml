@@ -57,7 +57,7 @@ jobs:
         if: steps.changes.outputs.run_flutter == 'true'
         # The real font is not committed (see README), but the build needs a
         # file at its path.
-        run: cp assets/fonts/JameelNooriNastaleeq.ttf assets/fonts/IndoPakNastaleeqHanafi.ttf
+        run: cp assets/fonts/JameelNooriNastaleeq.ttf assets/fonts/AlQuranNeo5x3-Arabic.ttf
 
       - name: Install dependencies
         if: steps.changes.outputs.run_flutter == 'true'

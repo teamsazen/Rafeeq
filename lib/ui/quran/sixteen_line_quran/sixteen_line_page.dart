@@ -18,13 +18,6 @@ const _quranStroke = 0.02;
 const _surahNameFont = 'Surah Names';
 const _linesPerPage = 16;
 const _lineInset = 8.0;
-// Set word by word: this font's spaces are too narrow on their own.
-const _bismillah = AyahLine([
-  'بِسْمِ',
-  'اللّٰهِ',
-  'الرَّحْمٰنِ',
-  'الرَّحِیْمِ',
-], centered: true);
 
 /// Page colours, taken from the app's light or dark palette.
 @immutable
@@ -131,6 +124,7 @@ class SixteenLinePage extends ConsumerWidget {
                   ),
                   child: _PageLines(
                     lines: quran.pages[page - 1],
+                    bismillah: quran.bismillah,
                     colors: colors,
                     surahNames: [for (final s in surahs) s.name],
                   ),
@@ -155,11 +149,13 @@ class SixteenLinePage extends ConsumerWidget {
 class _PageLines extends StatelessWidget {
   const _PageLines({
     required this.lines,
+    required this.bismillah,
     required this.colors,
     required this.surahNames,
   });
 
   final List<SixteenLine> lines;
+  final AyahLine bismillah;
   final SixteenLinePageColors colors;
   final List<String> surahNames;
 
@@ -217,7 +213,7 @@ class _PageLines extends StatelessWidget {
                         color: colors.accent,
                       ),
                       BismillahLine() => _AyahLineView(
-                        line: _bismillah,
+                        line: bismillah,
                         style: style,
                         width: width,
                         colors: colors,
