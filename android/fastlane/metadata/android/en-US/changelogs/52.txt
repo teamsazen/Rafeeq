@@ -1,0 +1,5 @@
+# Release Notes
+- New 16 Line Quran: the IndoPak mushaf as sharp text, all 548 pages built in, no download needed
+- Swipe to turn pages, pinch with two fingers to zoom, and jump to any surah, juz or page
+- Opens on the page you last read
+- Find it on the home screen, right after Ayah Picture
