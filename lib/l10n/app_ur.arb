@@ -368,6 +368,7 @@
   "showTransliteration": "تلفظ دکھائیں",
   "showTransliterationSubtitle": "عربی کے نیچے صوتی لائن دکھائیں۔",
   "simpleMode": "سادہ موڈ",
+  "sixteenLineCredit": "قرآن کا متن اور فونٹ: QuranWBW کا انڈو پاک v5.4، ان کی اجازت سے۔ ترتیب: Tarteel کی QUL۔",
   "sixteenLineGoTo": "یہاں جائیں",
   "sixteenLineGoToPage": "جائیں",
   "sixteenLineGoToPageHint": "صفحہ نمبر (1–{count})",

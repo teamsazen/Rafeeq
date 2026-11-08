@@ -1195,6 +1195,10 @@ class AppLocalizationsUr extends AppLocalizations {
   String get simpleMode => 'سادہ موڈ';
 
   @override
+  String get sixteenLineCredit =>
+      'قرآن کا متن اور فونٹ: QuranWBW کا انڈو پاک v5.4، ان کی اجازت سے۔ ترتیب: Tarteel کی QUL۔';
+
+  @override
   String get sixteenLineGoTo => 'یہاں جائیں';
 
   @override

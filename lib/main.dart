@@ -23,6 +23,7 @@ import 'package:rafeeq/l10n/app_localizations.dart';
 import 'package:rafeeq/ui/app_home/home/app_home_screen.dart';
 import 'package:rafeeq/ui/onboarding/onboarding_screen.dart';
 import 'package:rafeeq/ui/quran/quran_player_overlay.dart';
+import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_credits.dart';
 import 'package:rafeeq/data/namaz_prayers_data.dart';
 import 'package:rafeeq/data/raw/namaz_prayers_raw.dart';
 import 'package:rafeeq/data/raw/wudu_steps_raw.dart';
@@ -32,6 +33,7 @@ import 'package:rafeeq/ui/prayer_times/prayer_notification_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerSixteenLineQuranLicenses();
 
   // Load and initialize Namaz Prayers data from JSON string
   initializeNamazPrayers(namazPrayersJson);

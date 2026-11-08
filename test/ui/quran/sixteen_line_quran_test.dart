@@ -113,6 +113,11 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('sixteen-line-index-action')));
       await tester.pumpAndSettle();
+      expect(
+        find.textContaining('used with their permission'),
+        findsOneWidget,
+        reason: 'QuranWBW asks for credit wherever their text is used',
+      );
       await tester.tap(find.text('Juz'));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-2')));

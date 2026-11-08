@@ -1192,6 +1192,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get simpleMode => 'Simple Mode';
 
   @override
+  String get sixteenLineCredit =>
+      'Quran text and font: IndoPak v5.4 by QuranWBW, used with their permission. Layout: QUL by Tarteel.';
+
+  @override
   String get sixteenLineGoTo => 'Go to';
 
   @override

@@ -82,6 +82,22 @@ class SixteenLineQuranIndexScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: SafeArea(
+                  top: false,
+                  child: Text(
+                    context.loc.sixteenLineCredit,
+                    key: const ValueKey('sixteen-line-credit'),
+                    textAlign: TextAlign.center,
+                    style: labelStyle.copyWith(
+                      color: palette.subtitle,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           _ => Center(child: CircularProgressIndicator(color: palette.accent)),

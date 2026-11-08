@@ -2312,6 +2312,12 @@ abstract class AppLocalizations {
   /// **'Simple Mode'**
   String get simpleMode;
 
+  /// No description provided for @sixteenLineCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran text and font: IndoPak v5.4 by QuranWBW, used with their permission. Layout: QUL by Tarteel.'**
+  String get sixteenLineCredit;
+
   /// No description provided for @sixteenLineGoTo.
   ///
   /// In en, this message translates to:

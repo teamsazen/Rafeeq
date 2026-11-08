@@ -389,6 +389,7 @@
   "showTransliteration": "Show Transliteration",
   "showTransliterationSubtitle": "Show phonetic line under Arabic.",
   "simpleMode": "Simple Mode",
+  "sixteenLineCredit": "Quran text and font: IndoPak v5.4 by QuranWBW, used with their permission. Layout: QUL by Tarteel.",
   "sixteenLineGoTo": "Go to",
   "sixteenLineGoToPage": "Go",
   "sixteenLineGoToPageHint": "Page number (1–{count})",
