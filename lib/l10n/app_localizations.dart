@@ -2324,17 +2324,41 @@ abstract class AppLocalizations {
   /// **'Go to'**
   String get sixteenLineGoTo;
 
-  /// No description provided for @sixteenLineGoToPage.
+  /// No description provided for @sixteenLineGoToPageNumber.
   ///
   /// In en, this message translates to:
-  /// **'Go'**
-  String get sixteenLineGoToPage;
+  /// **'Go to page {page}'**
+  String sixteenLineGoToPageNumber(Object page);
 
-  /// No description provided for @sixteenLineGoToPageHint.
+  /// No description provided for @sixteenLineJuzNisf.
   ///
   /// In en, this message translates to:
-  /// **'Page number (1–{count})'**
-  String sixteenLineGoToPageHint(Object count);
+  /// **'Half'**
+  String get sixteenLineJuzNisf;
+
+  /// No description provided for @sixteenLineJuzRub.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarter'**
+  String get sixteenLineJuzRub;
+
+  /// No description provided for @sixteenLineJuzSalasa.
+  ///
+  /// In en, this message translates to:
+  /// **'Third Quarter'**
+  String get sixteenLineJuzSalasa;
+
+  /// No description provided for @sixteenLineJuzStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get sixteenLineJuzStart;
+
+  /// No description provided for @sixteenLineNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found for “{query}”'**
+  String sixteenLineNoMatch(Object query);
 
   /// No description provided for @sixteenLinePageNumber.
   ///
@@ -2353,6 +2377,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read 16 Line Tajweedi Quran'**
   String get sixteenLineQuranSubtitle;
+
+  /// No description provided for @sixteenLineSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Surah, juz or page number'**
+  String get sixteenLineSearchHint;
 
   /// No description provided for @sleepTimer.
   ///

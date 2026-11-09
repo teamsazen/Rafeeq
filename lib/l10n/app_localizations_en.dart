@@ -1199,11 +1199,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sixteenLineGoTo => 'Go to';
 
   @override
-  String get sixteenLineGoToPage => 'Go';
+  String sixteenLineGoToPageNumber(Object page) {
+    return 'Go to page $page';
+  }
 
   @override
-  String sixteenLineGoToPageHint(Object count) {
-    return 'Page number (1–$count)';
+  String get sixteenLineJuzNisf => 'Half';
+
+  @override
+  String get sixteenLineJuzRub => 'Quarter';
+
+  @override
+  String get sixteenLineJuzSalasa => 'Third Quarter';
+
+  @override
+  String get sixteenLineJuzStart => 'Start';
+
+  @override
+  String sixteenLineNoMatch(Object query) {
+    return 'Nothing found for “$query”';
   }
 
   @override
@@ -1216,6 +1230,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sixteenLineQuranSubtitle => 'Read 16 Line Tajweedi Quran';
+
+  @override
+  String get sixteenLineSearchHint => 'Surah, juz or page number';
 
   @override
   String get sleepTimer => 'Sleep Timer';

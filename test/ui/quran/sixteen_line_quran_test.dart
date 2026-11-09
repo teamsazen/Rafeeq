@@ -53,6 +53,47 @@ void main() {
       expect(ayahEnds, hasLength(7));
     });
 
+    test('marks where every ruku ends', () {
+      final rukus = [
+        for (final page in quran.pages)
+          for (final line in page.whereType<AyahLine>())
+            if (line.ruku != null) line.ruku!,
+      ];
+      expect(rukus, hasLength(556));
+      // Al-Baqara's second ruku, ayahs 8 to 20, ends on page 4.
+      final page4 = quran.pages[3].whereType<AyahLine>();
+      final ruku = page4.firstWhere((line) => line.ruku != null).ruku!;
+      expect(ruku.numberInSurah, 2);
+      expect(ruku.ayahCount, 13);
+    });
+
+    test('knows where each quarter of a juz begins', () {
+      expect(quran.juzQuarters, hasLength(120));
+      for (var juz = 1; juz <= 30; juz++) {
+        final start = quran.juzQuarter(juz, JuzQuarter.start);
+        expect(start.page, quran.juzStartPages[juz - 1]);
+        final pages = [
+          for (final quarter in JuzQuarter.values)
+            quran.juzQuarter(juz, quarter).page,
+        ];
+        expect(pages, orderedEquals([...pages]..sort()), reason: 'juz $juz');
+      }
+      // Juz 1: rub' opens with 2:44 on page 7, nisf with 2:75 on page 10,
+      // thalatha with 2:106 on page 15.
+      expect(
+        quran.juzQuarter(1, JuzQuarter.rub),
+        const SixteenLinePosition(7, 1),
+      );
+      expect(quran.juzQuarter(1, JuzQuarter.nisf).page, 10);
+      expect(quran.juzQuarter(1, JuzQuarter.thalatha).page, 15);
+    });
+
+    test('finds the banner that opens a surah', () {
+      final position = quran.surahStart(2);
+      final line = quran.pages[position.page - 1][position.line!];
+      expect((line as SurahNameLine).surahNumber, 2);
+    });
+
     test('takes the bismillah from the text itself', () {
       final fatiha = quran.pages.first.whereType<AyahLine>().first.words;
       expect(quran.bismillah.words, fatiha.take(4).toList());
@@ -122,8 +163,81 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-2')));
       await tester.pumpAndSettle();
+      expect(find.text('Quarter'), findsOneWidget);
+      expect(find.text('Half'), findsOneWidget);
+      expect(find.text('Third Quarter'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-2-start')));
+      await tester.pumpAndSettle();
 
       expect(find.textContaining('Juz 2 · Page 20'), findsOneWidget);
+    });
+
+    testWidgets('jumps to a quarter of a juz and points out its line', (
+      tester,
+    ) async {
+      await pumpReader(tester);
+
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-index-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Juz'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-1')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-1-rub')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.textContaining('Page 7'), findsOneWidget);
+      final tint = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byKey(const ValueKey('sixteen-line-highlight-1')),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect((tint.decoration as BoxDecoration).color?.a, greaterThan(0));
+
+      // Then it fades.
+      await tester.pumpAndSettle();
+      final faded = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byKey(const ValueKey('sixteen-line-highlight-1')),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect((faded.decoration as BoxDecoration).color?.a, 0);
+    });
+
+    testWidgets('searches surahs and juz by name', (tester) async {
+      await pumpReader(tester);
+
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-index-action')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('sixteen-line-search')),
+        'yaseen',
+      );
+      await tester.pump();
+      expect(find.byKey(const ValueKey('sixteen-line-surah-36')), findsOne);
+      expect(find.byKey(const ValueKey('sixteen-line-surah-1')), findsNothing);
+
+      await tester.enterText(
+        find.byKey(const ValueKey('sixteen-line-search')),
+        'tilkal',
+      );
+      await tester.tap(find.text('Juz'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('sixteen-line-juz-3')), findsOne);
+      expect(find.byKey(const ValueKey('sixteen-line-juz-1')), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-3')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('sixteen-line-juz-3-start')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Juz 3 · Page 38'), findsOneWidget);
     });
 
     testWidgets('jumps to a typed page number', (tester) async {
@@ -132,7 +246,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('sixteen-line-index-action')));
       await tester.pumpAndSettle();
       await tester.enterText(
-        find.byKey(const ValueKey('sixteen-line-page-field')),
+        find.byKey(const ValueKey('sixteen-line-search')),
         '300',
       );
       await tester.pump();

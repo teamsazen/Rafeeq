@@ -19,6 +19,13 @@ const _surahNameFont = 'Surah Names';
 const _linesPerPage = 16;
 const _lineInset = 8.0;
 
+/// Room left of the frame for the ruku sign, as in the printed mushaf.
+const _rukuMargin = 18.0;
+
+/// From the frame's outer edge to the lines inside it: the outer border,
+/// the gap and the inner border.
+const _frameInset = 1.4 + 3 + 0.6;
+
 /// Page colours, taken from the app's light or dark palette.
 @immutable
 class SixteenLinePageColors {
@@ -60,11 +67,15 @@ class SixteenLinePage extends ConsumerWidget {
     required this.quran,
     required this.page,
     required this.colors,
+    this.highlightLine,
   });
 
   final SixteenLineQuran quran;
   final int page;
   final SixteenLinePageColors colors;
+
+  /// A line to point out for a moment, after jumping to it.
+  final int? highlightLine;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,7 +91,7 @@ class SixteenLinePage extends ConsumerWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+      padding: const EdgeInsets.fromLTRB(4 + _rukuMargin, 6, 10, 6),
       child: Column(
         children: [
           Padding(
@@ -127,6 +138,7 @@ class SixteenLinePage extends ConsumerWidget {
                     bismillah: quran.bismillah,
                     colors: colors,
                     surahNames: [for (final s in surahs) s.name],
+                    highlightLine: highlightLine,
                   ),
                 ),
               ),
@@ -146,18 +158,44 @@ class SixteenLinePage extends ConsumerWidget {
   }
 }
 
+/// Hangs [ruku]'s sign in the margin left of the frame, level with the
+/// line it ends on.
+Widget _withRuku(
+  RukuEnd? ruku, {
+  required double height,
+  required Color color,
+  required Widget child,
+}) {
+  if (ruku == null) return child;
+  return Stack(
+    clipBehavior: Clip.none,
+    children: [
+      child,
+      Positioned(
+        left: -(_frameInset + _rukuMargin),
+        width: _rukuMargin,
+        top: 0,
+        height: height,
+        child: _RukuSign(ruku: ruku, color: color),
+      ),
+    ],
+  );
+}
+
 class _PageLines extends StatelessWidget {
   const _PageLines({
     required this.lines,
     required this.bismillah,
     required this.colors,
     required this.surahNames,
+    this.highlightLine,
   });
 
   final List<SixteenLine> lines;
   final AyahLine bismillah;
   final SixteenLinePageColors colors;
   final List<String> surahNames;
+  final int? highlightLine;
 
   @override
   Widget build(BuildContext context) {
@@ -187,49 +225,131 @@ class _PageLines extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (final (index, line) in lines.indexed)
-                  Container(
+                  _withRuku(
+                    line is AyahLine ? line.ruku : null,
                     height: lineHeight,
-                    width: constraints.maxWidth,
-                    padding: EdgeInsetsDirectional.only(
-                      start: _lineInset,
-                      end: line is SurahNameLine ? _lineInset : endInset,
-                    ),
-                    // Ruled like a printed mushaf: a hairline under every
-                    // line but the last, edge to edge inside the frame.
-                    decoration: index == lines.length - 1
-                        ? null
-                        : BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: colors.frame.withValues(alpha: 0.35),
-                                width: 0.6,
+                    color: colors.accent,
+                    child: _LineHighlight(
+                      key: ValueKey('sixteen-line-highlight-$index'),
+                      enabled: index == highlightLine,
+                      color: colors.accent,
+                      child: Container(
+                        height: lineHeight,
+                        width: constraints.maxWidth,
+                        padding: EdgeInsetsDirectional.only(
+                          start: _lineInset,
+                          end: line is SurahNameLine ? _lineInset : endInset,
+                        ),
+                        // Ruled like a printed mushaf: a hairline under every
+                        // line but the last, edge to edge inside the frame.
+                        decoration: index == lines.length - 1
+                            ? null
+                            : BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: colors.frame.withValues(alpha: 0.35),
+                                    width: 0.6,
+                                  ),
+                                ),
                               ),
-                            ),
+                        child: switch (line) {
+                          SurahNameLine(:final surahNumber) => _SurahTitle(
+                            surahNumber: surahNumber,
+                            name: surahNames[surahNumber - 1],
+                            color: colors.accent,
                           ),
-                    child: switch (line) {
-                      SurahNameLine(:final surahNumber) => _SurahTitle(
-                        surahNumber: surahNumber,
-                        name: surahNames[surahNumber - 1],
-                        color: colors.accent,
+                          BismillahLine() => _AyahLineView(
+                            line: bismillah,
+                            style: style,
+                            width: width,
+                            colors: colors,
+                          ),
+                          AyahLine() => _AyahLineView(
+                            line: line,
+                            style: style,
+                            width: width,
+                            naturalWidth: layout.naturalWidths[index],
+                            colors: colors,
+                          ),
+                        },
                       ),
-                      BismillahLine() => _AyahLineView(
-                        line: bismillah,
-                        style: style,
-                        width: width,
-                        colors: colors,
-                      ),
-                      AyahLine() => _AyahLineView(
-                        line: line,
-                        style: style,
-                        width: width,
-                        naturalWidth: layout.naturalWidths[index],
-                        colors: colors,
-                      ),
-                    },
+                    ),
                   ),
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Tints a line, then fades it out: shows where a jump landed, which can
+/// be part way down the page.
+class _LineHighlight extends StatefulWidget {
+  const _LineHighlight({
+    super.key,
+    required this.enabled,
+    required this.color,
+    required this.child,
+  });
+
+  final bool enabled;
+  final Color color;
+  final Widget child;
+
+  @override
+  State<_LineHighlight> createState() => _LineHighlightState();
+}
+
+class _LineHighlightState extends State<_LineHighlight>
+    with SingleTickerProviderStateMixin {
+  // Holds long enough to find, then fades.
+  static final _tint = TweenSequence([
+    TweenSequenceItem(tween: ConstantTween(1.0), weight: 55),
+    TweenSequenceItem(
+      tween: Tween(
+        begin: 1.0,
+        end: 0.0,
+      ).chain(CurveTween(curve: Curves.easeOut)),
+      weight: 45,
+    ),
+  ]);
+
+  AnimationController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.enabled) {
+      _controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 2800),
+      )..forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (controller == null) return widget.child;
+    return AnimatedBuilder(
+      animation: controller,
+      child: widget.child,
+      builder: (context, child) {
+        final tint = _tint.transform(controller.value);
+        // Kept in the tree once faded, so the line is not rebuilt.
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: widget.color.withValues(alpha: 0.2 * tint),
+          ),
+          child: child,
         );
       },
     );
@@ -430,3 +550,43 @@ class _SurahTitle extends StatelessWidget {
     );
   }
 }
+
+/// ع with the ruku's number in its surah above and its ayah count below,
+/// as printed in the margin of an IndoPak mushaf.
+class _RukuSign extends StatelessWidget {
+  const _RukuSign({required this.ruku, required this.color});
+
+  final RukuEnd ruku;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style(double size) => TextStyle(
+      fontFamily: 'Jameel Noori Nastaleeq',
+      fontSize: size,
+      height: 1,
+      color: color,
+    );
+    return Semantics(
+      label: 'Ruku ${ruku.numberInSurah}, ${ruku.ayahCount}',
+      child: ExcludeSemantics(
+        child: FittedBox(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_arabicDigits(ruku.numberInSurah), style: style(11)),
+              Text('ع', style: style(17)),
+              Text(_arabicDigits(ruku.ayahCount), style: style(11)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String _arabicDigits(int number) => number
+    .toString()
+    .split('')
+    .map((digit) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(digit)])
+    .join();

@@ -1202,11 +1202,25 @@ class AppLocalizationsUr extends AppLocalizations {
   String get sixteenLineGoTo => 'یہاں جائیں';
 
   @override
-  String get sixteenLineGoToPage => 'جائیں';
+  String sixteenLineGoToPageNumber(Object page) {
+    return 'صفحہ $page پر جائیں';
+  }
 
   @override
-  String sixteenLineGoToPageHint(Object count) {
-    return 'صفحہ نمبر (1–$count)';
+  String get sixteenLineJuzNisf => 'نصف';
+
+  @override
+  String get sixteenLineJuzRub => 'ربع';
+
+  @override
+  String get sixteenLineJuzSalasa => 'ثلاثہ';
+
+  @override
+  String get sixteenLineJuzStart => 'آغاز';
+
+  @override
+  String sixteenLineNoMatch(Object query) {
+    return '“$query” سے کچھ نہیں ملا';
   }
 
   @override
@@ -1219,6 +1233,9 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get sixteenLineQuranSubtitle => '16 سطری تجویدی قرآن پڑھیں';
+
+  @override
+  String get sixteenLineSearchHint => 'سورت، پارہ یا صفحہ نمبر';
 
   @override
   String get sleepTimer => 'نیند ٹائمر';

@@ -37,11 +37,16 @@ Output shape (kept compact because it ships in the app):
         ["s", 2],                      # surah name banner for surah 2
         ["b"],                         # bismillah line
         ["a", 0, ["word", "word"]],    # ayah line; 1 = centered
+        ["a", 0, [...], [[5, 13]]],    # ...ending ruku 5 of its surah,
+                                       # which has 13 ayahs
       ],
     ],
     "surahStart": [1, 2, ...],         # first page of each surah (114)
     "juzStart": [1, 2, 20, ...],       # first page of each juz (30)
-    "bismillah": ["word", ...]         # the bismillah, without its sign
+    "bismillah": ["word", ...],        # the bismillah, without its sign
+    "quarters": [[1, 2], ...]          # per juz, where its start, rub',
+                                       # nisf and thalatha begin, as
+                                       # [page, line index on the page]
   }
 """
 
@@ -110,12 +115,47 @@ def main() -> None:
     # Juz boundaries come from the quran.json the app already ships.
     quran = json.loads((ROOT / "assets/quran.json").read_text())
     ayah_juz = {}
+    # Rukus too: the ayah that closes each one, with the ruku's number in
+    # its surah and how many ayahs it holds. The mushaf marks it with ع in
+    # the margin.
+    ruku_end = {}
+    # And the quarters of each juz, numbered 0 to 119 in juz order. A juz
+    # starts where its "juz" field says, which follows the IndoPak paras
+    # (para 7, "wa idha sami'u", opens at 5:83). Its rub' (1/4), nisf (1/2)
+    # and thalatha (3/4) open its 3rd, 5th and 7th hizb quarters.
+    quarter_of = {}
     for surah in quran["data"]["surahs"]:
-        for ayah in surah["ayahs"]:
+        ayahs = surah["ayahs"]
+        number_in_surah, first = 0, 0
+        for i, ayah in enumerate(ayahs):
             ayah_juz[(surah["number"], ayah["numberInSurah"])] = ayah["juz"]
+            key = (surah["number"], ayah["numberInSurah"])
+            juz, hizb_quarter = ayah["juz"], ayah["hizbQuarter"]
+            if (juz - 1) * 4 not in quarter_of.values():
+                quarter_of[key] = (juz - 1) * 4
+            within = (hizb_quarter - 1) % 8
+            quarter = (hizb_quarter - 1) // 8 * 4 + within // 2
+            if within in (2, 4, 6) and quarter not in quarter_of.values():
+                quarter_of[key] = quarter
+            last = i + 1 == len(ayahs) or ayahs[i + 1]["ruku"] != ayah["ruku"]
+            if last:
+                number_in_surah += 1
+                ruku_end[(surah["number"], ayah["numberInSurah"])] = [
+                    number_in_surah,
+                    i + 1 - first,
+                ]
+                first = i + 1
+    last_word = {}
+    first_word = {}
+    for wid in ids:
+        last_word[word_ayah[wid]] = wid
+        first_word.setdefault(word_ayah[wid], wid)
+    quarter_word = {first_word[ayah]: q for ayah, q in quarter_of.items()}
+    quarters = {}
 
     pages = []
     surah_start = {}
+    ruku_count = 0
     juz_start = {}
     with sqlite3.connect(layout_db) as db:
         rows = db.execute(
@@ -135,6 +175,9 @@ def main() -> None:
             lines.append(["b"])
         elif kind == "ayah":
             first, last = int(first), int(last)
+            for w in range(first, last + 1):
+                if w in quarter_word:
+                    quarters[quarter_word[w]] = [page, len(lines)]
             line_words = []
             for w in range(first, last + 1):
                 index = wbw_index[w]
@@ -142,7 +185,16 @@ def main() -> None:
                     continue  # one v5.4 word standing for two QUL words
                 used.add(index)
                 line_words.append(wbw[index])
-            lines.append(["a", int(centered or 0), line_words])
+            line = ["a", int(centered or 0), line_words]
+            rukus = [
+                ruku_end[word_ayah[w]]
+                for w in range(first, last + 1)
+                if last_word[word_ayah[w]] == w and word_ayah[w] in ruku_end
+            ]
+            if rukus:
+                line.append(rukus)
+                ruku_count += len(rukus)
+            lines.append(line)
             for w in range(first, last + 1):
                 juz = ayah_juz[word_ayah[w]]
                 juz_start.setdefault(juz, page)
@@ -153,6 +205,10 @@ def main() -> None:
     assert len(pages) == 548, len(pages)
     assert sorted(surah_start) == list(range(1, 115)), "missing surahs"
     assert sorted(juz_start) == list(range(1, 31)), "missing juz"
+    assert ruku_count == len(ruku_end), "rukus left off the pages"
+    assert sorted(quarters) == list(range(120)), "missing quarters"
+    for juz in range(30):
+        assert quarters[juz * 4][0] == juz_start[juz + 1], f"juz {juz + 1}"
     assert used == set(range(len(wbw))), "v5.4 words left out of the layout"
 
     # Al-Fatiha's first ayah is the bismillah; its last word is the sign.
@@ -164,6 +220,7 @@ def main() -> None:
         "surahStart": [surah_start[s] for s in range(1, 115)],
         "juzStart": [juz_start[j] for j in range(1, 31)],
         "bismillah": bismillah,
+        "quarters": [quarters[q] for q in sorted(quarters)],
     }
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     print(f"Wrote {out} ({out.stat().st_size / 1024 / 1024:.2f} MB)")

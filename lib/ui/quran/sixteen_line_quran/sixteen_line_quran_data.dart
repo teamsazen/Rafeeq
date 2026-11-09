@@ -26,8 +26,20 @@ class BismillahLine extends SixteenLine {
   const BismillahLine();
 }
 
+/// The end of a ruku, marked with ع in the margin of its line.
+@immutable
+class RukuEnd {
+  const RukuEnd({required this.numberInSurah, required this.ayahCount});
+
+  /// Which ruku of its surah this is, from 1.
+  final int numberInSurah;
+
+  /// How many ayahs the ruku holds.
+  final int ayahCount;
+}
+
 class AyahLine extends SixteenLine {
-  const AyahLine(this.words, {required this.centered});
+  const AyahLine(this.words, {required this.centered, this.ruku});
 
   /// Words in reading order. Ayah end signs are words of their own.
   final List<String> words;
@@ -35,7 +47,37 @@ class AyahLine extends SixteenLine {
   /// Short lines (end of a surah) sit in the middle instead of filling
   /// the width.
   final bool centered;
+
+  /// Set when a ruku ends on this line.
+  final RukuEnd? ruku;
 }
+
+/// A place to open the reader at: a page and, when known, the line on it
+/// to point out.
+@immutable
+class SixteenLinePosition {
+  const SixteenLinePosition(this.page, [this.line]);
+
+  final int page;
+
+  /// Index into the page's lines.
+  final int? line;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SixteenLinePosition && other.page == page && other.line == line;
+
+  @override
+  int get hashCode => Object.hash(page, line);
+
+  @override
+  String toString() => 'SixteenLinePosition($page, $line)';
+}
+
+/// The four places a juz is read in: its start, then rub' (a quarter),
+/// nisf (half) and thalatha (three quarters), as marked in the margin of
+/// an IndoPak mushaf.
+enum JuzQuarter { start, rub, nisf, thalatha }
 
 class SixteenLineQuran {
   const SixteenLineQuran({
@@ -43,6 +85,7 @@ class SixteenLineQuran {
     required this.surahStartPages,
     required this.juzStartPages,
     required this.bismillah,
+    required this.juzQuarters,
   });
 
   /// Page n is `pages[n - 1]`.
@@ -57,7 +100,23 @@ class SixteenLineQuran {
   /// The bismillah over each surah, word by word, as the text gives it.
   final AyahLine bismillah;
 
+  /// Where each quarter of each juz begins: juz n's quarters are
+  /// `juzQuarters[(n - 1) * 4]` onwards, in [JuzQuarter] order.
+  final List<SixteenLinePosition> juzQuarters;
+
   int get pageCount => pages.length;
+
+  SixteenLinePosition juzQuarter(int juz, JuzQuarter quarter) =>
+      juzQuarters[(juz - 1) * 4 + quarter.index];
+
+  /// The banner that opens [surah].
+  SixteenLinePosition surahStart(int surah) {
+    final page = surahStartPages[surah - 1];
+    final line = pages[page - 1].indexWhere(
+      (line) => line is SurahNameLine && line.surahNumber == surah,
+    );
+    return SixteenLinePosition(page, line < 0 ? null : line);
+  }
 
   int juzForPage(int page) => _lastStartAtOrBefore(juzStartPages, page);
 
@@ -92,6 +151,7 @@ class SixteenLineQuran {
           _ => AyahLine(
             (line[2] as List).cast<String>(),
             centered: line[1] == 1,
+            ruku: line.length > 3 ? _rukuEnd(line[3] as List) : null,
           ),
         };
       }).toList();
@@ -104,8 +164,17 @@ class SixteenLineQuran {
         (json['bismillah'] as List).cast<String>(),
         centered: true,
       ),
+      juzQuarters: [
+        for (final raw in json['quarters'] as List)
+          SixteenLinePosition((raw as List)[0] as int, raw[1] as int),
+      ],
     );
   }
+}
+
+RukuEnd _rukuEnd(List rukus) {
+  final ruku = rukus.first as List;
+  return RukuEnd(numberInSurah: ruku[0] as int, ayahCount: ruku[1] as int);
 }
 
 SixteenLineQuran _parse(String source) =>

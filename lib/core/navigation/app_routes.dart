@@ -26,6 +26,7 @@ import 'package:rafeeq/ui/quran/quran_view_settings.dart';
 import 'package:rafeeq/ui/quran/read_quran_home_screen.dart';
 import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_quran_screen.dart';
 import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_quran_index_screen.dart';
+import 'package:rafeeq/ui/quran/sixteen_line_quran/sixteen_line_quran_data.dart';
 import 'package:rafeeq/ui/ramadan/ramadan_calendar_screen.dart';
 
 // ---------------------------------------------------------------------------
@@ -124,8 +125,8 @@ class AppRoutes {
         );
 
       case sixteenLineQuranIndex:
-        // Pops with the chosen page, so the route must be typed for it.
-        return _build<int>(
+        // Pops with the chosen place, so the route must be typed for it.
+        return _build<SixteenLinePosition>(
           settings,
           SixteenLineQuranIndexScreen(
             currentPage: settings.arguments as int? ?? 1,

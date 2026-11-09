@@ -51,6 +51,9 @@ class _SixteenLineQuranScreenState
   /// Bumped on every jump so the page view is rebuilt at the new page.
   int _jumps = 0;
 
+  /// The line the last jump landed on, pointed out when the page opens.
+  int? _jumpLine;
+
   void _onPageChanged(int page) {
     if (page == _page) return;
     setState(() => _page = page);
@@ -58,15 +61,17 @@ class _SixteenLineQuranScreenState
   }
 
   Future<void> _openIndex() async {
-    final page = await Navigator.of(
-      context,
-    ).pushNamed<int>(AppRoutes.sixteenLineQuranIndex, arguments: _page);
-    if (page == null || !mounted) return;
+    final position = await Navigator.of(context).pushNamed<SixteenLinePosition>(
+      AppRoutes.sixteenLineQuranIndex,
+      arguments: _page,
+    );
+    if (position == null || !mounted) return;
     setState(() {
-      _page = page;
+      _page = position.page;
+      _jumpLine = position.line;
       _jumps++;
     });
-    ref.read(sixteenLineLastPageProvider.notifier).save(page);
+    ref.read(sixteenLineLastPageProvider.notifier).save(position.page);
   }
 
   @override
@@ -121,6 +126,7 @@ class _SixteenLineQuranScreenState
             quran: value,
             colors: colors,
             initialPage: _page,
+            initialLine: _jumpLine,
             onPageChanged: _onPageChanged,
           ),
           AsyncError() => Center(
@@ -150,12 +156,16 @@ class _SwipeReader extends StatefulWidget {
     required this.quran,
     required this.colors,
     required this.initialPage,
+    this.initialLine,
     required this.onPageChanged,
   });
 
   final SixteenLineQuran quran;
   final SixteenLinePageColors colors;
   final int initialPage;
+
+  /// A line of [initialPage] to point out as it opens.
+  final int? initialLine;
   final ValueChanged<int> onPageChanged;
 
   @override
@@ -167,6 +177,9 @@ class _SwipeReaderState extends State<_SwipeReader> {
 
   late final _controller = PageController(initialPage: widget.initialPage - 1);
   late int _index = widget.initialPage - 1;
+
+  /// Shown once: dropped as soon as the reader leaves the page.
+  late int? _highlightLine = widget.initialLine;
 
   /// Built pages, reused so that a rebuild of the reader (the title
   /// changing as a page turns) does not rebuild the pages mid swipe.
@@ -287,6 +300,7 @@ class _SwipeReaderState extends State<_SwipeReader> {
       quran: widget.quran,
       page: index + 1,
       colors: widget.colors,
+      highlightLine: index == widget.initialPage - 1 ? _highlightLine : null,
     );
     return ValueListenableBuilder<_Zoom>(
       valueListenable: _zoom,
@@ -326,6 +340,11 @@ class _SwipeReaderState extends State<_SwipeReader> {
               physics: _canTurn ? null : const NeverScrollableScrollPhysics(),
               itemCount: widget.quran.pageCount,
               onPageChanged: (index) {
+                if (_highlightLine != null) {
+                  // Coming back to the page should not point it out again.
+                  _highlightLine = null;
+                  _pages.remove(widget.initialPage - 1);
+                }
                 _index = index;
                 widget.onPageChanged(index + 1);
               },
