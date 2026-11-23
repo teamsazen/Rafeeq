@@ -191,7 +191,7 @@ private fun ReaderAppBar(quran: QuranText?, section: Section, onBack: () -> Unit
             Box(Modifier.size(48.dp).pressable({ nav.push(Route.QuranAyahPicker) }, scale = .9f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.NumberedList, p.title, 24.dp)
             }
-            Box(Modifier.size(48.dp).pressable({ nav.push(Route.Placeholder(R.string.quranViewSettings)) }, scale = .9f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(48.dp).pressable({ nav.push(Route.QuranSettings) }, scale = .9f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.Tune, p.title, 24.dp)
             }
         }

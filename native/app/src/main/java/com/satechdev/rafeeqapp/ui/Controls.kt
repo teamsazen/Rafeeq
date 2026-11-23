@@ -8,7 +8,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -16,7 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -54,5 +69,46 @@ fun AppSwitch(checked: Boolean, onChange: (Boolean) -> Unit) {
                 .shadow(2.dp, CircleShape)
                 .background(Color.White, CircleShape),
         )
+    }
+}
+
+
+/**
+ * A slider from [min] to [max] in whole steps, as the Flutter settings
+ * slider (3 dp track, 6 dp thumb). The thumb follows on a spring and each
+ * step ticks (from 99 Names). Right to left in Urdu, as Flutter's Slider.
+ */
+@Composable
+fun AppSlider(value: Float, min: Float, max: Float, onChange: (Float) -> Unit, modifier: Modifier = Modifier) {
+    val p = palette
+    val haptics = LocalHapticFeedback.current
+    val density = LocalDensity.current
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    BoxWithConstraints(modifier.fillMaxWidth().height(28.dp)) {
+        val thumb = 12.dp
+        val trackPx = with(density) { (maxWidth - thumb).toPx() }
+        val half = with(density) { (thumb / 2).toPx() }
+        val steps = (max - min).toInt()
+        val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
+        fun set(touchX: Float) {
+            var f = ((touchX - half) / trackPx).coerceIn(0f, 1f)
+            if (rtl) f = 1 - f
+            val v = min + Math.round(f * steps) * (max - min) / steps
+            if (v != value) {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onChange(v)
+            }
+        }
+        val x by animateDpAsState(with(density) { (trackPx * fraction).toDp() }, spring(stiffness = Spring.StiffnessMedium), label = "slider")
+        Box(
+            Modifier
+                .fillMaxSize()
+                .pointerInput(value) { detectTapGestures { set(it.x) } }
+                .pointerInput(value) { detectHorizontalDragGestures { change, _ -> set(change.position.x) } },
+        ) {
+            Box(Modifier.align(Alignment.CenterStart).padding(horizontal = thumb / 2).fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(p.divider))
+            Box(Modifier.align(Alignment.CenterStart).padding(start = thumb / 2).width(x).height(3.dp).clip(RoundedCornerShape(2.dp)).background(p.accent))
+            Box(Modifier.align(Alignment.CenterStart).offset(x = x).size(thumb).background(p.accent, CircleShape))
+        }
     }
 }

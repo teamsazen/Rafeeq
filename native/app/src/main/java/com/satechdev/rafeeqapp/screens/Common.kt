@@ -126,6 +126,8 @@ fun SettingsCard(
     subtitle: String? = null,
     badge: String? = null,
     switch: Boolean? = null,
+    foreground: Color? = null,
+    supporting: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val p = palette
@@ -140,7 +142,7 @@ fun SettingsCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
-                AppIcon(icon, p.accent, 22.dp)
+                AppIcon(icon, foreground ?: p.accent, 22.dp)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
@@ -148,6 +150,10 @@ fun SettingsCard(
                 if (subtitle != null) {
                     Spacer(Modifier.height(4.dp))
                     Txt(subtitle, style(14.sp, p.subtitle, lineHeight = 1.2f))
+                }
+                if (supporting != null) {
+                    Spacer(Modifier.height(8.dp))
+                    supporting()
                 }
             }
             if (switch != null) {

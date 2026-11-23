@@ -73,6 +73,11 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     NumberedList(materialIcons, 0xf793),
     Tune(materialIcons, 0xf0258),
     PlayCircle(materialIcons, 0xf00a2),
+    FormatSize(materialIcons, 0xf798),
+    TranslateRounded(materialIcons, 0xf0250),
+    TextFields(materialIcons, 0xf021e),
+    RecordVoice(materialIcons, 0xf2f3),
+    RestartAlt(materialIcons, 0xf0106),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),

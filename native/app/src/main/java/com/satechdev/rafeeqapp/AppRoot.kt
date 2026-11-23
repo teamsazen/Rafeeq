@@ -79,6 +79,8 @@ import com.satechdev.rafeeqapp.screens.NotificationSoundScreen
 import com.satechdev.rafeeqapp.screens.NotificationTimingScreen
 import com.satechdev.rafeeqapp.screens.PrayerTimesScreen
 import com.satechdev.rafeeqapp.screens.QuranAyahPickerScreen
+import com.satechdev.rafeeqapp.screens.QuranSettingsScreen
+import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.OnboardingScreen
@@ -134,6 +136,8 @@ sealed interface Route {
     }
     data class QuranSectionPicker(val juz: Boolean) : Route { override val key = "section-picker-$juz" }
     data object QuranAyahPicker : Route { override val key = "ayah-picker" }
+    data object QuranSettings : Route { override val key = "quran-settings" }
+    data object TranslationPicker : Route { override val key = "translation-picker" }
     data object PrayerTimes : Route { override val key = "prayer-times" }
     data object NotificationSettings : Route { override val key = "notification-settings" }
     data object NotificationTiming : Route { override val key = "notification-timing" }
@@ -348,6 +352,8 @@ fun AppRoot() {
                                         is Route.QuranReader -> ReaderScreen(route)
                                         is Route.QuranSectionPicker -> QuranSectionPickerScreen(route.juz)
                                         Route.QuranAyahPicker -> QuranAyahPickerScreen()
+                                        Route.QuranSettings -> QuranSettingsScreen()
+                                        Route.TranslationPicker -> TranslationPickerScreen()
                                         Route.PrayerTimes -> PrayerTimesScreen()
                                         Route.NotificationSettings -> NotificationSettingsScreen()
                                         Route.NotificationTiming -> NotificationTimingScreen()

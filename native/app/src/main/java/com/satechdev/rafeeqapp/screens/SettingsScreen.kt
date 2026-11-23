@@ -54,7 +54,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle)) { nav.push(Route.NotificationSettings) },
         ),
         tr(R.string.quran) to listOf(
-            Row(Glyph.MenuBook, tr(R.string.quranViewSettings), tr(R.string.settingsQuranViewSubtitle), onClick = soon(R.string.quranViewSettings)),
+            Row(Glyph.MenuBook, tr(R.string.quranViewSettings), tr(R.string.settingsQuranViewSubtitle)) { nav.push(Route.QuranSettings) },
         ),
         tr(R.string.settingsSectionSupport) to listOf(
             Row(Glyph.ChatBubble, tr(R.string.feedback), tr(R.string.feedbackSubtitle)) { context.open(FEEDBACK_FORM) },

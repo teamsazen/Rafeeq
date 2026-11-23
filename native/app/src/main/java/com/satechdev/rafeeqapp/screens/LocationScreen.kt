@@ -346,34 +346,9 @@ private fun <T> LocationPicker(
     val p = palette
     val search = rememberTextFieldState()
     val query = search.text.toString()
-    var focused by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(p.background)) {
         AppBar(title, onBack = nav::pop)
-        Box(Modifier.fillMaxWidth().padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
-            val border by animateColorAsState(if (focused) p.accent else p.divider, tween(AppMotion.FAST), label = "border")
-            BasicTextField(
-                search,
-                Modifier
-                    .widthIn(max = 760.dp)
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .border(if (focused) 1.5.dp else 1.dp, border, RoundedCornerShape(12.dp))
-                    .onFocusChanged { focused = it.isFocused },
-                textStyle = style(15.sp, p.title),
-                lineLimits = TextFieldLineLimits.SingleLine,
-                cursorBrush = SolidColor(p.accent),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                decorator = { field ->
-                    Row(Modifier.padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.weight(1f)) {
-                            if (query.isEmpty()) Txt(tr(R.string.search), style(15.sp, p.subtitle), maxLines = 1)
-                            field()
-                        }
-                        AppIcon(Glyph.Search, p.subtitle, 24.dp)
-                    }
-                },
-            )
-        }
+        SearchField(search, tr(R.string.search))
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (state) {
                 Loaded.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Spinner(p.accent, 36.dp, 3.dp) }
@@ -431,5 +406,37 @@ private fun PickerRow(title: String, selected: Boolean, onClick: () -> Unit) {
                 AppIcon(Glyph.CheckMark, p.checkForeground, 15.dp)
             }
         }
+    }
+}
+
+/** The picker search box: a rounded outline that takes the accent while typing (Flutter's search TextField). */
+@Composable
+internal fun SearchField(state: androidx.compose.foundation.text.input.TextFieldState, hint: String) {
+    val p = palette
+    var focused by remember { mutableStateOf(false) }
+    Box(Modifier.fillMaxWidth().padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
+        val border by animateColorAsState(if (focused) p.accent else p.divider, tween(AppMotion.FAST), label = "border")
+        BasicTextField(
+            state,
+            Modifier
+                .widthIn(max = 760.dp)
+                .fillMaxWidth()
+                .height(52.dp)
+                .border(if (focused) 1.5.dp else 1.dp, border, RoundedCornerShape(12.dp))
+                .onFocusChanged { focused = it.isFocused },
+            textStyle = style(15.sp, p.title),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            cursorBrush = SolidColor(p.accent),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            decorator = { field ->
+                Row(Modifier.padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f)) {
+                        if (state.text.isEmpty()) Txt(hint, style(15.sp, p.subtitle), maxLines = 1)
+                        field()
+                    }
+                    AppIcon(Glyph.Search, p.subtitle, 24.dp)
+                }
+            },
+        )
     }
 }
