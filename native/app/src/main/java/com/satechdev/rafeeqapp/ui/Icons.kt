@@ -64,6 +64,7 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     LocationOff(materialIcons, 0xf192),
     NotificationsActive(materialIcons, 0xf234),
     VolumeUp(materialIcons, 0xf4a8),
+    Close(materialIcons, 0xf647),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),

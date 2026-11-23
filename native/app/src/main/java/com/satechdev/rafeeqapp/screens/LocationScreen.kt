@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
  * The manual choice while the location screen and its pickers are open:
  * the pickers fill it in, and choosing a city saves it.
  */
-private object LocationDraft {
+internal object LocationDraft {
     var country by mutableStateOf<Country?>(null)
     var city by mutableStateOf<String?>(null)
     var manualExpanded by mutableStateOf(false)
@@ -188,7 +188,7 @@ fun LocationScreen() {
 }
 
 @Composable
-private fun LocationOptionCard(
+internal fun LocationOptionCard(
     icon: Glyph,
     title: String,
     description: String,
@@ -232,7 +232,7 @@ private fun LocationOptionCard(
 }
 
 @Composable
-private fun ManualLocationField(
+internal fun ManualLocationField(
     value: String?,
     placeholder: String,
     onSelectedSurface: Boolean,

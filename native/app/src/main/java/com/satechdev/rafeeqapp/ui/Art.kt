@@ -12,7 +12,12 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import android.graphics.BlurMaskFilter
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -57,8 +62,10 @@ open class Art(val colors: ArtColors) {
     val tealDark get() = colors.primaryDeep
     val gold get() = colors.gold
     val goldLight get() = colors.goldLight
+    val cream get() = colors.surface
     val creamDark get() = colors.surfaceDeep
     val wood get() = colors.wood
+    val woodDark get() = colors.woodDeep
 
     fun DrawScope.stroke(color: Color, width: Float, from: Offset, to: Offset) =
         drawLine(color, from, to, width, StrokeCap.Round)
@@ -73,6 +80,28 @@ open class Art(val colors: ArtColors) {
             radius,
             center,
         )
+    }
+
+    /** A soft drop shadow under [path] (Flutter's ArtPainter.shadow, a blurred mask). */
+    fun DrawScope.shadow(path: Path, blur: Float = 6f, offset: Offset = Offset(0f, 4f)) {
+        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.Black.copy(alpha = if (dark) .35f else .12f).toArgb()
+            // Flutter gives a sigma, Android a radius (sigma ≈ 0.577 × radius); both follow the canvas scale.
+            maskFilter = BlurMaskFilter(blur * 1.73f, BlurMaskFilter.Blur.NORMAL)
+        }
+        translate(offset.x, offset.y) { drawIntoCanvas { it.nativeCanvas.drawPath(path.asAndroidPath(), paint) } }
+    }
+
+    fun DrawScope.leaf(base: Offset, length: Float, angle: Float) {
+        rotate(Math.toDegrees(angle.toDouble()).toFloat(), pivot = base) {
+            drawPath(Path().apply {
+                moveTo(base.x, base.y)
+                quadraticTo(base.x + length * .5f, base.y - length * .32f, base.x + length, base.y)
+                quadraticTo(base.x + length * .5f, base.y + length * .32f, base.x, base.y)
+                close()
+            }, tealDark)
+            drawLine(teal.copy(alpha = .7f), base, base + Offset(length * .85f, 0f), 1f, StrokeCap.Round)
+        }
     }
 
     fun DrawScope.sparkle(c: Offset, r: Float, color: Color = gold) {

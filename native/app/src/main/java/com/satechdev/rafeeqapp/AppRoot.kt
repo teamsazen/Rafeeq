@@ -78,6 +78,7 @@ import com.satechdev.rafeeqapp.screens.NotificationSettingsScreen
 import com.satechdev.rafeeqapp.screens.NotificationSoundScreen
 import com.satechdev.rafeeqapp.screens.NotificationTimingScreen
 import com.satechdev.rafeeqapp.screens.PrayerTimesScreen
+import com.satechdev.rafeeqapp.screens.OnboardingScreen
 import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
 import com.satechdev.rafeeqapp.screens.CityPickerScreen
 import com.satechdev.rafeeqapp.screens.CountryPickerScreen
@@ -106,9 +107,13 @@ import kotlin.math.max
 
 // ---------- Routes ----------
 
+/** Set when onboarding is finished (lib/main.dart). */
+const val ONBOARDING_DONE = "onboarding_completed_v2"
+
 sealed interface Route {
     val key: String
     data object Shell : Route { override val key = "shell" }
+    data object Onboarding : Route { override val key = "onboarding" }
     data object Theme : Route { override val key = "theme" }
     data object Language : Route { override val key = "language" }
     data object CalculationMethod : Route { override val key = "calculation-method" }
@@ -130,8 +135,8 @@ sealed interface Route {
 }
 
 /** A tiny back stack: push goes deeper, back pops. No navigation library needed (from 99 Names). */
-class Navigator {
-    val stack = mutableStateListOf<Route>(Route.Shell)
+class Navigator(start: Route) {
+    val stack = mutableStateListOf(start)
     var forward by mutableStateOf(true); private set
 
     /** The bottom bar's tab while [Route.Shell] is showing. */
@@ -139,6 +144,9 @@ class Navigator {
 
     fun push(route: Route) { forward = true; stack.add(route) }
     fun pop() { if (stack.size > 1) { forward = false; stack.removeAt(stack.lastIndex) } }
+
+    /** Starts over at [route], with nothing to go back to (onboarding into the app). */
+    fun reset(route: Route) { forward = true; stack.clear(); stack.add(route) }
 }
 
 val LocalNavigator = compositionLocalOf<Navigator> { error("No navigator") }
@@ -224,7 +232,8 @@ fun AppRoot() {
     val dark = isDark(Settings.themeMode)
     val p = if (dark) Palette.Dark else Palette.Light
     val language = Settings.language
-    val nav = remember { Navigator() }
+    // The Flutter app's flag, so people who finished onboarding there skip it.
+    val nav = remember { Navigator(if (Settings.flag(ONBOARDING_DONE)) Route.Shell else Route.Onboarding) }
     val holder = rememberSaveableStateHolder()
     val reveal = remember { ThemeReveal() }
     val layer = rememberGraphicsLayer()
@@ -311,6 +320,7 @@ fun AppRoot() {
                                 Box(Modifier.fillMaxSize().background(palette.background)) {
                                     when (route) {
                                         Route.Shell -> AppShell()
+                                        Route.Onboarding -> OnboardingScreen()
                                         Route.Theme -> ThemeScreen()
                                         Route.Language -> LanguageScreen()
                                         Route.CalculationMethod -> CalculationMethodScreen()

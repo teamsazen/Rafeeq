@@ -124,7 +124,7 @@ previous build, with nothing lost.
 
 ### Phase 2: home, prayer times and azan
 
-Home screen and its scene artwork, Friday, Ramadan and Eid cards, location
+Home screen and its scene artwork, location
 (GPS and manual), calculation, juristic and high latitude settings, Hijri
 correction, time format, prayer times screen, notification settings and
 sound, exact azan alarms that survive reboot, and onboarding.
@@ -153,7 +153,7 @@ Flutter app comes out of the repo, as in 99 Names.
 | Phase | State |
 |---|---|
 | 1. Foundation | Done (2026-11-23), see notes |
-| 2. Home, prayer times, azan | In progress: home, prayer times, settings, location and reminders done; onboarding and event cards left |
+| 2. Home, prayer times, azan | Done (2026-11-23), see notes |
 | 3. Quran | Not started |
 | 4. Everything else | Not started |
 | 5. Release | Not started |
@@ -174,8 +174,6 @@ Left for later phases:
 - Predictive back (Android 14+) on page changes.
 - The bottom bar has no backdrop blur; it uses Flutter's translucent
   gradient only. Compose has no backdrop blur before Android 12.
-- Back on the home tab exits straight away; Flutter asks first (phase 2,
-  with the home screen).
 - Material Icons ships as the full font (1.6 MB); subset the icon fonts to
   the glyphs used before release (phase 5).
 - Credit the icon fonts in Licences (phase 4).
@@ -198,3 +196,12 @@ Left for later phases:
   once.
 - Debug builds can fire a test reminder:
   `adb shell am broadcast -n com.satechdev.rafeeqapp.debug/com.satechdev.rafeeqapp.DebugReminderReceiver -a test --ei seconds 60`.
+- The Friday, Ramadan and Eid event cards and dialogs are left out on
+  purpose (owner, 2026-11-23): they will come back later in a better form.
+  Their `eventPreviews` and seen markers in the settings are kept untouched.
+- Onboarding uses the Flutter flag `onboarding_completed_v2`, so people who
+  finished it in Flutter go straight in. Steps slide forward and back
+  instead of Flutter's fade. Back on the home tab asks before leaving.
+- To check: the R-Debug icon showed as the default robot on one Samsung
+  settings screen (likely its icon cache from the Flutter debug build);
+  look at the launcher icon before release.

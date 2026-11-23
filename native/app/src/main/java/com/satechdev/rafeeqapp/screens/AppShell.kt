@@ -1,6 +1,10 @@
 package com.satechdev.rafeeqapp.screens
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -64,7 +68,11 @@ private const val HOME = 0
 fun AppShell() {
     val nav = LocalNavigator.current
     val goHome = { nav.tab = HOME }
-    BackHandler(nav.tab != HOME, goHome)
+    val activity = LocalContext.current as? Activity
+    var askExit by remember { mutableStateOf(false) }
+    // Back goes home from another tab; on home it asks before leaving, as Flutter does.
+    BackHandler { if (nav.tab != HOME) goHome() else askExit = true }
+    if (askExit) ExitDialog(onDismiss = { askExit = false }, onExit = { askExit = false; activity?.finish() })
 
     Box(Modifier.fillMaxSize().background(palette.background)) {
         AnimatedContent(
