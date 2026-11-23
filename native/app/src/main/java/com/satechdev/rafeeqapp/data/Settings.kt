@@ -288,6 +288,21 @@ object Settings {
         prefs.edit().putLong(k(key), value.toLong()).apply()
     }
 
+    /** Every stored key and value, for the developer panel in debug builds. */
+    fun everything(): Map<String, Any?> = prefs.all.toSortedMap()
+
+    /** Removes one stored key (as stored, with its prefix) and reloads, for the developer panel. */
+    fun remove(storedKey: String) {
+        prefs.edit().remove(storedKey).commit()
+        load(app)
+    }
+
+    /** Removes every stored key and reloads, for the developer panel. */
+    fun clearAll() {
+        prefs.edit().clear().commit()
+        load(app)
+    }
+
     /** A plain shared_preferences string, such as the chosen reciter. */
     fun string(key: String): String? = prefs.getString(k(key), null)
 

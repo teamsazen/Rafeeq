@@ -84,7 +84,15 @@ import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.AyahFocusScreen
+import com.satechdev.rafeeqapp.screens.AboutScreen
+import com.satechdev.rafeeqapp.screens.DeveloperPanelScreen
+import com.satechdev.rafeeqapp.screens.DeveloperPrefsScreen
+import com.satechdev.rafeeqapp.screens.LicenceDetailScreen
+import com.satechdev.rafeeqapp.screens.LicencesScreen
 import com.satechdev.rafeeqapp.screens.AsmaDetailScreen
+import com.satechdev.rafeeqapp.screens.LegalDocument
+import com.satechdev.rafeeqapp.screens.LegalScreen
+import com.satechdev.rafeeqapp.screens.VersionScreen
 import com.satechdev.rafeeqapp.screens.AyahPictureScreen
 import com.satechdev.rafeeqapp.screens.PictureAyahPickerScreen
 import com.satechdev.rafeeqapp.screens.PictureSurahPickerScreen
@@ -108,7 +116,6 @@ import com.satechdev.rafeeqapp.screens.HijriCorrectionScreen
 import com.satechdev.rafeeqapp.screens.JuristicMethodScreen
 import com.satechdev.rafeeqapp.screens.TimeFormatScreen
 import com.satechdev.rafeeqapp.screens.LanguageScreen
-import com.satechdev.rafeeqapp.screens.PlaceholderScreen
 import com.satechdev.rafeeqapp.screens.ThemeScreen
 import com.satechdev.rafeeqapp.ui.AppFonts
 import com.satechdev.rafeeqapp.ui.AppMotion
@@ -157,6 +164,13 @@ sealed interface Route {
     data object HijriCalendar : Route { override val key = "hijri-calendar" }
     data object AsmaList : Route { override val key = "asma" }
     data object Namaz : Route { override val key = "namaz" }
+    data class Legal(val document: LegalDocument) : Route { override val key = "legal-${document.key}" }
+    data object About : Route { override val key = "about" }
+    data object Licences : Route { override val key = "licences" }
+    data class LicenceDetail(val index: Int) : Route { override val key = "licence-$index" }
+    data object DeveloperPanel : Route { override val key = "developer" }
+    data object DeveloperPrefs : Route { override val key = "developer-prefs" }
+    data object Version : Route { override val key = "version" }
     data object NamazGuide : Route { override val key = "namaz-guide" }
     data object Wudu : Route { override val key = "wudu" }
     data class AsmaDetail(val index: Int) : Route { override val key = "asma-$index" }
@@ -175,7 +189,6 @@ sealed interface Route {
     data class NotificationSound(val notifKey: NotifKey) : Route { override val key = "notification-sound-${notifKey.stored}" }
 
     /** A screen that is still Flutter only; it arrives in a later phase. */
-    data class Placeholder(@StringRes val title: Int) : Route { override val key = "placeholder-$title" }
 }
 
 /** A tiny back stack: push goes deeper, back pops. No navigation library needed (from 99 Names). */
@@ -387,6 +400,13 @@ fun AppRoot() {
                                         Route.HijriCalendar -> HijriCalendarScreen()
                                         Route.AsmaList -> AsmaListScreen()
                                         Route.Namaz -> NamazScreen()
+                                        is Route.Legal -> LegalScreen(route.document)
+                                        Route.About -> AboutScreen()
+                                        Route.Licences -> LicencesScreen()
+                                        is Route.LicenceDetail -> LicenceDetailScreen(route.index)
+                                        Route.DeveloperPanel -> DeveloperPanelScreen()
+                                        Route.DeveloperPrefs -> DeveloperPrefsScreen()
+                                        Route.Version -> VersionScreen()
                                         Route.NamazGuide -> NamazGuideScreen()
                                         Route.Wudu -> WuduScreen()
                                         is Route.AsmaDetail -> AsmaDetailScreen(route.index)
@@ -402,7 +422,6 @@ fun AppRoot() {
                                         Route.NotificationTiming -> NotificationTimingScreen()
                                         is Route.NotificationEditor -> NotificationEditorScreen(route.notifKey)
                                         is Route.NotificationSound -> NotificationSoundScreen(route.notifKey)
-                                        is Route.Placeholder -> PlaceholderScreen(route.title)
                                     }
                                 }
                             }

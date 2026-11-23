@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Strings only the native app has. The rest come from lib/l10n (strings.xml). -->
 <resources>
-    <string name="nativeComingTitle">Coming to the native app</string>
-    <string name="nativeComingBody">This screen is still being rebuilt. It works in the current Rafeeq app.</string>
     <string name="settingsNotificationSubtitle">Prayer reminders and notification settings</string>
     <string name="settingsQuranViewSubtitle">Script, font size, translation &amp; recitation settings</string>
     <string name="unableToPlayQuranAudio">Unable to play Quran audio right now.</string>

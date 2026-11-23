@@ -54,25 +54,3 @@ fun LanguageScreen() {
         }
     }
 }
-
-/** Stands in for a screen that is still Flutter only, until its phase. */
-@Composable
-fun PlaceholderScreen(@StringRes title: Int) {
-    val nav = LocalNavigator.current
-    Column(Modifier.fillMaxSize().background(palette.background)) {
-        AppBar(tr(title), onBack = nav::pop)
-        ComingSoon()
-    }
-}
-
-@Composable
-fun ComingSoon(modifier: Modifier = Modifier) {
-    val p = palette
-    Box(modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-        Column(Modifier.widthIn(max = 420.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Txt(tr(R.string.nativeComingTitle), style(18.sp, p.title, FontWeight.SemiBold, align = TextAlign.Center))
-            Spacer(Modifier.height(8.dp))
-            Txt(tr(R.string.nativeComingBody), style(14.sp, p.subtitle, lineHeight = 1.4f, align = TextAlign.Center))
-        }
-    }
-}

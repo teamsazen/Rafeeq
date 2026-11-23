@@ -1,5 +1,15 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.ui.pressable
+
+import com.satechdev.rafeeqapp.ui.AppIcon
+
+import androidx.compose.ui.Alignment
+
+import androidx.compose.foundation.layout.size
+
+import androidx.compose.foundation.layout.Box
+
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -36,7 +46,6 @@ private class Row(val icon: Glyph, val title: String, val subtitle: String?, val
 fun SettingsScreen(onBack: () -> Unit) {
     val nav = LocalNavigator.current
     val context = LocalContext.current
-    fun soon(title: Int): () -> Unit = { nav.push(Route.Placeholder(title)) }
 
     val sections = listOf(
         tr(R.string.general) to listOf(
@@ -64,19 +73,26 @@ fun SettingsScreen(onBack: () -> Unit) {
             Row(Glyph.Code, tr(R.string.contribute), tr(R.string.contributeSubtitle)) { context.open(REPOSITORY) },
         ),
         tr(R.string.settingsSectionAppInfo) to listOf(
-            Row(Glyph.PrivacyTip, tr(R.string.privacyPolicy), tr(R.string.privacyPolicySubtitle), onClick = soon(R.string.privacyPolicy)),
-            Row(Glyph.Gavel, tr(R.string.termsAndConditions), tr(R.string.termsAndConditionsSubtitle), onClick = soon(R.string.termsAndConditions)),
-            Row(Glyph.Description, tr(R.string.licenses), tr(R.string.licensesSubtitle), onClick = soon(R.string.licenses)),
+            Row(Glyph.PrivacyTip, tr(R.string.privacyPolicy), tr(R.string.privacyPolicySubtitle), onClick = { nav.push(Route.Legal(LegalDocument.Privacy)) }),
+            Row(Glyph.Gavel, tr(R.string.termsAndConditions), tr(R.string.termsAndConditionsSubtitle), onClick = { nav.push(Route.Legal(LegalDocument.Terms)) }),
+            Row(Glyph.Description, tr(R.string.licenses), tr(R.string.licensesSubtitle), onClick = { nav.push(Route.Licences) }),
             Row(Glyph.Info, tr(R.string.about), tr(R.string.aboutSubtitle), badge = if (Settings.aboutOpened) null else "NEW") {
                 Settings.markAboutOpened()
-                nav.push(Route.Placeholder(R.string.about))
+                nav.push(Route.About)
             },
-            Row(Glyph.Tag, tr(R.string.version), "${tr(R.string.versionSubtitle)}  •  ${BuildConfig.VERSION_NAME}", onClick = soon(R.string.version)),
+            Row(Glyph.Tag, tr(R.string.version), "${tr(R.string.versionSubtitle)}  •  ${BuildConfig.VERSION_NAME}", onClick = { nav.push(Route.Version) }),
         ),
     )
 
     Column(Modifier.fillMaxSize().background(palette.background)) {
-        AppBar(tr(R.string.settings), onBack = onBack)
+        AppBar(tr(R.string.settings), onBack = onBack) {
+            // Debug builds only, as Flutter's kDebugMode action.
+            if (BuildConfig.DEBUG) {
+                Box(Modifier.size(48.dp).pressable({ nav.push(Route.DeveloperPanel) }, scale = .85f), contentAlignment = Alignment.Center) {
+                    AppIcon(Glyph.DeveloperMode, palette.title, 24.dp)
+                }
+            }
+        }
         CenteredList(bottom = TabBottomPadding) {
             sections.forEachIndexed { index, (title, rows) ->
                 item(key = "title-$index") {
