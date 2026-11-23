@@ -72,6 +72,14 @@ import com.satechdev.rafeeqapp.data.AppLanguage
 import com.satechdev.rafeeqapp.data.Settings
 import com.satechdev.rafeeqapp.data.ThemeMode
 import com.satechdev.rafeeqapp.screens.AppShell
+import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
+import com.satechdev.rafeeqapp.screens.CityPickerScreen
+import com.satechdev.rafeeqapp.screens.CountryPickerScreen
+import com.satechdev.rafeeqapp.screens.LocationScreen
+import com.satechdev.rafeeqapp.screens.HighLatitudeRuleScreen
+import com.satechdev.rafeeqapp.screens.HijriCorrectionScreen
+import com.satechdev.rafeeqapp.screens.JuristicMethodScreen
+import com.satechdev.rafeeqapp.screens.TimeFormatScreen
 import com.satechdev.rafeeqapp.screens.LanguageScreen
 import com.satechdev.rafeeqapp.screens.PlaceholderScreen
 import com.satechdev.rafeeqapp.screens.ThemeScreen
@@ -97,6 +105,14 @@ sealed interface Route {
     data object Shell : Route { override val key = "shell" }
     data object Theme : Route { override val key = "theme" }
     data object Language : Route { override val key = "language" }
+    data object CalculationMethod : Route { override val key = "calculation-method" }
+    data object JuristicMethod : Route { override val key = "juristic-method" }
+    data object HighLatitudeRule : Route { override val key = "high-latitude-rule" }
+    data object HijriCorrection : Route { override val key = "hijri-correction" }
+    data object TimeFormat : Route { override val key = "time-format" }
+    data object Location : Route { override val key = "location" }
+    data object CountryPicker : Route { override val key = "country-picker" }
+    data object CityPicker : Route { override val key = "city-picker" }
 
     /** A screen that is still Flutter only; it arrives in a later phase. */
     data class Placeholder(@StringRes val title: Int) : Route { override val key = "placeholder-$title" }
@@ -286,6 +302,14 @@ fun AppRoot() {
                                         Route.Shell -> AppShell()
                                         Route.Theme -> ThemeScreen()
                                         Route.Language -> LanguageScreen()
+                                        Route.CalculationMethod -> CalculationMethodScreen()
+                                        Route.JuristicMethod -> JuristicMethodScreen()
+                                        Route.HighLatitudeRule -> HighLatitudeRuleScreen()
+                                        Route.HijriCorrection -> HijriCorrectionScreen()
+                                        Route.TimeFormat -> TimeFormatScreen()
+                                        Route.Location -> LocationScreen()
+                                        Route.CountryPicker -> CountryPickerScreen()
+                                        Route.CityPicker -> CityPickerScreen()
                                         is Route.Placeholder -> PlaceholderScreen(route.title)
                                     }
                                 }

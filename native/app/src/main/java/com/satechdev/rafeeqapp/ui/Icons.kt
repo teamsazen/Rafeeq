@@ -50,6 +50,11 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Info(materialIcons, 0xf815),
     Tag(materialIcons, 0xf0216),
     ArrowBack(materialIcons, 0xf572),
+    MyLocation(materialIcons, 0xf1fe),
+    Check(materialIcons, 0xf636),
+    ArrowDown(materialIcons, 0xf82b),
+    Search(materialIcons, 0xf013d),
+    CloudOff(materialIcons, 0xef61),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),
@@ -58,6 +63,7 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     SettingsSolid(cupertinoIcons, 0xf412),
     Location(cupertinoIcons, 0xf6ee),
     CheckMark(cupertinoIcons, 0xf3fd),
+    LocationSlash(cupertinoIcons, 0xf6f6),
 
     // Flutter Islamic Icons
     Quran(islamicIcons, 0xe81b),

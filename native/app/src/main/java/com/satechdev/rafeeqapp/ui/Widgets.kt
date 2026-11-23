@@ -2,6 +2,19 @@ package com.satechdev.rafeeqapp.ui
 
 import android.provider.Settings.Global
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -89,4 +102,25 @@ fun Modifier.pressable(onClick: (() -> Unit)?, scale: Float = .98f): Modifier {
     return this
         .graphicsLayer { scaleX = s; scaleY = s }
         .clickable(source, indication = null, enabled = onClick != null, role = Role.Button) { onClick?.invoke() }
+}
+
+/** A small indeterminate spinner, like Flutter's CircularProgressIndicator (Compose without Material has none). */
+@Composable
+fun Spinner(color: Color, size: Dp = 20.dp, stroke: Dp = 2.dp) {
+    val turn = rememberInfiniteTransition(label = "spinner")
+    val angle by turn.animateFloat(0f, 360f, infiniteRepeatable(tween(1000, easing = LinearEasing)), label = "angle")
+    val sweep by turn.animateFloat(
+        30f, 270f,
+        infiniteRepeatable(tween(700, easing = AppMotion.easeOut), RepeatMode.Reverse),
+        label = "sweep",
+    )
+    Canvas(Modifier.size(size)) {
+        val width = stroke.toPx()
+        drawArc(
+            color, angle, sweep, useCenter = false,
+            topLeft = Offset(width / 2, width / 2),
+            size = Size(this.size.width - width, this.size.height - width),
+            style = Stroke(width, cap = StrokeCap.Round),
+        )
+    }
 }

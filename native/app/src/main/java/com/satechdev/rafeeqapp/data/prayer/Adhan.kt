@@ -25,7 +25,7 @@ import kotlin.math.tan
  * fails: "twilight angle" with a method that has an Isha interval and no Isha
  * angle (Umm al-Qura, Qatar) uses an Isha night portion of 0, which those
  * methods never read; and a Maghrib angle the sun never reaches keeps Maghrib
- * at sunset. tool/adhan_reference checks every other case against Dart.
+ * at sunset. tool/reference checks every other case against Dart.
  */
 
 data class Coordinates(val latitude: Double, val longitude: Double)

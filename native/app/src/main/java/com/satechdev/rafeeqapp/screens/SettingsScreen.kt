@@ -41,15 +41,15 @@ fun SettingsScreen(onBack: () -> Unit) {
     val sections = listOf(
         tr(R.string.general) to listOf(
             Row(Glyph.Translate, tr(R.string.language), languageLabel(Settings.language)) { nav.push(Route.Language) },
-            Row(Glyph.Explore, tr(R.string.location), locationLabel(), onClick = soon(R.string.location)),
+            Row(Glyph.Explore, tr(R.string.location), locationLabel()) { nav.push(Route.Location) },
             Row(Glyph.Palette, tr(R.string.appTheme), themeLabel(Settings.themeMode)) { nav.push(Route.Theme) },
         ),
         tr(R.string.settingsSectionPrayer) to listOf(
-            Row(Glyph.Clock, tr(R.string.calculationMethod), calcMethodLabel(Settings.prayerCalcMethod), onClick = soon(R.string.calculationMethod)),
-            Row(Glyph.Layers, tr(R.string.juristicMethod), asrLabel(Settings.asrMethod), onClick = soon(R.string.juristicMethod)),
-            Row(Glyph.Public, tr(R.string.highLatitudeRule), highLatitudeLabel(Settings.highLatitude), onClick = soon(R.string.highLatitudeRule)),
-            Row(Glyph.Calendar, tr(R.string.hijriCorrection), hijriLabel(Settings.hijriCorrection), onClick = soon(R.string.hijriCorrection)),
-            Row(Glyph.Schedule, tr(R.string.timeFormat), timeFormatLabel(Settings.timeFormat), onClick = soon(R.string.timeFormat)),
+            Row(Glyph.Clock, tr(R.string.calculationMethod), tr(Settings.calcMethod.label)) { nav.push(Route.CalculationMethod) },
+            Row(Glyph.Layers, tr(R.string.juristicMethod), tr(Settings.asrMethod.label)) { nav.push(Route.JuristicMethod) },
+            Row(Glyph.Public, tr(R.string.highLatitudeRule), tr(Settings.highLatitude.label)) { nav.push(Route.HighLatitudeRule) },
+            Row(Glyph.Calendar, tr(R.string.hijriCorrection), tr(Settings.hijriCorrection.label)) { nav.push(Route.HijriCorrection) },
+            Row(Glyph.Schedule, tr(R.string.timeFormat), tr(Settings.timeFormat.label)) { nav.push(Route.TimeFormat) },
             Row(Glyph.AccessTime, tr(R.string.prayerTimes), locationLabel(), onClick = soon(R.string.prayerTimes)),
             Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle), onClick = soon(R.string.notification)),
         ),
@@ -111,55 +111,10 @@ fun themeLabel(mode: ThemeMode) = when (mode) {
 }
 
 @Composable
-private fun locationLabel(): String {
-    val parts = listOfNotNull(Settings.city, Settings.country)
+fun locationLabel(): String {
+    val parts = listOfNotNull(Settings.location?.city, Settings.location?.country)
     return if (parts.isEmpty()) tr(R.string.locationNotSet) else parts.joinToString(", ")
 }
-
-@Composable
-private fun calcMethodLabel(name: String) = tr(
-    when (name) {
-        "muslim_world_league" -> R.string.calcMethodMWL
-        "egyptian" -> R.string.calcMethodEgyptian
-        "umm_al_qura" -> R.string.calcMethodUmmAlQura
-        "dubai" -> R.string.calcMethodDubai
-        "moon_sighting_committee" -> R.string.calcMethodMoonsighting
-        "north_america" -> R.string.calcMethodNorthAmerica
-        "kuwait" -> R.string.calcMethodKuwait
-        "qatar" -> R.string.calcMethodQatar
-        "singapore" -> R.string.calcMethodSingapore
-        "turkey" -> R.string.calcMethodTurkey
-        "tehran" -> R.string.calcMethodTehran
-        "jafari" -> R.string.calcMethodJafari
-        else -> R.string.calcMethodKarachi
-    },
-)
-
-@Composable
-private fun asrLabel(name: String) = tr(if (name == "others") R.string.asrMethodStandard else R.string.asrMethodHanafi)
-
-@Composable
-private fun highLatitudeLabel(name: String) = tr(
-    when (name) {
-        "middleOfTheNight" -> R.string.highLatMiddleNight
-        "oneSeventh" -> R.string.highLatOneSeventh
-        else -> R.string.highLatAngleBased
-    },
-)
-
-@Composable
-private fun hijriLabel(name: String) = tr(
-    when (name) {
-        "minus2Days" -> R.string.hijriMinus2Days
-        "minus1Day" -> R.string.hijriMinus1Day
-        "plus1Day" -> R.string.hijriPlus1Day
-        "plus2Days" -> R.string.hijriPlus2Days
-        else -> R.string.hijriNone
-    },
-)
-
-@Composable
-private fun timeFormatLabel(name: String) = tr(if (name == "twentyFourHour") R.string.timeFormat24Hour else R.string.timeFormat12Hour)
 
 // ---------- Intents ----------
 

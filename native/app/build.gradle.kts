@@ -63,6 +63,8 @@ android {
     }
 
     compileOptions {
+        // java.time on Android 7 (minSdk 24), as the Flutter app had.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -102,6 +104,8 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")

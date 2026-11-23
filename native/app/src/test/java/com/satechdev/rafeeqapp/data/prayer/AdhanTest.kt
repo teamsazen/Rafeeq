@@ -9,7 +9,7 @@ import java.util.TimeZone
 
 /**
  * The Kotlin port against the Dart adhan package the Flutter app uses
- * (resources/adhan_reference.json, from tool/adhan_reference).
+ * (resources/adhan_reference.json, from tool/reference).
  */
 class AdhanTest {
     private val zone = TimeZone.getTimeZone("America/New_York")
