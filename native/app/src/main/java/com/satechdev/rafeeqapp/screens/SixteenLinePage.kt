@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.semantics.contentDescription
@@ -275,17 +276,18 @@ private fun WordsCanvas(
     ) {
         val at = place(widths, size.width, centered, naturalPx, fontPx).also { places = it }
         if (glow > 0f && keys != null) {
-            // The words of the ayah being recited, each with half the space either side so they join up.
-            val pad = 3.dp.toPx()
-            keys.forEachIndexed { i, key ->
-                if (key == playing) {
-                    drawRoundRect(
-                        p.accent.copy(alpha = .2f * glow),
-                        Offset(at.lefts[i] - at.gap / 2, pad),
-                        Size(widths[i] * at.scale + at.gap, size.height - pad * 2),
-                        CornerRadius(4.dp.toPx()),
-                    )
-                }
+            // One band under the whole ayah on this line, from its first word to its last.
+            val lit = keys.indices.filter { keys[it] == playing }
+            if (lit.isNotEmpty()) {
+                val left = lit.minOf { at.lefts[it] } - at.gap / 2
+                val right = lit.maxOf { at.lefts[it] + widths[it] * at.scale } + at.gap / 2
+                val pad = 3.dp.toPx()
+                drawRoundRect(
+                    p.accent.copy(alpha = .2f * glow),
+                    Offset(left.coerceAtLeast(0f), pad),
+                    Size(right.coerceAtMost(size.width) - left.coerceAtLeast(0f), size.height - pad * 2),
+                    CornerRadius(6.dp.toPx()),
+                )
             }
         }
         val outline = Stroke(width = fontPx * STROKE * at.scale, join = StrokeJoin.Round)
@@ -293,7 +295,8 @@ private fun WordsCanvas(
             val top = (size.height - text.size.height * at.scale) / 2
             withTransform({ translate(at.lefts[i], top); scale(at.scale, at.scale, Offset.Zero) }) {
                 drawText(text, ink, drawStyle = outline)
-                drawText(text, ink)
+                // Fill named outright: the paragraph keeps the last draw style, which was the outline.
+                drawText(text, ink, drawStyle = Fill)
             }
             if (i == rukuWord && ain != null) {
                 val x = at.lefts[i] + (widths[i] * at.scale - ain.size.width) / 2

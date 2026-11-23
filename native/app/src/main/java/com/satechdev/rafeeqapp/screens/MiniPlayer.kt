@@ -1,11 +1,15 @@
 package com.satechdev.rafeeqapp.screens
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.runtime.mutableFloatStateOf
 import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
@@ -143,7 +147,7 @@ private fun MiniPlayer(where: PlayerPlace) {
         state.effectiveDuration <= 0 -> 0f
         else -> (state.position.toFloat() / state.effectiveDuration).coerceIn(0f, 1f)
     }
-    val progress by animateFloatAsState(progressTarget, tween(180), label = "progress")
+    val progress = smoothProgress(state, progressTarget)
     // Once finished it opens nothing, but still takes the tap so it cannot reach the screen behind.
     val open: () -> Unit = if (state.isComplete) ({}) else ({
         when (where) {
@@ -273,4 +277,29 @@ fun PlayingWave(color: Color, modifier: Modifier = Modifier) {
             drawRoundRect(color, Offset(i * (bar + gap), (size.height - h) / 2), Size(bar, h), CornerRadius(bar / 2))
         }
     }
+}
+
+/**
+ * The progress line's fraction, moved on every frame while an ayah plays:
+ * the player reports its position only every 200 ms, so the line runs on
+ * from the last report by the time since, and a new report just corrects it.
+ */
+@Composable
+private fun smoothProgress(state: AudioState, reported: Float): Float {
+    var shown by remember { mutableFloatStateOf(reported) }
+    val running = state.isPlaying && !state.isComplete && state.duration > 0
+    val position = state.position
+    val duration = state.effectiveDuration
+    LaunchedEffect(running, position, duration, reported) {
+        if (!running) {
+            shown = reported
+            return@LaunchedEffect
+        }
+        val start = withFrameMillis { it }
+        while (true) {
+            val now = withFrameMillis { it }
+            shown = ((position + (now - start)).toFloat() / duration).coerceIn(0f, 1f)
+        }
+    }
+    return shown
 }
