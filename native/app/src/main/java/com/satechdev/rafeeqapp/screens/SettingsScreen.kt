@@ -1,0 +1,176 @@
+package com.satechdev.rafeeqapp.screens
+
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import com.satechdev.rafeeqapp.BuildConfig
+import com.satechdev.rafeeqapp.LocalNavigator
+import com.satechdev.rafeeqapp.R
+import com.satechdev.rafeeqapp.Route
+import com.satechdev.rafeeqapp.data.AppLanguage
+import com.satechdev.rafeeqapp.data.Settings
+import com.satechdev.rafeeqapp.data.ThemeMode
+import com.satechdev.rafeeqapp.tr
+import com.satechdev.rafeeqapp.ui.Glyph
+import com.satechdev.rafeeqapp.ui.palette
+
+private const val PLAY_STORE = "https://play.google.com/store/apps/details?id=com.satechdev.rafeeqapp"
+private const val FEEDBACK_FORM = "https://forms.gle/cDLne2RtGvfmqrJn9"
+private const val REPOSITORY = "https://github.com/teamsazen/Rafeeq"
+private const val REPORT_ISSUE = "https://github.com/teamsazen/Rafeeq/issues/new"
+
+private class Row(val icon: Glyph, val title: String, val subtitle: String?, val badge: String? = null, val onClick: () -> Unit)
+
+/** The Settings tab, laid out as lib/ui/app_home/home/settings_screen.dart. */
+@Composable
+fun SettingsScreen(onBack: () -> Unit) {
+    val nav = LocalNavigator.current
+    val context = LocalContext.current
+    fun soon(title: Int): () -> Unit = { nav.push(Route.Placeholder(title)) }
+
+    val sections = listOf(
+        tr(R.string.general) to listOf(
+            Row(Glyph.Translate, tr(R.string.language), languageLabel(Settings.language)) { nav.push(Route.Language) },
+            Row(Glyph.Explore, tr(R.string.location), locationLabel(), onClick = soon(R.string.location)),
+            Row(Glyph.Palette, tr(R.string.appTheme), themeLabel(Settings.themeMode)) { nav.push(Route.Theme) },
+        ),
+        tr(R.string.settingsSectionPrayer) to listOf(
+            Row(Glyph.Clock, tr(R.string.calculationMethod), calcMethodLabel(Settings.prayerCalcMethod), onClick = soon(R.string.calculationMethod)),
+            Row(Glyph.Layers, tr(R.string.juristicMethod), asrLabel(Settings.asrMethod), onClick = soon(R.string.juristicMethod)),
+            Row(Glyph.Public, tr(R.string.highLatitudeRule), highLatitudeLabel(Settings.highLatitude), onClick = soon(R.string.highLatitudeRule)),
+            Row(Glyph.Calendar, tr(R.string.hijriCorrection), hijriLabel(Settings.hijriCorrection), onClick = soon(R.string.hijriCorrection)),
+            Row(Glyph.Schedule, tr(R.string.timeFormat), timeFormatLabel(Settings.timeFormat), onClick = soon(R.string.timeFormat)),
+            Row(Glyph.AccessTime, tr(R.string.prayerTimes), locationLabel(), onClick = soon(R.string.prayerTimes)),
+            Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle), onClick = soon(R.string.notification)),
+        ),
+        tr(R.string.quran) to listOf(
+            Row(Glyph.MenuBook, tr(R.string.quranViewSettings), tr(R.string.settingsQuranViewSubtitle), onClick = soon(R.string.quranViewSettings)),
+        ),
+        tr(R.string.settingsSectionSupport) to listOf(
+            Row(Glyph.ChatBubble, tr(R.string.feedback), tr(R.string.feedbackSubtitle)) { context.open(FEEDBACK_FORM) },
+            Row(Glyph.StarBorder, tr(R.string.rateThisApp), tr(R.string.rateThisAppSubtitle)) { context.open(PLAY_STORE) },
+            Row(Glyph.Share, tr(R.string.shareThisApp), tr(R.string.shareThisAppSubtitle)) { context.share(PLAY_STORE) },
+            Row(Glyph.BugReport, tr(R.string.reportIssue), tr(R.string.reportIssueSubtitle)) { context.open(REPORT_ISSUE) },
+            Row(Glyph.Code, tr(R.string.contribute), tr(R.string.contributeSubtitle)) { context.open(REPOSITORY) },
+        ),
+        tr(R.string.settingsSectionAppInfo) to listOf(
+            Row(Glyph.PrivacyTip, tr(R.string.privacyPolicy), tr(R.string.privacyPolicySubtitle), onClick = soon(R.string.privacyPolicy)),
+            Row(Glyph.Gavel, tr(R.string.termsAndConditions), tr(R.string.termsAndConditionsSubtitle), onClick = soon(R.string.termsAndConditions)),
+            Row(Glyph.Description, tr(R.string.licenses), tr(R.string.licensesSubtitle), onClick = soon(R.string.licenses)),
+            Row(Glyph.Info, tr(R.string.about), tr(R.string.aboutSubtitle), badge = if (Settings.aboutOpened) null else "NEW") {
+                Settings.markAboutOpened()
+                nav.push(Route.Placeholder(R.string.about))
+            },
+            Row(Glyph.Tag, tr(R.string.version), "${tr(R.string.versionSubtitle)}  •  ${BuildConfig.VERSION_NAME}", onClick = soon(R.string.version)),
+        ),
+    )
+
+    Column(Modifier.fillMaxSize().background(palette.background)) {
+        AppBar(tr(R.string.settings), onBack = onBack)
+        CenteredList(bottom = TabBottomPadding) {
+            sections.forEachIndexed { index, (title, rows) ->
+                item(key = "title-$index") {
+                    if (index > 0) Spacer(Modifier.height(24.dp))
+                    SectionTitle(title)
+                    Spacer(Modifier.height(12.dp))
+                }
+                rows.forEachIndexed { rowIndex, row ->
+                    item(key = "$index-$rowIndex") {
+                        if (rowIndex > 0) Spacer(Modifier.height(8.dp))
+                        SettingsCard(row.icon, row.title, row.subtitle, row.badge, row.onClick)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---------- Labels, as the Flutter enums' getLabel ----------
+
+@Composable
+fun languageLabel(language: AppLanguage) = when (language) {
+    AppLanguage.English -> tr(R.string.languageEnglish)
+    AppLanguage.Urdu -> tr(R.string.languageUrdu)
+}
+
+@Composable
+fun themeLabel(mode: ThemeMode) = when (mode) {
+    ThemeMode.Light -> tr(R.string.themeModeLight)
+    ThemeMode.System -> tr(R.string.themeModeSystem)
+    ThemeMode.Dark -> tr(R.string.themeModeDark)
+}
+
+@Composable
+private fun locationLabel(): String {
+    val parts = listOfNotNull(Settings.city, Settings.country)
+    return if (parts.isEmpty()) tr(R.string.locationNotSet) else parts.joinToString(", ")
+}
+
+@Composable
+private fun calcMethodLabel(name: String) = tr(
+    when (name) {
+        "muslim_world_league" -> R.string.calcMethodMWL
+        "egyptian" -> R.string.calcMethodEgyptian
+        "umm_al_qura" -> R.string.calcMethodUmmAlQura
+        "dubai" -> R.string.calcMethodDubai
+        "moon_sighting_committee" -> R.string.calcMethodMoonsighting
+        "north_america" -> R.string.calcMethodNorthAmerica
+        "kuwait" -> R.string.calcMethodKuwait
+        "qatar" -> R.string.calcMethodQatar
+        "singapore" -> R.string.calcMethodSingapore
+        "turkey" -> R.string.calcMethodTurkey
+        "tehran" -> R.string.calcMethodTehran
+        "jafari" -> R.string.calcMethodJafari
+        else -> R.string.calcMethodKarachi
+    },
+)
+
+@Composable
+private fun asrLabel(name: String) = tr(if (name == "others") R.string.asrMethodStandard else R.string.asrMethodHanafi)
+
+@Composable
+private fun highLatitudeLabel(name: String) = tr(
+    when (name) {
+        "middleOfTheNight" -> R.string.highLatMiddleNight
+        "oneSeventh" -> R.string.highLatOneSeventh
+        else -> R.string.highLatAngleBased
+    },
+)
+
+@Composable
+private fun hijriLabel(name: String) = tr(
+    when (name) {
+        "minus2Days" -> R.string.hijriMinus2Days
+        "minus1Day" -> R.string.hijriMinus1Day
+        "plus1Day" -> R.string.hijriPlus1Day
+        "plus2Days" -> R.string.hijriPlus2Days
+        else -> R.string.hijriNone
+    },
+)
+
+@Composable
+private fun timeFormatLabel(name: String) = tr(if (name == "twentyFourHour") R.string.timeFormat24Hour else R.string.timeFormat12Hour)
+
+// ---------- Intents ----------
+
+private fun Context.open(url: String) {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+    }
+}
+
+private fun Context.share(text: String) {
+    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+    startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+}
