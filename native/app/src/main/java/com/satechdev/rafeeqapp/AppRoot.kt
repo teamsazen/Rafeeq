@@ -83,6 +83,7 @@ import com.satechdev.rafeeqapp.screens.QuranSettingsScreen
 import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
+import com.satechdev.rafeeqapp.screens.SixteenLineIndexScreen
 import com.satechdev.rafeeqapp.screens.SixteenLineScreen
 import com.satechdev.rafeeqapp.screens.OnboardingScreen
 import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
@@ -358,7 +359,7 @@ fun AppRoot() {
                                         Route.QuranSettings -> QuranSettingsScreen()
                                         Route.TranslationPicker -> TranslationPickerScreen()
                                         Route.SixteenLine -> SixteenLineScreen()
-                                        is Route.SixteenLineIndex -> PlaceholderScreen(R.string.sixteenLineQuran)
+                                        is Route.SixteenLineIndex -> SixteenLineIndexScreen(route.page)
                                         Route.PrayerTimes -> PrayerTimesScreen()
                                         Route.NotificationSettings -> NotificationSettingsScreen()
                                         Route.NotificationTiming -> NotificationTimingScreen()

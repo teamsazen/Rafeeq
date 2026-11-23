@@ -183,7 +183,7 @@ private fun BackArrow(onBack: () -> Unit) {
  * absolute, so the underline follows the label in Urdu too.
  */
 @Composable
-private fun Tabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+internal fun Tabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit) {
     val p = palette
     val density = LocalDensity.current
     var lefts by remember { mutableStateOf(List(labels.size) { 0f }) }
