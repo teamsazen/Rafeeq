@@ -88,6 +88,9 @@ import com.satechdev.rafeeqapp.screens.AsmaDetailScreen
 import com.satechdev.rafeeqapp.screens.AsmaListScreen
 import com.satechdev.rafeeqapp.screens.ChooseReciterScreen
 import com.satechdev.rafeeqapp.screens.HijriCalendarScreen
+import com.satechdev.rafeeqapp.screens.NamazGuideScreen
+import com.satechdev.rafeeqapp.screens.NamazScreen
+import com.satechdev.rafeeqapp.screens.WuduScreen
 import com.satechdev.rafeeqapp.screens.MiniPlayerSlot
 import com.satechdev.rafeeqapp.screens.PlayerPlace
 import com.satechdev.rafeeqapp.screens.SixteenLineIndexScreen
@@ -150,6 +153,9 @@ sealed interface Route {
     data object AyahFocus : Route { override val key = "ayah-focus" }
     data object HijriCalendar : Route { override val key = "hijri-calendar" }
     data object AsmaList : Route { override val key = "asma" }
+    data object Namaz : Route { override val key = "namaz" }
+    data object NamazGuide : Route { override val key = "namaz-guide" }
+    data object Wudu : Route { override val key = "wudu" }
     data class AsmaDetail(val index: Int) : Route { override val key = "asma-$index" }
     data object ChooseReciter : Route { override val key = "choose-reciter" }
     data object TranslationPicker : Route { override val key = "translation-picker" }
@@ -373,6 +379,9 @@ fun AppRoot() {
                                         Route.AyahFocus -> AyahFocusScreen()
                                         Route.HijriCalendar -> HijriCalendarScreen()
                                         Route.AsmaList -> AsmaListScreen()
+                                        Route.Namaz -> NamazScreen()
+                                        Route.NamazGuide -> NamazGuideScreen()
+                                        Route.Wudu -> WuduScreen()
                                         is Route.AsmaDetail -> AsmaDetailScreen(route.index)
                                         Route.ChooseReciter -> ChooseReciterScreen()
                                         Route.TranslationPicker -> TranslationPickerScreen()

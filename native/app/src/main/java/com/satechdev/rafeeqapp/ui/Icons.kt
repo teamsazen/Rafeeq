@@ -99,6 +99,8 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     CupertinoPause(cupertinoIcons, 0xf477),
     CupertinoPlay(cupertinoIcons, 0xf487),
     CupertinoClear(cupertinoIcons, 0xf404),
+    CupertinoArrowRight(cupertinoIcons, 0xf50a),
+    CupertinoChevronForward(cupertinoIcons, 0xf3d1),
     CupertinoBookmark(cupertinoIcons, 0xf3e9),
     CupertinoBookmarkFill(cupertinoIcons, 0xf3ea),
     CupertinoShare(cupertinoIcons, 0xf4ca),

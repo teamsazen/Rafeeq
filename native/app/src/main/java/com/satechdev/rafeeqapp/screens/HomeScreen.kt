@@ -302,7 +302,7 @@ private fun ExploreGrid() {
     var sixteenLineNew by remember { mutableStateOf(!Settings.flag(SIXTEEN_LINE_OPENED)) }
     val items = listOf(
         ExploreItem(tr(R.string.quran), Glyph.QuranSolid) { nav.tab = 1 },
-        ExploreItem(tr(R.string.dailyPrayerLabel), Glyph.MenuBookRounded) { nav.push(Route.Placeholder(R.string.dailyPrayerLabel)) },
+        ExploreItem(tr(R.string.dailyPrayerLabel), Glyph.MenuBookRounded) { nav.push(Route.Namaz) },
         ExploreItem(tr(R.string.qibla), Glyph.KaabaSolid) { nav.tab = 2 },
         ExploreItem(tr(R.string.homeCalendar), Glyph.IslamicCalendar) { nav.push(Route.HijriCalendar) },
         ExploreItem(tr(R.string.homeAllahsNames), Glyph.AllahSolid) { nav.push(Route.AsmaList) },
