@@ -1,5 +1,8 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.data.audio.QuranAudio
+import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +62,9 @@ import com.satechdev.rafeeqapp.ui.pressable
 import com.satechdev.rafeeqapp.ui.style
 import kotlin.math.hypot
 
+/** Flutter Prefs.isQuranAutoScrollEnabled, shared with the reader. */
+private const val AUTO_SCROLL_KEY = "isQuranAutoScrollEnabled"
+
 /** The page the 16 line reader was last on (Flutter's sixteen_line_quran_last_page). */
 const val SIXTEEN_LINE_LAST_PAGE = "sixteen_line_quran_last_page"
 
@@ -108,13 +114,16 @@ fun SixteenLineScreen() {
             }
             Box(Modifier.fillMaxWidth().height(1.dp).background(p.divider))
         }
-        Box(Modifier.weight(1f).fillMaxWidth().navigationBarsPadding(), contentAlignment = Alignment.Center) {
+        val audio = QuranAudio.state
+        Box(Modifier.weight(1f).fillMaxWidth().then(if (audio.isVisible) Modifier else Modifier.navigationBarsPadding()), contentAlignment = Alignment.Center) {
             when {
                 q != null && text != null -> SwipeReader(q, text!!, page) { page = it; Settings.setInt(SIXTEEN_LINE_LAST_PAGE, it) }
                 failed -> Txt(tr(R.string.legalRetry), style(14.sp, p.title))
                 else -> Spinner(p.accent, 36.dp, 3.dp)
             }
         }
+        // The player sits under the page while something is recited.
+        Box(Modifier.background(if (audio.isVisible) p.card else p.background).navigationBarsPadding()) { MiniPlayerSlot(PlayerPlace.Elsewhere) }
     }
 }
 
@@ -140,6 +149,18 @@ private fun SwipeReader(quran: SixteenLineQuran, text: QuranText, initialPage: I
             if (highlight?.first != index + 1) highlight = null
             onPageChanged(index + 1)
         }
+    }
+    // Tap an ayah to hear it; the one being recited is lit, and the page turns to follow it.
+    val context = LocalContext.current
+    val audio = QuranAudio.state
+    val playing = audio.currentAyah?.takeIf { audio.isVisible }?.let { it.surahNumber * 1000 + it.numberInSurah }
+    val onAyahTap: (Int) -> Unit = { key ->
+        if (key == playing && !audio.isComplete) QuranAudio.togglePlayPause()
+        else playAudio(context) { QuranAudio.playSurah(context, key / 1000, key % 1000) }
+    }
+    LaunchedEffect(playing) {
+        val target = playing?.let { quran.ayahPages[it] } ?: return@LaunchedEffect
+        if (audio.isPlaying && target - 1 != pager.currentPage && Settings.bool(AUTO_SCROLL_KEY, true)) pager.animateScrollToPage(target - 1)
     }
     val surahNames = remember(text) { text.surahs.map { it.name } }
     val englishNames = remember(text) { text.surahs.map { it.englishName } }
@@ -205,6 +226,12 @@ private fun SwipeReader(quran: SixteenLineQuran, text: QuranText, initialPage: I
                 beyondViewportPageCount = 1,
                 userScrollEnabled = fingers < 2 && !zoomed,
                 key = { it },
+                // A short, slow swipe still turns the page: past a fifth of it, never more than one page.
+                flingBehavior = PagerDefaults.flingBehavior(
+                    state = pager,
+                    pagerSnapDistance = PagerSnapDistance.atMost(1),
+                    snapPositionalThreshold = .18f,
+                ),
             ) { index ->
                 val appDirection = if (Settings.language.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 CompositionLocalProvider(LocalLayoutDirection provides appDirection) {
@@ -220,7 +247,7 @@ private fun SwipeReader(quran: SixteenLineQuran, text: QuranText, initialPage: I
                             }
                         },
                     ) {
-                        SixteenLinePage(quran, index + 1, surahNames, englishNames, highlight?.takeIf { it.first == index + 1 }?.second)
+                        SixteenLinePage(quran, index + 1, surahNames, englishNames, highlight?.takeIf { it.first == index + 1 }?.second, playing, onAyahTap)
                     }
                 }
             }

@@ -156,7 +156,8 @@ object QuranAudio {
         // The same selection again: start from the ayah without reloading.
         if (!force && state.scope == playbackScope && state.scopeNumber == number && state.ayahs.isNotEmpty() && player.mediaItemCount == ayahs.size) {
             state = state.copy(isVisible = true, isComplete = false, endRemaining = 0)
-            player.seekTo(index, 0)
+            // The paused ayah resumes where it stopped; another starts from its beginning.
+            if (index != player.currentMediaItemIndex || player.playbackState == Player.STATE_ENDED) player.seekTo(index, 0)
             player.play()
             return
         }

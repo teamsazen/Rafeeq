@@ -45,6 +45,65 @@ class SixteenLineQuran(
 ) {
     val pageCount get() = pages.size
 
+    /**
+     * Which ayah each word belongs to, as surah * 1000 + ayah, by page and
+     * line (null for banner and bismillah lines). A word belongs to the ayah
+     * whose end ring comes next, which can be on the next page.
+     */
+    val wordAyahs: List<List<IntArray?>>
+
+    /** For a line that ends a ruku, the index of the word (the ring) that ends it, by page and line; -1 otherwise. */
+    val rukuRings: List<IntArray>
+
+    /** The page each ayah (surah * 1000 + ayah) starts on. */
+    val ayahPages: Map<Int, Int>
+
+    init {
+        val words = pages.map { page -> page.map { line -> (line as? AyahLine)?.let { IntArray(it.words.size) } } }
+        val rings = pages.map { page -> IntArray(page.size) { -1 } }
+        val ends = HashMap<Int, Int>()
+        val pending = ArrayList<Triple<Int, Int, Int>>()
+        var surah = 1
+        // Where each surah's rukus have reached, to find the ayah a ruku ends on.
+        var rukuAyah = 0
+        pages.forEachIndexed { p, page ->
+            page.forEachIndexed { l, line ->
+                when (line) {
+                    is SurahNameLine -> {
+                        surah = line.surahNumber
+                        rukuAyah = 0
+                        pending.clear()
+                    }
+                    is AyahLine -> {
+                        val rukuEnd = line.ruku?.let { rukuAyah += it.ayahCount; rukuAyah }
+                        line.words.forEachIndexed { w, word ->
+                            pending += Triple(p, l, w)
+                            val ayah = RINGLESS_ENDS[Triple(p, l, w)]?.rem(1000) ?: when {
+                                // The IndoPak text counts Al-Fatiha without its bismillah (an empty
+                                // ring) and ends ayah 6 at "an'amta 'alayhim"; recitation counts the
+                                // bismillah as ayah 1, so its rings are one ayah on.
+                                surah == 1 && word.contains('\uF61E') -> 1
+                                surah == 1 -> ayahEndNumber(word)?.let { if (it < 6) it + 1 else 7 }
+                                else -> ayahEndNumber(word)
+                            }
+                            if (ayah != null) {
+                                val key = surah * 1000 + ayah
+                                ends[key] = pending.first().first + 1
+                                pending.forEach { (pp, ll, ww) -> words[pp][ll]!![ww] = key }
+                                pending.clear()
+                                if (ayah == rukuEnd) rings[p][l] = w
+                            }
+                        }
+                    }
+                    BismillahLine -> Unit
+                }
+            }
+        }
+        wordAyahs = words
+        rukuRings = rings
+        ayahPages = ends
+    }
+
     fun juzQuarter(juz: Int, quarter: JuzQuarter) = juzQuarters[(juz - 1) * 4 + quarter.ordinal]
 
     /** The banner that opens [surah]. */
@@ -112,6 +171,49 @@ class SixteenLineQuran(
  * as the numbered ring. U+F61E is the bismillah's empty ring.
  */
 fun isAyahEnd(word: String) = word.codePoints().anyMatch { it in 0xF500..0xF61E }
+
+/** The ayah number on [word]'s end ring (1 to 286), or null when it does not end an ayah. */
+fun ayahEndNumber(word: String): Int? {
+    val code = word.codePoints().filter { it in 0xF500..0xF61D }.findFirst()
+    return if (code.isPresent) code.asInt - 0xF500 + 1 else null
+}
+
+/**
+ * Ayah ends the text marks with a sajdah ring or a bare sign instead of a
+ * numbered ring, found by scripts/sixteen_line_ayah_ends.py: page index,
+ * line, word to surah * 1000 + ayah.
+ */
+private val RINGLESS_ENDS = mapOf(
+    Triple(64, 14, 2) to 3171,
+    Triple(100, 15, 5) to 5031,
+    Triple(118, 3, 6) to 6036,
+    Triple(145, 8, 4) to 7091,
+    Triple(158, 8, 2) to 7206,
+    Triple(225, 2, 6) to 13015,
+    Triple(244, 7, 6) to 16050,
+    Triple(263, 7, 2) to 17109,
+    Triple(276, 0, 2) to 19031,
+    Triple(277, 14, 6) to 19058,
+    Triple(300, 6, 9) to 22018,
+    Triple(306, 10, 1) to 22077,
+    Triple(327, 12, 1) to 25058,
+    Triple(327, 15, 2) to 25060,
+    Triple(337, 10, 5) to 26208,
+    Triple(340, 8, 11) to 27026,
+    Triple(374, 2, 4) to 32015,
+    Triple(374, 5, 8) to 32018,
+    Triple(383, 6, 1) to 33060,
+    Triple(408, 10, 3) to 38024,
+    Triple(420, 4, 4) to 40006,
+    Triple(426, 11, 9) to 40069,
+    Triple(431, 15, 8) to 41038,
+    Triple(447, 4, 4) to 44044,
+    Triple(470, 1, 1) to 51054,
+    Triple(474, 13, 9) to 53062,
+    Triple(534, 7, 4) to 84021,
+    Triple(539, 7, 1) to 91011,
+    Triple(541, 15, 4) to 96019,
+)
 
 /** Loads assets/quran_16_line.json once, off the main thread. */
 object SixteenLineStore {

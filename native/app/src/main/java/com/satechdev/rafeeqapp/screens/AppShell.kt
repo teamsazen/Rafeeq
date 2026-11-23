@@ -112,8 +112,8 @@ private val tabs = listOf(
 )
 
 /**
- * Flutter's RafeeqBottomNavigationBar: a translucent bar with a hairline on
- * top. The pill behind the selected icon slides to the next tab on a spring.
+ * Flutter's RafeeqBottomNavigationBar, made solid (owner, 2026-11-23): a bar
+ * with a hairline on top. The pill behind the selected icon slides to the next tab on a spring.
  */
 @Composable
 private fun BottomBar(selected: Int, labels: List<String>, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
@@ -123,6 +123,8 @@ private fun BottomBar(selected: Int, labels: List<String>, onSelect: (Int) -> Un
     Box(
         modifier
             .fillMaxWidth()
+            // Solid: the page behind no longer shows through; Flutter's gradient tints it as before.
+            .background(p.background)
             .background(Brush.verticalGradient(listOf(p.navTop, p.navBottom)))
             .drawBehind {
                 drawLine(p.navBorder, Offset.Zero, Offset(size.width, 0f), strokeWidth = .7.dp.toPx())

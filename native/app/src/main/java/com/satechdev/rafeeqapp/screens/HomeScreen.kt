@@ -326,7 +326,7 @@ private fun ExploreCard(item: ExploreItem, modifier: Modifier) {
                 Modifier.align(Alignment.TopStart),
                 maxLines = 2,
             )
-            AppIcon(item.icon, p.selectedCard, 36.dp, Modifier.align(Alignment.BottomEnd))
+            AppIcon(item.icon, p.highlight, 36.dp, Modifier.align(Alignment.BottomEnd))
         }
     }
 }

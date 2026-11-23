@@ -298,8 +298,9 @@ private fun AyahCard(ayah: Ayah, onPlay: () -> Unit) {
     // The ayah being recited is lit, and tapping it pauses.
     val current = audio.currentAyah?.number == ayah.number
     val pausable = current && audio.isPlaying
-    val tap = if (pausable) QuranAudio::togglePlayPause else onPlay
-    val card by animateColorAsState(if (current) p.selectedCard else p.card, tween(220, easing = AppMotion.easeOut), label = "ayah")
+    // On the ayah already chosen, play and pause carry on where it was.
+    val tap = if (current && !audio.isComplete) QuranAudio::togglePlayPause else onPlay
+    val card by animateColorAsState(if (current) p.highlight else p.card, tween(220, easing = AppMotion.easeOut), label = "ayah")
     val ink by animateColorAsState(if (current) p.background else p.title, tween(220, easing = AppMotion.easeOut), label = "ink")
     val translationInk by animateColorAsState(if (current) p.card else p.title, tween(220, easing = AppMotion.easeOut), label = "translationInk")
     val reference = if (urdu) "القرآن ${localNumber(ayah.surahNumber)}:${localNumber(ayah.numberInSurah)}" else "${ayah.surahNumber}:${ayah.numberInSurah}"
