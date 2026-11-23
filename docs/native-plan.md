@@ -173,8 +173,10 @@ Left for later phases:
 
 - The bottom bar has no backdrop blur; it uses Flutter's translucent
   gradient only. Compose has no backdrop blur before Android 12.
-- The icon fonts are cut to the glyphs used (1.9 MB to 18 KB) by
-  `scripts/subset_icon_fonts.py`; run it after adding a `Glyph`.
+- The icon fonts are cut to the glyphs used (1.9 MB to 18 KB), and Google
+  Sans to its Latin scripts (2 MB to 116 KB), by `scripts/subset_fonts.py`;
+  run it after adding a `Glyph`. Jameel Noori stays whole (Urdu needs
+  nearly all of it). Release APK: 12.8 MB.
 - `strings.xml` is generated: after changing `lib/l10n/*.arb`, run
   `python3 scripts/arb_to_android_strings.py`. Native-only strings live in
   `native_strings.xml`.

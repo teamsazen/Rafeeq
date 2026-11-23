@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.ui
 
+import com.satechdev.rafeeqapp.R
 import android.content.res.AssetManager
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.runtime.Composable
@@ -104,7 +105,8 @@ object AppFonts {
     lateinit var surahNames: FontFamily; private set
 
     fun init(assets: AssetManager) {
-        sans = FontFamily(Font("fonts/GoogleSans-Regular.ttf", assets, FontWeight.Normal))
+        // Cut to the Latin scripts by scripts/subset_fonts.py (2 MB to 116 KB).
+        sans = FontFamily(Font(R.font.google_sans, FontWeight.Normal))
         urdu = FontFamily(Font("fonts/JameelNooriNastaleeq.ttf", assets))
         quran = FontFamily(Font("fonts/PDMSSaleemQuran.ttf", assets))
         indopak = FontFamily(Font("fonts/AlQuranNeo5x3-Arabic.ttf", assets))

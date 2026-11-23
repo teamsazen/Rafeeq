@@ -93,10 +93,11 @@ android {
     sourceSets["main"].assets.directories.add("../../assets")
 
     // The app has English and Urdu; libraries ship no other languages. The
-    // azan, the PNG logo and the SVG wordmark have native forms in res.
+    // azan, the PNG logo, the SVG wordmark and Google Sans (cut to Latin) have
+    // native forms in res.
     androidResources {
         localeFilters += listOf("en", "ur")
-        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:<dir>sounds:logo.png:calligraphy.svg"
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:<dir>sounds:logo.png:calligraphy.svg:GoogleSans-Regular.ttf"
     }
 }
 
