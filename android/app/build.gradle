@@ -1,12 +1,9 @@
 plugins {
     id "com.android.application"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.firebase.crashlytics" version "3.0.3" apply false
-    id "com.google.gms.google-services" version "4.4.2" apply false
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
 }
-
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.gms.google-services'
 
 // Firebase only runs in release builds (see lib/main.dart), so debug builds
 // do not need a Firebase client for the `.debug` application ID.
@@ -41,17 +38,18 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.satechdev.rafeeqapp"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
+    // AGP 9 turns resValue off by default; the debug build names itself with it.
+    buildFeatures {
+        resValues = true
     }
 
     sourceSets {
@@ -84,6 +82,12 @@ android {
         release {
             signingConfig = signingConfigs.release
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 

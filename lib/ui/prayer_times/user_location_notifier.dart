@@ -17,6 +17,7 @@ class UserLocationNotifier extends Notifier<UserLocation?> {
   late final SharedPreferences _sharedPreferences = ref.read(
     sharedPreferencesProvider,
   );
+  late final _geocoding = Geocoding();
 
   @override
   UserLocation? build() {
@@ -29,7 +30,7 @@ class UserLocationNotifier extends Notifier<UserLocation?> {
 
   Future<void> _reverseGeocodeLegacyLocation(UserLocation location) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await _geocoding.placemarkFromCoordinates(
         location.latitude,
         location.longitude,
       );
@@ -87,7 +88,7 @@ class UserLocationNotifier extends Notifier<UserLocation?> {
     String? country;
     String? countryCode;
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await _geocoding.placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
@@ -130,7 +131,7 @@ class UserLocationNotifier extends Notifier<UserLocation?> {
     required String city,
   }) async {
     try {
-      final matches = await locationFromAddress('$city, $country');
+      final matches = await _geocoding.locationFromAddress('$city, $country');
       if (matches.isEmpty) return false;
 
       final match = matches.first;
@@ -179,7 +180,7 @@ class UserLocationNotifier extends Notifier<UserLocation?> {
       String? country;
       String? countryCode;
       try {
-        List<Placemark> placemarks = await placemarkFromCoordinates(
+        List<Placemark> placemarks = await _geocoding.placemarkFromCoordinates(
           position.latitude,
           position.longitude,
         );
