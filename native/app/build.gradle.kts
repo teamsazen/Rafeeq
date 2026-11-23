@@ -4,6 +4,15 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+}
+
+// The Firebase config lives in src/release (kept out of git, as the Flutter
+// app's android/app/google-services.json). It names only the release app, so
+// debug builds go without Firebase, as Flutter's do.
+googleServices {
+    missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.IGNORE
 }
 
 // The Play upload key, shared with the Flutter app (android/app/build.gradle).
@@ -109,6 +118,11 @@ dependencies {
     // Quran recitation, in the background and on the lock screen (docs/native-plan.md).
     implementation("androidx.media3:media3-exoplayer:1.11.1")
     implementation("androidx.media3:media3-session:1.11.1")
+    implementation(platform("com.google.firebase:firebase-bom:35.2.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+    // Flexible in-app updates from Play, as Flutter's in_app_update.
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 

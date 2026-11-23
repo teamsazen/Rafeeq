@@ -63,6 +63,7 @@ import com.satechdev.rafeeqapp.R
 import com.satechdev.rafeeqapp.Route
 import com.satechdev.rafeeqapp.Toast
 import com.satechdev.rafeeqapp.data.Country
+import com.satechdev.rafeeqapp.data.Analytics
 import com.satechdev.rafeeqapp.data.LocationService
 import com.satechdev.rafeeqapp.data.Settings
 import com.satechdev.rafeeqapp.tr
@@ -111,6 +112,7 @@ fun LocationScreen() {
         scope.launch {
             val updated = runCatching { LocationService.updateFromGps(context) }.getOrDefault(false)
             updatingAutomatic = false
+            if (updated) Analytics.event("settings_location_to_automatic")
             if (updated) LocationDraft.reset()
             Toast.show(strings.getString(if (updated) R.string.locationUpdated else R.string.locationPermissionDenied))
         }
@@ -326,6 +328,7 @@ fun CityPickerScreen() {
         nav.pop()
         scope.launch {
             val updated = runCatching { LocationService.setManual(context.applicationContext, chosen, city) }.getOrDefault(false)
+            if (updated) Analytics.event("settings_location_to_manual")
             LocationDraft.updatingManual = false
             Toast.show(strings.getString(if (updated) R.string.locationUpdated else R.string.locationNotFound))
         }

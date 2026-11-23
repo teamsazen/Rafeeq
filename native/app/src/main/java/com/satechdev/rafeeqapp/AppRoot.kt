@@ -84,7 +84,9 @@ import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.AyahFocusScreen
+import com.satechdev.rafeeqapp.data.Analytics
 import com.satechdev.rafeeqapp.screens.AboutScreen
+import com.satechdev.rafeeqapp.screens.UpdateReadyDialog
 import com.satechdev.rafeeqapp.screens.DeveloperPanelScreen
 import com.satechdev.rafeeqapp.screens.DeveloperPrefsScreen
 import com.satechdev.rafeeqapp.screens.LicenceDetailScreen
@@ -353,7 +355,10 @@ fun AppRoot() {
                     drawLayer(layer)
                 },
             ) {
-                SharedTransitionLayout {
+                // Each screen (or tab) shown, under its Flutter analytics name.
+        val shown = screenName(nav.stack.last(), nav.tab)
+        LaunchedEffect(shown) { Analytics.screen(shown) }
+        SharedTransitionLayout {
                     AnimatedContent(
                         nav.stack.last(),
                         transitionSpec = {
@@ -455,6 +460,7 @@ fun AppRoot() {
             val ownSlot = top == Route.Shell || top is Route.QuranReader || top == Route.AyahFocus || top == Route.Onboarding || top == Route.SixteenLine || top is Route.SixteenLineIndex
             MiniPlayerSlot(PlayerPlace.Elsewhere, Modifier.align(Alignment.BottomCenter), overlay = true, show = !ownSlot)
 
+            UpdateReadyDialog()
             ToastHost(Modifier.align(Alignment.BottomCenter))
         }
     }

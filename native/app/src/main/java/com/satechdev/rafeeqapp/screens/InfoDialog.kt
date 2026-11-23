@@ -1,5 +1,8 @@
 package com.satechdev.rafeeqapp.screens
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -107,6 +110,35 @@ fun ExitDialog(onDismiss: () -> Unit, onExit: () -> Unit) {
                 Modifier.weight(1f).pressable(onExit).clip(RoundedCornerShape(14.dp)).background(p.accent).padding(vertical = 14.dp),
                 contentAlignment = Alignment.Center,
             ) { Txt(tr(R.string.exit), style(15.sp, p.checkForeground, FontWeight.SemiBold)) }
+        }
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+/** A downloaded update waiting to be installed; null when there is none (AppUpdateService). */
+object UpdatePrompt {
+    var install by mutableStateOf<(() -> Unit)?>(null)
+}
+
+/** Asks to install a downloaded update now or later (showUpdateReadyDialog). */
+@Composable
+fun UpdateReadyDialog() {
+    val install = UpdatePrompt.install ?: return
+    val p = palette
+    val dismiss = { UpdatePrompt.install = null }
+    InfoDialog(tr(R.string.updateReady), dismiss) {
+        Txt(tr(R.string.updateDownloadedMessage), style(16.sp, p.title, lineHeight = 1.5f, align = TextAlign.Center), Modifier.fillMaxWidth())
+        Spacer(Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(
+                Modifier.weight(1f).pressable(dismiss).clip(RoundedCornerShape(14.dp))
+                    .border(1.dp, p.title.copy(alpha = .3f), RoundedCornerShape(14.dp)).padding(vertical = 14.dp),
+                contentAlignment = Alignment.Center,
+            ) { Txt(tr(R.string.later), style(15.sp, p.title, FontWeight.SemiBold)) }
+            Box(
+                Modifier.weight(1f).pressable({ dismiss(); install() }).clip(RoundedCornerShape(14.dp)).background(p.accent).padding(vertical = 14.dp),
+                contentAlignment = Alignment.Center,
+            ) { Txt(tr(R.string.installNow), style(15.sp, p.card, FontWeight.SemiBold)) }
         }
         Spacer(Modifier.height(16.dp))
     }

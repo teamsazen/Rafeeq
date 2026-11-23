@@ -176,35 +176,41 @@ object Settings {
     }
 
     fun setThemeMode(mode: ThemeMode) {
+        Analytics.themeChanged(mode.stored)
         themeMode = mode
         update(APP_SETTINGS) { put("themeMode", mode.stored) }
     }
 
     fun setLanguage(value: AppLanguage) {
+        Analytics.languageChanged(value.code)
         language = value
         update(APP_SETTINGS) { put("language", value.code) }
         remindersChanged()
     }
 
     fun setHijriCorrection(value: HijriCorrection) {
+        Analytics.hijriCorrectionChanged(value.stored)
         hijriCorrection = value
         update(APP_SETTINGS) { put("hijriCorrection", value.stored) }
         remindersChanged()
     }
 
     fun setCalcMethod(value: PrayerCalcMethod) {
+        Analytics.calculationMethodChanged(value.stored)
         calcMethod = value
         update(PRAYER_SETTINGS) { put("prayerCalcMethod", value.stored) }
         remindersChanged()
     }
 
     fun setAsrMethod(value: AsrMethod) {
+        Analytics.juristicMethodChanged(value.stored)
         asrMethod = value
         update(PRAYER_SETTINGS) { put("asrCalculationMethod", value.stored) }
         remindersChanged()
     }
 
     fun setHighLatitude(value: HighLatitude) {
+        Analytics.highLatitudeChanged(value.stored)
         highLatitude = value
         update(PRAYER_SETTINGS) { put("highLatitudeAdjustment", value.stored) }
         remindersChanged()

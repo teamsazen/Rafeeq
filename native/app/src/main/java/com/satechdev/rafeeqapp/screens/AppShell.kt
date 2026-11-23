@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.data.AppUpdateCheck
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,8 @@ fun AppShell() {
     // Back goes home from another tab; on home it asks before leaving, as Flutter does.
     BackHandler { if (nav.tab != HOME) goHome() else askExit = true }
     if (askExit) ExitDialog(onDismiss = { askExit = false }, onExit = { askExit = false; activity?.finish() })
+    // A Play update downloads in the background and then asks to install (release builds).
+    AppUpdateCheck { install -> UpdatePrompt.install = install }
 
     Box(Modifier.fillMaxSize().background(palette.background)) {
         AnimatedContent(

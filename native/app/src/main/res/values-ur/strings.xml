@@ -387,7 +387,9 @@
     <string name="sixteenLineSearchHint">سورت، پارہ یا صفحہ نمبر</string>
     <string name="sleepTimer">نیند ٹائمر</string>
     <string name="sleepTimerActive">نیند ٹائمر فعال ہے</string>
-    <string name="sleepTimerHours">%1$s گھنٹے</string>
+    <plurals name="sleepTimerHours">
+        <item quantity="other">%1$s گھنٹے</item>
+    </plurals>
     <string name="sleepTimerMinutes">%1$s منٹ</string>
     <string name="somethingWentWrong">کچھ غلط ہو گیا</string>
     <string name="soundAllahuAkbar">اللہ اکبر</string>

@@ -6,6 +6,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import com.satechdev.rafeeqapp.data.Analytics
 import com.satechdev.rafeeqapp.data.Settings
 import com.satechdev.rafeeqapp.data.prayer.Reminders
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
         Settings.load(this)
+        Analytics.init(this)
         AppFonts.init(assets)
         setContent { AppRoot() }
         // Tops up the reminders if anything changed since they were last scheduled (Flutter does this on start too).

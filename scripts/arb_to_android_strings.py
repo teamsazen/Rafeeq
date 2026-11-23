@@ -56,6 +56,12 @@ def convert(arb: dict, english: dict) -> str:
                 whole = value[: plural.start()] + body + value[plural.end():]
                 lines.append(f'        <item quantity="{quantity}">{escape(placeholders(whole, order))}</item>')
             lines.append("    </plurals>")
+        elif PLURAL.search(english.get(key, "")):
+            # Plural in English but not here (Urdu says "گھنٹے" for any count):
+            # still <plurals>, so both languages declare the same resource type.
+            lines.append(f'    <plurals name="{key}">')
+            lines.append(f'        <item quantity="other">{escape(placeholders(value, order))}</item>')
+            lines.append("    </plurals>")
         else:
             lines.append(f'    <string name="{key}">{escape(placeholders(value, order))}</string>')
     lines.append("</resources>")

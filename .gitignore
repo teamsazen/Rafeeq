@@ -67,3 +67,6 @@ app.*.map.json
 # Social post plan (local only)
 /LINKEDIN-POSTS.md
 /marketing/
+
+# The Firebase config for release builds, kept out of git like android/app/google-services.json.
+/native/app/src/release/google-services.json

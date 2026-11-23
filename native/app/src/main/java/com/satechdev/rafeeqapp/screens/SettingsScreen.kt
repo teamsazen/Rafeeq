@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.data.Analytics
 import com.satechdev.rafeeqapp.ui.pressable
 
 import com.satechdev.rafeeqapp.ui.AppIcon
@@ -49,15 +50,15 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     val sections = listOf(
         tr(R.string.general) to listOf(
-            Row(Glyph.Translate, tr(R.string.language), languageLabel(Settings.language)) { nav.push(Route.Language) },
-            Row(Glyph.Explore, tr(R.string.location), locationLabel()) { nav.push(Route.Location) },
-            Row(Glyph.Palette, tr(R.string.appTheme), themeLabel(Settings.themeMode)) { nav.push(Route.Theme) },
+            Row(Glyph.Translate, tr(R.string.language), languageLabel(Settings.language)) { Analytics.event("settings_language_screen_opened"); nav.push(Route.Language) },
+            Row(Glyph.Explore, tr(R.string.location), locationLabel()) { Analytics.event("settings_location_screen_opened"); nav.push(Route.Location) },
+            Row(Glyph.Palette, tr(R.string.appTheme), themeLabel(Settings.themeMode)) { Analytics.event("settings_theme_screen_opened"); nav.push(Route.Theme) },
         ),
         tr(R.string.settingsSectionPrayer) to listOf(
-            Row(Glyph.Clock, tr(R.string.calculationMethod), tr(Settings.calcMethod.label)) { nav.push(Route.CalculationMethod) },
-            Row(Glyph.Layers, tr(R.string.juristicMethod), tr(Settings.asrMethod.label)) { nav.push(Route.JuristicMethod) },
-            Row(Glyph.Public, tr(R.string.highLatitudeRule), tr(Settings.highLatitude.label)) { nav.push(Route.HighLatitudeRule) },
-            Row(Glyph.Calendar, tr(R.string.hijriCorrection), tr(Settings.hijriCorrection.label)) { nav.push(Route.HijriCorrection) },
+            Row(Glyph.Clock, tr(R.string.calculationMethod), tr(Settings.calcMethod.label)) { Analytics.event("settings_calculation_screen_opened"); nav.push(Route.CalculationMethod) },
+            Row(Glyph.Layers, tr(R.string.juristicMethod), tr(Settings.asrMethod.label)) { Analytics.event("settings_juristic_screen_opened"); nav.push(Route.JuristicMethod) },
+            Row(Glyph.Public, tr(R.string.highLatitudeRule), tr(Settings.highLatitude.label)) { Analytics.event("settings_high_latitude_screen_opened"); nav.push(Route.HighLatitudeRule) },
+            Row(Glyph.Calendar, tr(R.string.hijriCorrection), tr(Settings.hijriCorrection.label)) { Analytics.event("settings_hijri_correction_screen_opened"); nav.push(Route.HijriCorrection) },
             Row(Glyph.Schedule, tr(R.string.timeFormat), tr(Settings.timeFormat.label)) { nav.push(Route.TimeFormat) },
             Row(Glyph.AccessTime, tr(R.string.prayerTimes), locationLabel()) { nav.push(Route.PrayerTimes) },
             Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle)) { nav.push(Route.NotificationSettings) },
@@ -66,9 +67,9 @@ fun SettingsScreen(onBack: () -> Unit) {
             Row(Glyph.MenuBook, tr(R.string.quranViewSettings), tr(R.string.settingsQuranViewSubtitle)) { nav.push(Route.QuranSettings) },
         ),
         tr(R.string.settingsSectionSupport) to listOf(
-            Row(Glyph.ChatBubble, tr(R.string.feedback), tr(R.string.feedbackSubtitle)) { context.open(FEEDBACK_FORM) },
-            Row(Glyph.StarBorder, tr(R.string.rateThisApp), tr(R.string.rateThisAppSubtitle)) { context.open(PLAY_STORE) },
-            Row(Glyph.Share, tr(R.string.shareThisApp), tr(R.string.shareThisAppSubtitle)) { context.share(PLAY_STORE) },
+            Row(Glyph.ChatBubble, tr(R.string.feedback), tr(R.string.feedbackSubtitle)) { Analytics.event("settings_feedback_tapped"); context.open(FEEDBACK_FORM) },
+            Row(Glyph.StarBorder, tr(R.string.rateThisApp), tr(R.string.rateThisAppSubtitle)) { Analytics.event("settings_rate_app_tapped"); context.open(PLAY_STORE) },
+            Row(Glyph.Share, tr(R.string.shareThisApp), tr(R.string.shareThisAppSubtitle)) { Analytics.event("settings_share_app_tapped"); context.share(PLAY_STORE) },
             Row(Glyph.BugReport, tr(R.string.reportIssue), tr(R.string.reportIssueSubtitle)) { context.open(REPORT_ISSUE) },
             Row(Glyph.Code, tr(R.string.contribute), tr(R.string.contributeSubtitle)) { context.open(REPOSITORY) },
         ),

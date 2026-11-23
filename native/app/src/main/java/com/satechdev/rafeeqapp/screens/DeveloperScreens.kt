@@ -40,8 +40,8 @@ import com.satechdev.rafeeqapp.ui.pressable
 import com.satechdev.rafeeqapp.ui.style
 
 /*
- * Debug-only tools (lib/ui/developer). Flutter's update dialog test comes
- * with in-app updates (phase 5); its event previews went with the event cards.
+ * Debug-only tools (lib/ui/developer). Flutter's event previews went with
+ * the event cards.
  */
 
 private val danger = Color(0xFFFF5252)
@@ -50,6 +50,9 @@ private val danger = Color(0xFFFF5252)
 fun DeveloperPanelScreen() {
     val nav = LocalNavigator.current
     PushedScreen("Developer Panel") {
+        item {
+            SettingsCard(Glyph.BugReport, "Test Update Dialog", "Show the update ready dialog") { UpdatePrompt.install = {} }
+        }
         item {
             SettingsCard(Glyph.Code, "Shared Preferences", "View and manage local keys") { nav.push(Route.DeveloperPrefs) }
         }

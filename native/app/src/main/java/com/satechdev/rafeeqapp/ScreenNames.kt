@@ -1,0 +1,55 @@
+package com.satechdev.rafeeqapp
+
+/**
+ * The analytics name of what is on screen, as Flutter's AnalyticsScreenNames,
+ * so screen reports carry on from the Flutter app. On the shell it is the tab.
+ */
+fun screenName(route: Route, tab: Int): String = when (route) {
+    Route.Shell -> when (tab) {
+        0 -> "Home Screen"
+        1 -> "Quran Screen"
+        2 -> "Qibla Screen"
+        else -> "Settings Screen"
+    }
+    Route.Onboarding -> "Onboarding Screen"
+    Route.Theme -> "Theme Screen"
+    Route.Language -> "Language Screen"
+    Route.CalculationMethod -> "Calculation Method Screen"
+    Route.JuristicMethod -> "Juristic Method Screen"
+    Route.HighLatitudeRule -> "High Latitude Rule Screen"
+    Route.HijriCorrection -> "Hijri Correction Screen"
+    Route.TimeFormat -> "Time Format Screen"
+    Route.Location -> "Location Screen"
+    Route.CountryPicker -> "Country Picker Screen"
+    Route.CityPicker -> "City Picker Screen"
+    is Route.QuranReader -> "Quran Details Screen"
+    is Route.QuranSectionPicker -> "Quran Section Picker Screen"
+    is Route.QuranAyahPicker -> "Quran Ayah Picker Screen"
+    Route.QuranSettings -> "Quran View Settings Screen"
+    Route.AyahFocus -> "Ayah Focus Screen"
+    Route.ChooseReciter -> "Choose Reciter Screen"
+    is Route.TranslationPicker -> "Translation Selection Screen"
+    Route.HijriCalendar -> "Hijri Calendar Screen"
+    Route.AsmaList -> "Asma ul Husna Screen"
+    is Route.AsmaDetail -> "Asma ul Husna Detail Screen"
+    Route.Namaz -> "Namaz Prayer Screen"
+    Route.NamazGuide -> "Complete Namaz Guide Screen"
+    Route.Wudu -> "Wudu Procedure Screen"
+    is Route.AyahPicture -> "Ayah Picture Maker Screen"
+    Route.PictureSurahPicker -> "Quran Section Picker Screen"
+    Route.PictureAyahPicker -> "Quran Ayah Picker Screen"
+    Route.SixteenLine -> "Sixteen Line Quran Screen"
+    is Route.SixteenLineIndex -> "Sixteen Line Quran Index Screen"
+    Route.PrayerTimes -> "Prayer Times Screen"
+    Route.NotificationSettings -> "Prayer Notification Settings Screen"
+    Route.NotificationTiming -> "Notification Timing Screen"
+    is Route.NotificationEditor -> "Prayer Notification Editor Screen"
+    is Route.NotificationSound -> "Notification Sound Screen"
+    is Route.Legal -> if (route.document == com.satechdev.rafeeqapp.screens.LegalDocument.Privacy) "Privacy Policy Screen" else "Terms and Conditions Screen"
+    Route.About -> "About Screen"
+    Route.Version -> "Version Screen"
+    Route.Licences -> "Licenses Screen"
+    is Route.LicenceDetail -> "License Detail Screen"
+    Route.DeveloperPanel -> "Developer Panel Screen"
+    Route.DeveloperPrefs -> "Developer Preferences Screen"
+}
