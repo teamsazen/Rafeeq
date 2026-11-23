@@ -7,6 +7,23 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+/**
+ * The ayah's text without the Bismillah that opens the first ayah of 112
+ * surahs (shown once in the header instead). Fatiha keeps it: there it is
+ * the first ayah. The text spells it two ways (بِسْمِ and بِّسْمِ) and puts
+ * the shadda before the fatha on ٱللَّهِ, so the Flutter app's literal
+ * replace never matched; this compares the letters of the first two words
+ * and drops all four.
+ */
+fun Ayah.withoutBismillah(): String {
+    if (surahNumber == 1 || numberInSurah != 1) return text
+    val words = text.split(' ')
+    return if (words.size > 4 && letters(words[0]) == "بسم" && letters(words[1]) == "ٱلله") words.drop(4).joinToString(" ") else text
+}
+
+/** The letters of an Arabic word without harakat or Quranic marks, so mark order never matters. */
+internal fun letters(word: String) = word.filterNot { it in '\u064B'..'\u065F' || it == '\u0670' || it in '\u06D6'..'\u06ED' }
+
 /** An ayah of the Uthmani text in assets/quran.json (alquran.cloud's quran-uthmani). */
 data class Ayah(
     /** 1 to 6236 across the Quran. */

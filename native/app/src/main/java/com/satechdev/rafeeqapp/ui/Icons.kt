@@ -70,6 +70,9 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Play(materialIcons, 0xf00a0),
     SkipNext(materialIcons, 0xf0192),
     Pause(materialIcons, 0xf0056),
+    NumberedList(materialIcons, 0xf793),
+    Tune(materialIcons, 0xf0258),
+    PlayCircle(materialIcons, 0xf00a2),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),
@@ -83,6 +86,11 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Bell(cupertinoIcons, 0xf3e1),
     BellFill(cupertinoIcons, 0xf3e2),
     InfoCircle(cupertinoIcons, 0xf44c),
+    CupertinoPause(cupertinoIcons, 0xf477),
+    CupertinoPlay(cupertinoIcons, 0xf487),
+    CupertinoBookmark(cupertinoIcons, 0xf3e9),
+    CupertinoBookmarkFill(cupertinoIcons, 0xf3ea),
+    CupertinoShare(cupertinoIcons, 0xf4ca),
 
     // Flutter Islamic Icons
     Quran(islamicIcons, 0xe81b),

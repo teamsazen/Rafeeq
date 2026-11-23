@@ -76,6 +76,7 @@ import com.satechdev.rafeeqapp.data.quran.JuzNames
 import com.satechdev.rafeeqapp.data.quran.QuranStore
 import com.satechdev.rafeeqapp.data.quran.QuranText
 import com.satechdev.rafeeqapp.data.quran.SurahNames
+import com.satechdev.rafeeqapp.data.quran.withoutBismillah
 import com.satechdev.rafeeqapp.tr
 import com.satechdev.rafeeqapp.ui.AppIcon
 import com.satechdev.rafeeqapp.ui.Glyph
@@ -295,7 +296,6 @@ private fun IndexCard(heroKey: String, index: String, title: String, subtitle: S
     }
 }
 
-private const val BISMILLAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
 
 /** Bookmarked ayahs in mushaf order (lib/ui/quran/quran_bookmarks_tab.dart). */
 @Composable
@@ -318,7 +318,7 @@ private fun BookmarksList(quran: QuranText) {
     }
     IndexList(marks.size) { i ->
         val (surah, ayah) = marks[i]
-        val text = if (surah.number != 1 && ayah.numberInSurah == 1) ayah.text.replace(BISMILLAH, "").trim() else ayah.text
+        val text = ayah.withoutBismillah()
         Column(
             Modifier.fillMaxWidth().pressable({ nav.push(Route.QuranReader(surah = surah.number, ayah = ayah.numberInSurah)) })
                 .clip(RoundedCornerShape(12.dp)).background(p.card).padding(start = 12.dp, top = 6.dp, end = 4.dp, bottom = 12.dp),

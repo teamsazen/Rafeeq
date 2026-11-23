@@ -78,6 +78,9 @@ import com.satechdev.rafeeqapp.screens.NotificationSettingsScreen
 import com.satechdev.rafeeqapp.screens.NotificationSoundScreen
 import com.satechdev.rafeeqapp.screens.NotificationTimingScreen
 import com.satechdev.rafeeqapp.screens.PrayerTimesScreen
+import com.satechdev.rafeeqapp.screens.QuranAyahPickerScreen
+import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
+import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.OnboardingScreen
 import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
 import com.satechdev.rafeeqapp.screens.CityPickerScreen
@@ -129,6 +132,8 @@ sealed interface Route {
     data class QuranReader(val surah: Int? = null, val juz: Int? = null, val ayah: Int? = null) : Route {
         override val key = "reader-${surah ?: "j$juz"}"
     }
+    data class QuranSectionPicker(val juz: Boolean) : Route { override val key = "section-picker-$juz" }
+    data object QuranAyahPicker : Route { override val key = "ayah-picker" }
     data object PrayerTimes : Route { override val key = "prayer-times" }
     data object NotificationSettings : Route { override val key = "notification-settings" }
     data object NotificationTiming : Route { override val key = "notification-timing" }
@@ -340,7 +345,9 @@ fun AppRoot() {
                                         Route.Location -> LocationScreen()
                                         Route.CountryPicker -> CountryPickerScreen()
                                         Route.CityPicker -> CityPickerScreen()
-                                        is Route.QuranReader -> PlaceholderScreen(R.string.quran)
+                                        is Route.QuranReader -> ReaderScreen(route)
+                                        is Route.QuranSectionPicker -> QuranSectionPickerScreen(route.juz)
+                                        Route.QuranAyahPicker -> QuranAyahPickerScreen()
                                         Route.PrayerTimes -> PrayerTimesScreen()
                                         Route.NotificationSettings -> NotificationSettingsScreen()
                                         Route.NotificationTiming -> NotificationTimingScreen()
