@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.satechdev.rafeeqapp.data.hijri.HijriCorrection
 import com.satechdev.rafeeqapp.data.prayer.AsrMethod
+import com.satechdev.rafeeqapp.data.quran.AyahViewMode
+import com.satechdev.rafeeqapp.data.quran.Bookmark
+import com.satechdev.rafeeqapp.data.quran.PrefsList
+import com.satechdev.rafeeqapp.data.quran.QuranViewSettings
 import com.satechdev.rafeeqapp.data.prayer.HighLatitude
 import com.satechdev.rafeeqapp.data.prayer.NotifKey
 import com.satechdev.rafeeqapp.data.prayer.NotificationSettings
@@ -54,6 +58,8 @@ object Settings {
     private const val PRAYER_SETTINGS = "prayer_times_settings"
     private const val USER_LOCATION = "prefs.user_location"
     private const val ABOUT_OPENED = "about_opened_v1"
+    private const val QURAN_VIEW = "quran_view_settings"
+    private const val BOOKMARKS = "ayah_bookmarks"
 
     // Defaults are the Flutter app's (lib/core/app_settings_notifier.dart and
     // lib/ui/prayer_times/prayer_times_settings.dart).
@@ -76,6 +82,10 @@ object Settings {
     @set:JvmName("assignLocation")
     var location by mutableStateOf<UserLocation?>(null); private set
     var aboutOpened by mutableStateOf(false); private set
+    @set:JvmName("assignQuranView")
+    var quranView by mutableStateOf(QuranViewSettings()); private set
+    @set:JvmName("assignBookmarks")
+    var bookmarks by mutableStateOf(emptyList<Bookmark>()); private set
 
     private lateinit var app: Context
 
@@ -110,6 +120,59 @@ object Settings {
             )
         }
         aboutOpened = prefs.getBoolean(k(ABOUT_OPENED), false)
+        quranView = parseQuranView(json(QURAN_VIEW))
+        bookmarks = PrefsList.decode(prefs.getString(k(BOOKMARKS), null)).mapNotNull(Bookmark::of)
+    }
+
+    // --- Quran ---
+
+    fun setQuranView(value: QuranViewSettings) {
+        quranView = value
+        update(QURAN_VIEW) {
+            put("arabicFontSize", value.arabicFontSize.toDouble())
+            put("translationFontSize", value.translationFontSize.toDouble())
+            put("transliterationFontSize", value.transliterationFontSize.toDouble())
+            put("showTranslation", value.showTranslation)
+            put("showTransliteration", value.showTransliteration)
+            put("translationEditionId", value.translationEditionId)
+            put("transliterationEditionId", value.transliterationEditionId)
+            put("arabicFontFamily", value.arabicFontFamily)
+            put("translationFontFamily", value.translationFontFamily)
+            put("viewMode", value.viewMode.ordinal)
+            put("continueToNextSurah", value.continueToNextSurah)
+            put("surahRepeat", value.surahRepeat)
+            put("autoHidePlayerControls", value.autoHidePlayerControls)
+        }
+    }
+
+    fun isBookmarked(surah: Int, ayah: Int) = bookmarks.any { it.surah == surah && it.ayah == ayah }
+
+    fun toggleBookmark(surah: Int, ayah: Int) {
+        val mark = Bookmark(surah, ayah)
+        bookmarks = if (mark in bookmarks) bookmarks - mark else bookmarks + mark
+        prefs.edit().putString(k(BOOKMARKS), PrefsList.encode(bookmarks.map { it.key })).apply()
+    }
+
+    private fun parseQuranView(j: JSONObject): QuranViewSettings {
+        val d = QuranViewSettings()
+        fun num(name: String, default: Float) = if (j.has(name)) j.optDouble(name, default.toDouble()).toFloat() else default
+        fun bool(name: String, default: Boolean) = if (j.has(name)) j.optBoolean(name, default) else default
+        fun str(name: String, default: String) = j.optString(name).takeIf { it.isNotEmpty() && it != "null" } ?: default
+        return QuranViewSettings(
+            arabicFontSize = num("arabicFontSize", d.arabicFontSize),
+            translationFontSize = num("translationFontSize", d.translationFontSize),
+            transliterationFontSize = num("transliterationFontSize", d.transliterationFontSize),
+            showTranslation = bool("showTranslation", d.showTranslation),
+            showTransliteration = bool("showTransliteration", d.showTransliteration),
+            translationEditionId = str("translationEditionId", d.translationEditionId),
+            transliterationEditionId = str("transliterationEditionId", d.transliterationEditionId),
+            arabicFontFamily = str("arabicFontFamily", d.arabicFontFamily),
+            translationFontFamily = str("translationFontFamily", d.translationFontFamily),
+            viewMode = AyahViewMode.of(if (j.has("viewMode")) j.optInt("viewMode") else null),
+            continueToNextSurah = bool("continueToNextSurah", d.continueToNextSurah),
+            surahRepeat = bool("surahRepeat", d.surahRepeat),
+            autoHidePlayerControls = bool("autoHidePlayerControls", d.autoHidePlayerControls),
+        )
     }
 
     fun setThemeMode(mode: ThemeMode) {

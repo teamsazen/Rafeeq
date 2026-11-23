@@ -124,3 +124,18 @@ fun Spinner(color: Color, size: Dp = 20.dp, stroke: Dp = 2.dp) {
         )
     }
 }
+
+/**
+ * Quran text in the reader's font (lib/ui/quran/quran_details_screen.dart's
+ * getArabicTextStyle). Never letter-spaced: that would break ligatures such as لا.
+ */
+@Composable
+@ReadOnlyComposable
+fun quranStyle(size: TextUnit, color: Color, align: TextAlign = TextAlign.Unspecified) = TextStyle(
+    fontSize = size,
+    color = color,
+    fontFamily = AppFonts.quran,
+    lineHeight = 1.8.em,
+    letterSpacing = 0.em,
+    textAlign = align,
+)

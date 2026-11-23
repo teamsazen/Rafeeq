@@ -124,6 +124,11 @@ sealed interface Route {
     data object Location : Route { override val key = "location" }
     data object CountryPicker : Route { override val key = "country-picker" }
     data object CityPicker : Route { override val key = "city-picker" }
+
+    /** The reader at a surah or juz, optionally scrolled to an ayah of the surah. */
+    data class QuranReader(val surah: Int? = null, val juz: Int? = null, val ayah: Int? = null) : Route {
+        override val key = "reader-${surah ?: "j$juz"}"
+    }
     data object PrayerTimes : Route { override val key = "prayer-times" }
     data object NotificationSettings : Route { override val key = "notification-settings" }
     data object NotificationTiming : Route { override val key = "notification-timing" }
@@ -159,6 +164,10 @@ val LocalStrings = staticCompositionLocalOf<Resources> { error("No strings") }
 @Composable
 @ReadOnlyComposable
 fun tr(@StringRes id: Int): String = LocalStrings.current.getString(id)
+
+@Composable
+@ReadOnlyComposable
+fun tr(@StringRes id: Int, vararg args: Any): String = LocalStrings.current.getString(id, *args)
 
 // ---------- Hero (shared element) scopes ----------
 
@@ -331,6 +340,7 @@ fun AppRoot() {
                                         Route.Location -> LocationScreen()
                                         Route.CountryPicker -> CountryPickerScreen()
                                         Route.CityPicker -> CityPickerScreen()
+                                        is Route.QuranReader -> PlaceholderScreen(R.string.quran)
                                         Route.PrayerTimes -> PrayerTimesScreen()
                                         Route.NotificationSettings -> NotificationSettingsScreen()
                                         Route.NotificationTiming -> NotificationTimingScreen()

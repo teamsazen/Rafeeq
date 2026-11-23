@@ -79,12 +79,14 @@ android {
         )
     }
 
-    // The Flutter app's fonts, used where they are rather than copied (see AppFonts).
-    sourceSets["main"].assets.directories.add("../../assets/fonts")
+    // The Flutter app's assets (Quran text, fonts, legal pages…), used where they
+    // are rather than copied. The azan is in res/raw for notifications instead.
+    sourceSets["main"].assets.directories.add("../../assets")
 
     // The app has English and Urdu; libraries ship no other languages.
     androidResources {
         localeFilters += listOf("en", "ur")
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:<dir>sounds"
     }
 }
 

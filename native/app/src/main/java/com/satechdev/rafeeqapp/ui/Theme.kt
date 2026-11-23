@@ -86,8 +86,8 @@ val palette: Palette
     @Composable @ReadOnlyComposable get() = LocalPalette.current
 
 /**
- * The Flutter app's fonts, read from its assets/fonts (added to the APK's
- * assets in app/build.gradle.kts). GoogleSans ships one weight; heavier text
+ * The Flutter app's fonts, read from its assets/fonts (the Flutter assets
+ * folder is the APK's assets, see app/build.gradle.kts). GoogleSans ships one weight; heavier text
  * is synthesised, as Flutter does. Call [init] before drawing.
  */
 object AppFonts {
@@ -96,9 +96,9 @@ object AppFonts {
     lateinit var quran: FontFamily; private set
 
     fun init(assets: AssetManager) {
-        sans = FontFamily(Font("GoogleSans-Regular.ttf", assets, FontWeight.Normal))
-        urdu = FontFamily(Font("JameelNooriNastaleeq.ttf", assets))
-        quran = FontFamily(Font("PDMSSaleemQuran.ttf", assets))
+        sans = FontFamily(Font("fonts/GoogleSans-Regular.ttf", assets, FontWeight.Normal))
+        urdu = FontFamily(Font("fonts/JameelNooriNastaleeq.ttf", assets))
+        quran = FontFamily(Font("fonts/PDMSSaleemQuran.ttf", assets))
     }
 }
 

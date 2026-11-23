@@ -82,10 +82,7 @@ fun AppShell() {
         ) { tab ->
             when (tab) {
                 HOME -> HomeScreen()
-                1 -> Column(Modifier.fillMaxSize()) {
-                    AppBar(tr(R.string.quran), onBack = goHome)
-                    ComingSoon()
-                }
+                1 -> QuranHomeScreen(onBack = goHome)
                 2 -> Column(Modifier.fillMaxSize()) {
                     AppBar(tr(R.string.qibla), onBack = goHome)
                     ComingSoon()
