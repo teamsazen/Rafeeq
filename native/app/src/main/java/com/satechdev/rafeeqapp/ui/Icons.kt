@@ -71,6 +71,7 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     SkipNext(materialIcons, 0xf0192),
     Pause(materialIcons, 0xf0056),
     NumberedList(materialIcons, 0xf793),
+    BulletedList(materialIcons, 0xf792),
     Tune(materialIcons, 0xf0258),
     PlayCircle(materialIcons, 0xf00a2),
     FormatSize(materialIcons, 0xf798),

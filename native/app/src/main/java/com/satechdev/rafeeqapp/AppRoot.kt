@@ -83,6 +83,7 @@ import com.satechdev.rafeeqapp.screens.QuranSettingsScreen
 import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
+import com.satechdev.rafeeqapp.screens.SixteenLineScreen
 import com.satechdev.rafeeqapp.screens.OnboardingScreen
 import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
 import com.satechdev.rafeeqapp.screens.CityPickerScreen
@@ -138,6 +139,8 @@ sealed interface Route {
     data object QuranAyahPicker : Route { override val key = "ayah-picker" }
     data object QuranSettings : Route { override val key = "quran-settings" }
     data object TranslationPicker : Route { override val key = "translation-picker" }
+    data object SixteenLine : Route { override val key = "sixteen-line" }
+    data class SixteenLineIndex(val page: Int) : Route { override val key = "sixteen-line-index" }
     data object PrayerTimes : Route { override val key = "prayer-times" }
     data object NotificationSettings : Route { override val key = "notification-settings" }
     data object NotificationTiming : Route { override val key = "notification-timing" }
@@ -354,6 +357,8 @@ fun AppRoot() {
                                         Route.QuranAyahPicker -> QuranAyahPickerScreen()
                                         Route.QuranSettings -> QuranSettingsScreen()
                                         Route.TranslationPicker -> TranslationPickerScreen()
+                                        Route.SixteenLine -> SixteenLineScreen()
+                                        is Route.SixteenLineIndex -> PlaceholderScreen(R.string.sixteenLineQuran)
                                         Route.PrayerTimes -> PrayerTimesScreen()
                                         Route.NotificationSettings -> NotificationSettingsScreen()
                                         Route.NotificationTiming -> NotificationTimingScreen()

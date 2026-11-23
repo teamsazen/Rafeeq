@@ -94,11 +94,17 @@ object AppFonts {
     lateinit var sans: FontFamily; private set
     lateinit var urdu: FontFamily; private set
     lateinit var quran: FontFamily; private set
+    /** QuranWBW's AlQuran Neo for the 16 line Quran (not in git; see README "Getting Started"). */
+    lateinit var indopak: FontFamily; private set
+    /** QUL's surah name font: the text "surah001" draws surah 1's banner. */
+    lateinit var surahNames: FontFamily; private set
 
     fun init(assets: AssetManager) {
         sans = FontFamily(Font("fonts/GoogleSans-Regular.ttf", assets, FontWeight.Normal))
         urdu = FontFamily(Font("fonts/JameelNooriNastaleeq.ttf", assets))
         quran = FontFamily(Font("fonts/PDMSSaleemQuran.ttf", assets))
+        indopak = FontFamily(Font("fonts/AlQuranNeo5x3-Arabic.ttf", assets))
+        surahNames = FontFamily(Font("fonts/SurahNameV2.ttf", assets))
     }
 }
 

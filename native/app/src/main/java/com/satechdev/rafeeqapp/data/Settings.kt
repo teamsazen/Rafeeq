@@ -281,6 +281,13 @@ object Settings {
         Reminders.onLocationChanged(app)
     }
 
+    /** A shared_preferences int, which Flutter's setInt stores as a long. */
+    fun int(key: String): Int? = (prefs.all[k(key)] as? Number)?.toInt()
+
+    fun setInt(key: String, value: Int) {
+        prefs.edit().putLong(k(key), value.toLong()).apply()
+    }
+
     /** A plain shared_preferences flag, such as a "seen" marker. */
     fun flag(key: String): Boolean = prefs.getBoolean(k(key), false)
 

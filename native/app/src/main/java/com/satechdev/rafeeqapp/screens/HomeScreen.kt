@@ -314,7 +314,7 @@ private fun ExploreGrid() {
         ExploreItem(tr(R.string.sixteenLineQuran), Glyph.QuranBookSolid, dot = sixteenLineNew) {
             Settings.setFlag(SIXTEEN_LINE_OPENED)
             sixteenLineNew = false
-            nav.push(Route.Placeholder(R.string.sixteenLineQuran))
+            nav.push(Route.SixteenLine)
         },
     )
     BoxWithConstraints {
