@@ -346,7 +346,7 @@ private fun AyahCard(ayah: Ayah, onPlay: () -> Unit) {
             }
             BookmarkButton(bookmarked, ink) { Settings.toggleBookmark(ayah.surahNumber, ayah.numberInSurah) }
             val nav = LocalNavigator.current
-            Box(Modifier.size(48.dp).pressable({ nav.push(Route.Placeholder(R.string.shareAyah)) }, scale = .85f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(48.dp).pressable({ nav.push(Route.AyahPicture(surah = ayah.surahNumber, ayah = ayah.numberInSurah)) }, scale = .85f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.CupertinoShare, ink, 22.dp)
             }
             Spacer(Modifier.weight(1f))

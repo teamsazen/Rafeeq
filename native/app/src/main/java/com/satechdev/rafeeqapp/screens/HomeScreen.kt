@@ -309,7 +309,7 @@ private fun ExploreGrid() {
         ExploreItem(tr(R.string.homeAyahPicture), Glyph.PhotoOnRectangle, badge = ayahPictureNew) {
             Settings.setFlag(AYAH_PICTURE_OPENED)
             ayahPictureNew = false
-            nav.push(Route.Placeholder(R.string.homeAyahPicture))
+            nav.push(Route.AyahPicture())
         },
         ExploreItem(tr(R.string.sixteenLineQuran), Glyph.QuranBookSolid, dot = sixteenLineNew) {
             Settings.setFlag(SIXTEEN_LINE_OPENED)

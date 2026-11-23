@@ -117,7 +117,7 @@ fun QuranSettingsScreen() {
                 })
             }
             item(key = "edition") {
-                SettingsCard(Glyph.MenuBook, tr(R.string.translationEdition), editionName) { nav.push(Route.TranslationPicker) }
+                SettingsCard(Glyph.MenuBook, tr(R.string.translationEdition), editionName) { nav.push(Route.TranslationPicker()) }
             }
         }
         item(key = "reciter") {
@@ -209,7 +209,7 @@ private fun languageName(code: String) = languageNames[code.lowercase()] ?: code
 
 /** Translations grouped by language, English and Urdu first (TranslationSelectionPage). */
 @Composable
-fun TranslationPickerScreen() {
+fun TranslationPickerScreen(forPicture: Boolean = false) {
     val nav = LocalNavigator.current
     val p = palette
     val editions = rememberEditions()
@@ -247,9 +247,10 @@ fun TranslationPickerScreen() {
                                     TranslationRow(
                                         if (urdu) edition.name else edition.englishName,
                                         urduFont = edition.language.lowercase() == "ur",
-                                        selected = Settings.quranView.translationEditionId == edition.identifier,
+                                        selected = (if (forPicture) PicturePick.current.third else Settings.quranView.translationEditionId) == edition.identifier,
                                     ) {
-                                        Settings.setQuranView(Settings.quranView.copy(translationEditionId = edition.identifier))
+                                        if (forPicture) PicturePick.edition = edition.identifier
+                                        else Settings.setQuranView(Settings.quranView.copy(translationEditionId = edition.identifier))
                                         nav.pop()
                                     }
                                 }

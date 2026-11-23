@@ -150,7 +150,7 @@ private fun AsmaCard(item: AsmaName, onOpen: () -> Unit) {
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(p.divider))
         Row(Modifier.padding(4.dp)) {
-            Box(Modifier.size(48.dp).pressable({ nav.push(Route.Placeholder(R.string.homeAyahPicture)) }, scale = .85f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(48.dp).pressable({ nav.push(Route.AyahPicture(asma = item.number)) }, scale = .85f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.CupertinoShare, p.title, 22.dp)
             }
         }
@@ -169,7 +169,7 @@ fun AsmaDetailScreen(initialIndex: Int) {
             "${localNumber(names[pager.currentPage].number)} / ${localNumber(names.size)}",
             onBack = nav::pop,
         ) {
-            Box(Modifier.size(48.dp).pressable({ nav.push(Route.Placeholder(R.string.homeAyahPicture)) }, scale = .85f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(48.dp).pressable({ nav.push(Route.AyahPicture(asma = names[pager.currentPage].number)) }, scale = .85f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.CupertinoShare, p.title, 22.dp)
             }
         }

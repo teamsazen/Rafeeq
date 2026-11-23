@@ -85,6 +85,9 @@ import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.AyahFocusScreen
 import com.satechdev.rafeeqapp.screens.AsmaDetailScreen
+import com.satechdev.rafeeqapp.screens.AyahPictureScreen
+import com.satechdev.rafeeqapp.screens.PictureAyahPickerScreen
+import com.satechdev.rafeeqapp.screens.PictureSurahPickerScreen
 import com.satechdev.rafeeqapp.screens.AsmaListScreen
 import com.satechdev.rafeeqapp.screens.ChooseReciterScreen
 import com.satechdev.rafeeqapp.screens.HijriCalendarScreen
@@ -158,7 +161,11 @@ sealed interface Route {
     data object Wudu : Route { override val key = "wudu" }
     data class AsmaDetail(val index: Int) : Route { override val key = "asma-$index" }
     data object ChooseReciter : Route { override val key = "choose-reciter" }
-    data object TranslationPicker : Route { override val key = "translation-picker" }
+    /** [forPicture]: the choice is for the Ayah Picture, not the reader's setting. */
+    data class TranslationPicker(val forPicture: Boolean = false) : Route { override val key = "translation-picker-$forPicture" }
+    data class AyahPicture(val surah: Int? = null, val ayah: Int? = null, val asma: Int? = null) : Route { override val key = "ayah-picture-$surah-$ayah-$asma" }
+    data object PictureSurahPicker : Route { override val key = "picture-surah" }
+    data object PictureAyahPicker : Route { override val key = "picture-ayah" }
     data object SixteenLine : Route { override val key = "sixteen-line" }
     data class SixteenLineIndex(val page: Int) : Route { override val key = "sixteen-line-index" }
     data object PrayerTimes : Route { override val key = "prayer-times" }
@@ -384,7 +391,10 @@ fun AppRoot() {
                                         Route.Wudu -> WuduScreen()
                                         is Route.AsmaDetail -> AsmaDetailScreen(route.index)
                                         Route.ChooseReciter -> ChooseReciterScreen()
-                                        Route.TranslationPicker -> TranslationPickerScreen()
+                                        is Route.TranslationPicker -> TranslationPickerScreen(route.forPicture)
+                                        is Route.AyahPicture -> AyahPictureScreen(route)
+                                        Route.PictureSurahPicker -> PictureSurahPickerScreen()
+                                        Route.PictureAyahPicker -> PictureAyahPickerScreen()
                                         Route.SixteenLine -> SixteenLineScreen()
                                         is Route.SixteenLineIndex -> SixteenLineIndexScreen(route.page)
                                         Route.PrayerTimes -> PrayerTimesScreen()
