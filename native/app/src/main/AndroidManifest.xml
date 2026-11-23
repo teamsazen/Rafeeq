@@ -21,7 +21,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="${appName}"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Rafeeq">
+        <!-- Predictive back on Android 13 to 15 as well (16 has it by default):
+             the system's own back-to-home preview, with the app's page slide in-app. -->
         <!-- Same class name as the Flutter app, so launcher shortcuts keep working. -->
         <activity
             android:name=".MainActivity"
