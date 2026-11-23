@@ -1,5 +1,9 @@
 package com.satechdev.rafeeqapp.screens
 
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -346,6 +350,11 @@ private fun AyahCard(ayah: Ayah, onPlay: () -> Unit) {
                 AppIcon(Glyph.CupertinoShare, ink, 22.dp)
             }
             Spacer(Modifier.weight(1f))
+            if (current) {
+                AnimatedContent(tr(if (audio.isPlaying) R.string.playing else R.string.paused), transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(120)) }, label = "playing") {
+                    Txt(it, style(12.sp, p.card, FontWeight.SemiBold), Modifier.padding(end = 10.dp))
+                }
+            }
         }
     }
 }

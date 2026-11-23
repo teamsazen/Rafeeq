@@ -154,7 +154,7 @@ Flutter app comes out of the repo, as in 99 Names.
 |---|---|
 | 1. Foundation | Done (2026-11-23), see notes |
 | 2. Home, prayer times, azan | Done (2026-11-23), see notes |
-| 3. Quran | Not started |
+| 3. Quran | Done (2026-11-23), see notes |
 | 4. Everything else | Not started |
 | 5. Release | Not started |
 
@@ -180,6 +180,18 @@ Left for later phases:
 - `strings.xml` is generated: after changing `lib/l10n/*.arb`, run
   `python3 scripts/arb_to_android_strings.py`. Native-only strings live in
   `native_strings.xml`.
+
+### Phase 3 notes
+
+- Recitation runs in a Media3 `MediaSessionService` (`data/audio`), so it
+  keeps playing with the screen off and shows on the lock screen. Reciters
+  and `KEY_SELECTED_RECITER` match Flutter, as does
+  `global_last_played_index`.
+- The reader keeps Flutter's `isQuranAutoScrollEnabled` (on unless set off).
+- Left out because nothing in the Flutter app opens them: the Listen Quran
+  home, the unified/transliteration search and `ayah_text_share.dart`. The
+  ayah share button opens the Ayah Picture maker, which comes in phase 4.
+- The 16 line index search folds spellings as Flutter does (`SearchKeyTest`).
 
 ### Phase 2 notes (so far)
 
