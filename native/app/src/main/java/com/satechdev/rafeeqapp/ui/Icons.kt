@@ -51,6 +51,7 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Tag(materialIcons, 0xf0216),
     ArrowBack(materialIcons, 0xf572),
     MyLocation(materialIcons, 0xf1fe),
+    MyLocationRounded(materialIcons, 0xf8f0),
     Check(materialIcons, 0xf636),
     ArrowDown(materialIcons, 0xf82b),
     Search(materialIcons, 0xf013d),
