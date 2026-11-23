@@ -3,7 +3,6 @@ package com.satechdev.rafeeqapp.screens
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,8 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -168,15 +165,18 @@ fun LegalScreen(document: LegalDocument) {
 
 private const val PORTFOLIO = "https://muzamil.web.app/"
 
-private class OtherApp(val name: String, val icon: String, val pkg: String)
+private class OtherApp(val name: String, @androidx.annotation.DrawableRes val icon: Int, val pkg: String)
 
+/** The team's live apps on Google Play (developer "Sazen"), in the store's order, with their store icons. */
 private val otherApps = listOf(
-    OtherApp("99 Names", "asmaul_husna", "com.muzamil.asmaulhusna"),
-    OtherApp("Quran Khatam Tracker", "quran_khatam_tracker", "com.quran.khatam.tracker"),
-    OtherApp("SalahLog", "salah_log", "com.track_prayer"),
-    OtherApp("Budget AI", "budget_ai", "com.budgetai.android"),
-    OtherApp("FM Crafts", "fm_crafts", "com.fmcrafts.fmcrafts"),
-    OtherApp("Exit Rush", "exit_rush", "com.sazen.exit.rush"),
+    OtherApp("Exit Rush", R.drawable.other_app_exit_rush, "com.sazen.exit.rush"),
+    OtherApp("Quran Urdu Audio", R.drawable.other_app_quran_urdu_audio, "com.sazen.urdu.audio.quran.transcribed.shamshad.ali.khan"),
+    OtherApp("Budget AI", R.drawable.other_app_budget_ai, "com.budgetai.android"),
+    OtherApp("Bg Remover & Photo Enhancer", R.drawable.other_app_bg_remover, "com.sazen.bg.remover"),
+    OtherApp("99 Names", R.drawable.other_app_asmaul_husna, "com.muzamil.asmaulhusna"),
+    OtherApp("SalahLog", R.drawable.other_app_salah_log, "com.track_prayer"),
+    OtherApp("Quran Khatam Tracker", R.drawable.other_app_quran_khatam_tracker, "com.quran.khatam.tracker"),
+    OtherApp("FM Crafts", R.drawable.other_app_fm_crafts, "com.fmcrafts.fmcrafts"),
 )
 
 /** Opens [url] outside the app, or says it could not. */
@@ -249,7 +249,7 @@ fun AboutScreen() {
             }
             Spacer(Modifier.height(24.dp))
             Heading(tr(R.string.aboutWebsiteTitle))
-            Group { LinkTile("Sazen", "teamsazen.com", "sazen", latinSubtitle = true) { context.openLink("https://teamsazen.com", linkError) } }
+            Group { LinkTile("Sazen", "teamsazen.com", R.drawable.other_app_sazen, latinSubtitle = true) { context.openLink("https://teamsazen.com", linkError) } }
         }
     }
 }
@@ -264,31 +264,11 @@ private fun Group(content: @Composable () -> Unit) {
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(palette.card)) { content() }
 }
 
-/** An app icon from assets/other_apps, loaded once. */
 @Composable
-private fun rememberAppIcon(name: String): ImageBitmap? {
-    val context = LocalContext.current
-    var bitmap by remember(name) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(name) {
-        bitmap = withContext(Dispatchers.IO) {
-            runCatching {
-                context.assets.open("other_apps/$name.webp").use {
-                    BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = 2 })?.asImageBitmap()
-                }
-            }.getOrNull()
-        }
-    }
-    return bitmap
-}
-
-@Composable
-private fun LinkTile(title: String, subtitle: String, icon: String, latinSubtitle: Boolean, onClick: () -> Unit) {
+private fun LinkTile(title: String, subtitle: String, @androidx.annotation.DrawableRes icon: Int, latinSubtitle: Boolean, onClick: () -> Unit) {
     val p = palette
     Row(Modifier.fillMaxWidth().pressable(onClick).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        val image = rememberAppIcon(icon)
-        Box(Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).background(p.background)) {
-            if (image != null) Image(image, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-        }
+        Image(painterResource(icon), null, Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
             Txt(title, style(16.sp, p.title, FontWeight.SemiBold, family = AppFonts.sans).copy(textDirection = TextDirection.Ltr))
