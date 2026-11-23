@@ -5,4 +5,6 @@
     <string name="settingsQuranViewSubtitle">Script, font size, translation &amp; recitation settings</string>
     <string name="unableToPlayQuranAudio">Unable to play Quran audio right now.</string>
     <string name="qiblaBearingFromNorth">Qibla is %1$s° from North</string>
+    <string name="locationServicesOff">Location is turned off. Turn it on in your phone\'s settings.</string>
+    <string name="locationUnavailable">Couldn\'t find your location. Try again outside or near a window, or set it manually.</string>
 </resources>

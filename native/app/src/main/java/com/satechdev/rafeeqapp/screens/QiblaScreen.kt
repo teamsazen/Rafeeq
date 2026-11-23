@@ -81,6 +81,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.satechdev.rafeeqapp.LocalNavigator
+import com.satechdev.rafeeqapp.LocalStrings
 import com.satechdev.rafeeqapp.R
 import com.satechdev.rafeeqapp.Route
 import com.satechdev.rafeeqapp.Toast
@@ -202,13 +203,14 @@ private fun NeedsLocation() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var checking by remember { mutableStateOf(false) }
+    val strings = LocalStrings.current
     val denied = tr(R.string.locationPermissionDenied)
     fun locate() {
         checking = true
         scope.launch {
-            val ok = runCatching { LocationService.updateFromGps(context) }.getOrDefault(false)
+            val result = LocationService.updateFromGps(context)
             checking = false
-            if (!ok) Toast.show(denied)
+            if (result != LocationService.Located.Updated) Toast.show(strings.getString(result.message))
         }
     }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->

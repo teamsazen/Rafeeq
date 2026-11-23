@@ -10,7 +10,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,8 +77,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private const val AYAH_PICTURE_OPENED = "ayah_picture_opened_v1"
-private const val SIXTEEN_LINE_OPENED = "sixteen_line_quran_opened_v1"
 private val tabular = TextStyle(fontFeatureSettings = "tnum")
 
 /** The Rafeeq tab, as lib/ui/app_home/home/home_screen.dart. */
@@ -293,29 +288,19 @@ private fun FocusLabel(time: String, prayer: String, alignEnd: Boolean) {
     }
 }
 
-private class ExploreItem(val label: String, val icon: Glyph, val badge: Boolean = false, val dot: Boolean = false, val onClick: () -> Unit)
+private class ExploreItem(val label: String, val icon: Glyph, val onClick: () -> Unit)
 
 @Composable
 private fun ExploreGrid() {
     val nav = LocalNavigator.current
-    var ayahPictureNew by remember { mutableStateOf(!Settings.flag(AYAH_PICTURE_OPENED)) }
-    var sixteenLineNew by remember { mutableStateOf(!Settings.flag(SIXTEEN_LINE_OPENED)) }
     val items = listOf(
         ExploreItem(tr(R.string.quran), Glyph.QuranSolid) { nav.tab = 1 },
         ExploreItem(tr(R.string.dailyPrayerLabel), Glyph.MenuBookRounded) { nav.push(Route.Namaz) },
         ExploreItem(tr(R.string.qibla), Glyph.KaabaSolid) { nav.tab = 2 },
         ExploreItem(tr(R.string.homeCalendar), Glyph.IslamicCalendar) { nav.push(Route.HijriCalendar) },
         ExploreItem(tr(R.string.homeAllahsNames), Glyph.AllahSolid) { nav.push(Route.AsmaList) },
-        ExploreItem(tr(R.string.homeAyahPicture), Glyph.PhotoOnRectangle, badge = ayahPictureNew) {
-            Settings.setFlag(AYAH_PICTURE_OPENED)
-            ayahPictureNew = false
-            nav.push(Route.AyahPicture())
-        },
-        ExploreItem(tr(R.string.sixteenLineQuran), Glyph.QuranBookSolid, dot = sixteenLineNew) {
-            Settings.setFlag(SIXTEEN_LINE_OPENED)
-            sixteenLineNew = false
-            nav.push(Route.SixteenLine)
-        },
+        ExploreItem(tr(R.string.homeAyahPicture), Glyph.PhotoOnRectangle) { nav.push(Route.AyahPicture()) },
+        ExploreItem(tr(R.string.sixteenLineQuran), Glyph.QuranBookSolid) { nav.push(Route.SixteenLine) },
     )
     BoxWithConstraints {
         val ratio = if (maxWidth < 360.dp) 1.2f else 1.18f
@@ -338,32 +323,10 @@ private fun ExploreCard(item: ExploreItem, modifier: Modifier) {
             Txt(
                 item.label,
                 style(13.sp, p.title, FontWeight.Medium, lineHeight = 1.15f),
-                Modifier.align(Alignment.TopStart).padding(end = if (item.badge) 28.dp else if (item.dot) 14.dp else 0.dp),
+                Modifier.align(Alignment.TopStart),
                 maxLines = 2,
             )
             AppIcon(item.icon, p.selectedCard, 36.dp, Modifier.align(Alignment.BottomEnd))
-        }
-        if (item.dot && !item.badge) {
-            Box(
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 8.dp, end = 8.dp)
-                    .size(10.dp)
-                    .background(Color(0xFFE53935), CircleShape)
-                    .border(1.5.dp, p.card, CircleShape),
-            )
-        }
-        if (item.badge) {
-            Box(
-                Modifier
-                    .align(AbsoluteAlignment.TopRight)
-                    .offset(x = 4.dp, y = (-4).dp)
-                    .height(20.dp)
-                    .widthIn(min = 20.dp, max = 32.dp)
-                    .background(Color(0xFFE53935), RoundedCornerShape(100))
-                    .padding(horizontal = 4.dp),
-                contentAlignment = Alignment.Center,
-            ) { Txt("NEW", style(10.sp, Color.White, FontWeight.Bold, family = AppFonts.sans), maxLines = 1) }
         }
     }
 }

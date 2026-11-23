@@ -4,4 +4,6 @@
     <string name="settingsQuranViewSubtitle">خط، سائز، ترجمہ اور تلاوت کی ترتیبات</string>
     <string name="unableToPlayQuranAudio">ابھی قرآن کی آڈیو نہیں چل سکی۔</string>
     <string name="qiblaBearingFromNorth">قبلہ شمال سے %1$s° پر ہے</string>
+    <string name="locationServicesOff">لوکیشن بند ہے۔ فون کی سیٹنگز میں اسے آن کریں۔</string>
+    <string name="locationUnavailable">آپ کی لوکیشن نہیں مل سکی۔ کھلی جگہ یا کھڑکی کے پاس دوبارہ کوشش کریں، یا خود منتخب کریں۔</string>
 </resources>

@@ -122,6 +122,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:35.2.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
+    // The phone's position, as Flutter's geolocator: quick indoors, works with approximate permission.
+    implementation("com.google.android.gms:play-services-location:21.4.0")
     // Flexible in-app updates from Play, as Flutter's in_app_update.
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 

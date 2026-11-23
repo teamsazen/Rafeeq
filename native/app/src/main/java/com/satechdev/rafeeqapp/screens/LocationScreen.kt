@@ -110,11 +110,13 @@ fun LocationScreen() {
     fun useGps() {
         updatingAutomatic = true
         scope.launch {
-            val updated = runCatching { LocationService.updateFromGps(context) }.getOrDefault(false)
+            val result = LocationService.updateFromGps(context)
             updatingAutomatic = false
-            if (updated) Analytics.event("settings_location_to_automatic")
-            if (updated) LocationDraft.reset()
-            Toast.show(strings.getString(if (updated) R.string.locationUpdated else R.string.locationPermissionDenied))
+            if (result == LocationService.Located.Updated) {
+                Analytics.event("settings_location_to_automatic")
+                LocationDraft.reset()
+            }
+            Toast.show(strings.getString(result.message))
         }
     }
 

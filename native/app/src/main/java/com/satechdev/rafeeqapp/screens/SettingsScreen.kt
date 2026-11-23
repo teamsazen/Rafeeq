@@ -40,7 +40,7 @@ private const val FEEDBACK_FORM = "https://forms.gle/cDLne2RtGvfmqrJn9"
 private const val REPOSITORY = "https://github.com/teamsazen/Rafeeq"
 private const val REPORT_ISSUE = "https://github.com/teamsazen/Rafeeq/issues/new"
 
-private class Row(val icon: Glyph, val title: String, val subtitle: String?, val badge: String? = null, val onClick: () -> Unit)
+private class Row(val icon: Glyph, val title: String, val subtitle: String?, val onClick: () -> Unit)
 
 /** The Settings tab, laid out as lib/ui/app_home/home/settings_screen.dart. */
 @Composable
@@ -77,10 +77,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Row(Glyph.PrivacyTip, tr(R.string.privacyPolicy), tr(R.string.privacyPolicySubtitle), onClick = { nav.push(Route.Legal(LegalDocument.Privacy)) }),
             Row(Glyph.Gavel, tr(R.string.termsAndConditions), tr(R.string.termsAndConditionsSubtitle), onClick = { nav.push(Route.Legal(LegalDocument.Terms)) }),
             Row(Glyph.Description, tr(R.string.licenses), tr(R.string.licensesSubtitle), onClick = { nav.push(Route.Licences) }),
-            Row(Glyph.Info, tr(R.string.about), tr(R.string.aboutSubtitle), badge = if (Settings.aboutOpened) null else "NEW") {
-                Settings.markAboutOpened()
-                nav.push(Route.About)
-            },
+            Row(Glyph.Info, tr(R.string.about), tr(R.string.aboutSubtitle)) { nav.push(Route.About) },
             Row(Glyph.Tag, tr(R.string.version), "${tr(R.string.versionSubtitle)}  •  ${BuildConfig.VERSION_NAME}", onClick = { nav.push(Route.Version) }),
         ),
     )
@@ -104,7 +101,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 rows.forEachIndexed { rowIndex, row ->
                     item(key = "$index-$rowIndex") {
                         if (rowIndex > 0) Spacer(Modifier.height(8.dp))
-                        SettingsCard(row.icon, row.title, row.subtitle, row.badge, onClick = row.onClick)
+                        SettingsCard(row.icon, row.title, row.subtitle, onClick = row.onClick)
                     }
                 }
             }

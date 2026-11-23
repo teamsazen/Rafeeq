@@ -13,8 +13,20 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
 import androidx.core.content.ContextCompat
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.location.CurrentLocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.Task
+import com.satechdev.rafeeqapp.R
 import com.satechdev.rafeeqapp.data.prayer.UserLocation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -42,24 +54,59 @@ object LocationService {
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
+    /** How a request for the phone's position ended, so the message can say why. */
+    enum class Located(@androidx.annotation.StringRes val message: Int) {
+        Updated(R.string.locationUpdated),
+        NoPermission(R.string.locationPermissionDenied),
+        Off(R.string.locationServicesOff),
+        NoFix(R.string.locationUnavailable),
+    }
+
+    private val background = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var running: Deferred<Located>? = null
+
     /**
      * Saves the phone's current position as the automatic location, named by
-     * the geocoder. Needs location permission. Returns false when no fix comes.
+     * the geocoder. It runs in the app's own scope, so it finishes and saves
+     * even after the screen that asked is gone; a second ask joins the first.
      */
-    suspend fun updateFromGps(context: Context): Boolean {
-        val position = currentPosition(context) ?: return false
-        val address = reverseGeocode(context, position.latitude, position.longitude)
-        Settings.setLocation(
-            UserLocation(
-                latitude = position.latitude,
-                longitude = position.longitude,
-                city = address?.let(::cityOf),
-                country = address?.countryName,
-                countryCode = address?.countryCode,
-                source = "automatic",
-            ),
-        )
-        return true
+    fun locate(context: Context): Deferred<Located> {
+        running?.takeIf { it.isActive }?.let { return it }
+        val app = context.applicationContext
+        return background.async {
+            when {
+                !hasPermission(app) -> Located.NoPermission
+                !locationOn(app) -> Located.Off
+                else -> {
+                    val position = runCatching { currentPosition(app) }.getOrNull()
+                    if (position == null) {
+                        Located.NoFix
+                    } else {
+                        val address = reverseGeocode(app, position.latitude, position.longitude)
+                        Settings.setLocation(
+                            UserLocation(
+                                latitude = position.latitude,
+                                longitude = position.longitude,
+                                city = address?.let(::cityOf),
+                                country = address?.countryName,
+                                countryCode = address?.countryCode,
+                                source = "automatic",
+                            ),
+                        )
+                        Located.Updated
+                    }
+                }
+            }
+        }.also { running = it }
+    }
+
+    /** [locate], waiting for it. */
+    suspend fun updateFromGps(context: Context): Located = locate(context).await()
+
+    private fun locationOn(context: Context): Boolean {
+        val manager = context.getSystemService(LocationManager::class.java) ?: return false
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) manager.isLocationEnabled
+        else listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER).any { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
     }
 
     /** Saves "[city], [country]" as the manual location. False when the geocoder cannot find it. */
@@ -114,19 +161,60 @@ object LocationService {
         }
     }
 
+    private fun fine(context: Context) =
+        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    /**
+     * The phone's position: from Play services' fused location, as Flutter's
+     * geolocator, which is quick indoors and works with approximate
+     * permission; else from the platform's providers.
+     */
+    private suspend fun currentPosition(context: Context): Location? =
+        (if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) fusedPosition(context) else null)
+            ?: platformPosition(context)
+
     @SuppressLint("MissingPermission")
-    private suspend fun currentPosition(context: Context): Location? {
-        if (!hasPermission(context)) return null
+    private suspend fun fusedPosition(context: Context): Location? {
+        val client = LocationServices.getFusedLocationProviderClient(context)
+        val request = CurrentLocationRequest.Builder()
+            .setPriority(if (fine(context)) Priority.PRIORITY_HIGH_ACCURACY else Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+            // A fix from the last few minutes is as good for prayer times and the Qibla.
+            .setMaxUpdateAgeMillis(5 * 60_000L)
+            .setDurationMillis(20_000L)
+            .build()
+        val cancel = CancellationTokenSource()
+        val fresh = runCatching {
+            withTimeoutOrNull(21_000) { client.getCurrentLocation(request, cancel.token).awaitOrNull() }
+        }.getOrNull()
+        cancel.cancel()
+        return fresh ?: runCatching { client.lastLocation.awaitOrNull() }.getOrNull()
+    }
+
+    private suspend fun <T> Task<T>.awaitOrNull(): T? = suspendCancellableCoroutine { continuation ->
+        addOnCompleteListener { if (continuation.isActive) continuation.resume(if (it.isSuccessful) it.result else null) }
+    }
+
+    /** Without Play services: the most recent provider fix, else a new one from network or GPS, whichever is allowed and on. */
+    @SuppressLint("MissingPermission")
+    private suspend fun platformPosition(context: Context): Location? {
         val manager = context.getSystemService(LocationManager::class.java) ?: return null
-        val provider = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            .firstOrNull { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
-            ?: return null
+        // GPS needs precise permission; approximate allows only the network.
+        val allowed = buildList {
+            add(LocationManager.NETWORK_PROVIDER)
+            if (fine(context)) add(LocationManager.GPS_PROVIDER)
+        }.filter { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
+        if (allowed.isEmpty()) return null
+        val recent = allowed.mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }
+            .filter { System.currentTimeMillis() - it.time < 5 * 60_000L }
+            .maxByOrNull { it.time }
+        if (recent != null) return recent
+        val provider = allowed.first()
         val fresh = withTimeoutOrNull(20_000) {
             suspendCancellableCoroutine { continuation ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     val signal = CancellationSignal()
                     continuation.invokeOnCancellation { signal.cancel() }
-                    manager.getCurrentLocation(provider, signal, context.mainExecutor) { continuation.resume(it) }
+                    manager.getCurrentLocation(provider, signal, context.mainExecutor) { if (continuation.isActive) continuation.resume(it) }
                 } else {
                     val listener = object : LocationListener {
                         override fun onLocationChanged(location: Location) {
@@ -143,7 +231,7 @@ object LocationService {
                 }
             }
         }
-        return fresh ?: runCatching { manager.getLastKnownLocation(provider) }.getOrNull()
+        return fresh ?: allowed.mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }.maxByOrNull { it.time }
     }
 
     private suspend fun reverseGeocode(context: Context, latitude: Double, longitude: Double): Address? =

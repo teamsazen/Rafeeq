@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -29,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +44,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.satechdev.rafeeqapp.LocalNavigator
-import com.satechdev.rafeeqapp.ui.AppFonts
 import com.satechdev.rafeeqapp.ui.AppIcon
 import com.satechdev.rafeeqapp.ui.AppMotion
 import com.satechdev.rafeeqapp.ui.AppSwitch
@@ -124,7 +121,6 @@ fun SettingsCard(
     icon: Glyph,
     title: String,
     subtitle: String? = null,
-    badge: String? = null,
     switch: Boolean? = null,
     foreground: Color? = null,
     supporting: (@Composable () -> Unit)? = null,
@@ -159,21 +155,6 @@ fun SettingsCard(
             if (switch != null) {
                 Spacer(Modifier.width(12.dp))
                 AppSwitch(switch) { onClick?.invoke() }
-            }
-        }
-        if (badge != null) {
-            Box(
-                Modifier
-                    // Top right in both languages, as Flutter's Positioned(right: -4).
-                    .align(AbsoluteAlignment.TopRight)
-                    .absoluteOffset(x = 4.dp, y = (-4).dp)
-                    .height(20.dp)
-                    .widthIn(min = 20.dp, max = 32.dp)
-                    .background(Color(0xFFE53935), RoundedCornerShape(100))
-                    .padding(horizontal = 4.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Txt(badge, style(10.sp, Color.White, FontWeight.Bold, family = AppFonts.sans), maxLines = 1)
             }
         }
     }

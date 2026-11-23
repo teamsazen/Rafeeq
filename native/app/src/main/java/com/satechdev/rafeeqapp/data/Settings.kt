@@ -57,7 +57,6 @@ object Settings {
     private const val APP_SETTINGS = "app_settings"
     private const val PRAYER_SETTINGS = "prayer_times_settings"
     private const val USER_LOCATION = "prefs.user_location"
-    private const val ABOUT_OPENED = "about_opened_v1"
     private const val QURAN_VIEW = "quran_view_settings"
     private const val BOOKMARKS = "ayah_bookmarks"
 
@@ -81,7 +80,6 @@ object Settings {
     var notifications by mutableStateOf(NotificationSettings()); private set
     @set:JvmName("assignLocation")
     var location by mutableStateOf<UserLocation?>(null); private set
-    var aboutOpened by mutableStateOf(false); private set
     @set:JvmName("assignQuranView")
     var quranView by mutableStateOf(QuranViewSettings()); private set
     @set:JvmName("assignBookmarks")
@@ -119,7 +117,6 @@ object Settings {
                 source = it.optString("source").takeIf(String::isNotBlank),
             )
         }
-        aboutOpened = prefs.getBoolean(k(ABOUT_OPENED), false)
         quranView = parseQuranView(json(QURAN_VIEW))
         bookmarks = PrefsList.decode(prefs.getString(k(BOOKMARKS), null)).mapNotNull(Bookmark::of)
     }
@@ -324,11 +321,6 @@ object Settings {
 
     fun setFlag(key: String) {
         prefs.edit().putBoolean(k(key), true).apply()
-    }
-
-    fun markAboutOpened() {
-        aboutOpened = true
-        prefs.edit().putBoolean(k(ABOUT_OPENED), true).apply()
     }
 
     // --- storage ---

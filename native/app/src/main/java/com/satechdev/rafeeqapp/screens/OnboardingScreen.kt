@@ -91,6 +91,7 @@ import com.satechdev.rafeeqapp.ui.pressable
 import com.satechdev.rafeeqapp.ui.reducedMotion
 import com.satechdev.rafeeqapp.ui.style
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.time.LocalDateTime
 
 private enum class Step { Welcome, Language, Notifications, Location, Theme }
@@ -145,13 +146,23 @@ fun OnboardingScreen() {
     }
 
     // Location: GPS on request, or quietly on Next when nothing was chosen.
+    // A fix can take a while indoors, so after four seconds onboarding moves
+    // on and the search carries on in the background, saving when it lands.
     var quietOnNext by remember { mutableStateOf(false) }
     fun useGps() {
         busy = true
+        val search = LocationService.locate(context)
         scope.launch {
-            val updated = runCatching { LocationService.updateFromGps(context) }.getOrDefault(false)
+            val quick = withTimeoutOrNull(4_000) { search.await() }
             busy = false
-            if (updated) {
+            if (quick == null) {
+                quietOnNext = false
+                if (step == Step.Location) next()
+                val late = search.await()
+                Toast.show(strings.getString(late.message))
+                return@launch
+            }
+            if (quick == LocationService.Located.Updated) {
                 LocationDraft.reset()
                 LocationDraft.manualExpanded = false
             }
@@ -159,7 +170,7 @@ fun OnboardingScreen() {
                 quietOnNext = false
                 next()
             } else {
-                Toast.show(strings.getString(if (updated) R.string.locationUpdated else R.string.locationPermissionDenied))
+                Toast.show(strings.getString(quick.message))
             }
         }
     }
