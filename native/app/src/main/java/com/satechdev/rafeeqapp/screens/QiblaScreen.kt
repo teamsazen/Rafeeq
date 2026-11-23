@@ -98,7 +98,7 @@ internal fun qiblaBearing(latitude: Double, longitude: Double): Double {
 }
 
 /** How much of each new reading the heading takes; lower is calmer. */
-private const val HEADING_SMOOTHING = .18
+private const val HEADING_SMOOTHING = .22
 
 internal fun normalize(angle: Double) = ((angle % 360) + 360) % 360
 
@@ -314,16 +314,25 @@ private fun LiveCompass(location: UserLocation) {
 private fun compassGreen() = if (palette.dark) Color(0xFF43807A) else Color(0xFF07524E)
 
 /**
- * Follows [target] (degrees) the short way round on a spring, so the dial
- * glides instead of jittering and never spins the long way past north.
+ * The Kaaba marker's angle. While turning it simply follows the phone; when
+ * the phone comes to face the Qibla it springs onto the top and stays there,
+ * and on turning away it slides quickly back to the real bearing.
  */
 @Composable
-private fun smoothAngle(target: Float): Float {
+private fun kaabaAngle(target: Float, facing: Boolean): Float {
     val still = reducedMotion()
     val angle = remember { Animatable(target) }
-    LaunchedEffect(target) {
-        val delta = ((target - angle.value) % 360 + 540) % 360 - 180
-        if (still) angle.snapTo(angle.value + delta) else angle.animateTo(angle.value + delta, spring(dampingRatio = .9f, stiffness = 120f))
+    var settling by remember { mutableStateOf(false) }
+    fun nearest(to: Float) = angle.value + (((to - angle.value) % 360 + 540) % 360 - 180)
+    LaunchedEffect(facing) {
+        if (still) return@LaunchedEffect
+        settling = true
+        if (facing) angle.animateTo(nearest(0f), spring(dampingRatio = .45f, stiffness = 380f))
+        else angle.animateTo(nearest(target), tween(160))
+        settling = false
+    }
+    LaunchedEffect(target, facing) {
+        if (!settling && !facing || still) angle.snapTo(nearest(if (facing && !still) 0f else target))
     }
     return angle.value
 }
@@ -337,8 +346,9 @@ private fun Dial(size: Dp, heading: Float, marker: Float?, modifier: Modifier = 
     val p = palette
     val green = compassGreen()
     val tick = if (p.dark) p.title else Color(0xFFF1DCA7)
-    val north = -smoothAngle(heading)
-    val kaaba = marker?.let { smoothAngle(it) }
+    // The directions follow the (already filtered) heading directly, with no lag after the phone stops.
+    val north = -heading
+    val kaaba = marker?.let { kaabaAngle(it, facing) }
     // The Kaaba swells once when it comes to the top.
     val pulse = remember { Animatable(1f) }
     LaunchedEffect(facing) {
