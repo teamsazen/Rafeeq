@@ -70,6 +70,8 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     BookmarkBorder(materialIcons, 0xf5cf),
     Play(materialIcons, 0xf00a0),
     SkipNext(materialIcons, 0xf0192),
+    ChevronLeft(materialIcons, 0xf63a),
+    ChevronRight(materialIcons, 0xf63b),
     SkipPrevious(materialIcons, 0xf0193),
     Pause(materialIcons, 0xf0056),
     NumberedList(materialIcons, 0xf793),
