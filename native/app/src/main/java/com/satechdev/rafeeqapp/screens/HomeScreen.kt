@@ -305,7 +305,7 @@ private fun ExploreGrid() {
         ExploreItem(tr(R.string.dailyPrayerLabel), Glyph.MenuBookRounded) { nav.push(Route.Placeholder(R.string.dailyPrayerLabel)) },
         ExploreItem(tr(R.string.qibla), Glyph.KaabaSolid) { nav.tab = 2 },
         ExploreItem(tr(R.string.homeCalendar), Glyph.IslamicCalendar) { nav.push(Route.HijriCalendar) },
-        ExploreItem(tr(R.string.homeAllahsNames), Glyph.AllahSolid) { nav.push(Route.Placeholder(R.string.homeAllahsNames)) },
+        ExploreItem(tr(R.string.homeAllahsNames), Glyph.AllahSolid) { nav.push(Route.AsmaList) },
         ExploreItem(tr(R.string.homeAyahPicture), Glyph.PhotoOnRectangle, badge = ayahPictureNew) {
             Settings.setFlag(AYAH_PICTURE_OPENED)
             ayahPictureNew = false

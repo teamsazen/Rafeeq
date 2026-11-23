@@ -84,6 +84,8 @@ import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
 import com.satechdev.rafeeqapp.screens.AyahFocusScreen
+import com.satechdev.rafeeqapp.screens.AsmaDetailScreen
+import com.satechdev.rafeeqapp.screens.AsmaListScreen
 import com.satechdev.rafeeqapp.screens.ChooseReciterScreen
 import com.satechdev.rafeeqapp.screens.HijriCalendarScreen
 import com.satechdev.rafeeqapp.screens.MiniPlayerSlot
@@ -147,6 +149,8 @@ sealed interface Route {
     data object QuranSettings : Route { override val key = "quran-settings" }
     data object AyahFocus : Route { override val key = "ayah-focus" }
     data object HijriCalendar : Route { override val key = "hijri-calendar" }
+    data object AsmaList : Route { override val key = "asma" }
+    data class AsmaDetail(val index: Int) : Route { override val key = "asma-$index" }
     data object ChooseReciter : Route { override val key = "choose-reciter" }
     data object TranslationPicker : Route { override val key = "translation-picker" }
     data object SixteenLine : Route { override val key = "sixteen-line" }
@@ -368,6 +372,8 @@ fun AppRoot() {
                                         Route.QuranSettings -> QuranSettingsScreen()
                                         Route.AyahFocus -> AyahFocusScreen()
                                         Route.HijriCalendar -> HijriCalendarScreen()
+                                        Route.AsmaList -> AsmaListScreen()
+                                        is Route.AsmaDetail -> AsmaDetailScreen(route.index)
                                         Route.ChooseReciter -> ChooseReciterScreen()
                                         Route.TranslationPicker -> TranslationPickerScreen()
                                         Route.SixteenLine -> SixteenLineScreen()
