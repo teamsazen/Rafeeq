@@ -143,6 +143,13 @@ object Settings {
         prefs.edit().putString(k(USER_LOCATION), map.toString()).apply()
     }
 
+    /** A plain shared_preferences flag, such as a "seen" marker. */
+    fun flag(key: String): Boolean = prefs.getBoolean(k(key), false)
+
+    fun setFlag(key: String) {
+        prefs.edit().putBoolean(k(key), true).apply()
+    }
+
     fun markAboutOpened() {
         aboutOpened = true
         prefs.edit().putBoolean(k(ABOUT_OPENED), true).apply()

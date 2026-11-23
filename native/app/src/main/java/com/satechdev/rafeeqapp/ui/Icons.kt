@@ -55,6 +55,10 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     ArrowDown(materialIcons, 0xf82b),
     Search(materialIcons, 0xf013d),
     CloudOff(materialIcons, 0xef61),
+    MenuBookRounded(materialIcons, 0xf8b4),
+    Twilight(materialIcons, 0xf4bd),
+    Sunny(materialIcons, 0xf4bc),
+    Nightlight(materialIcons, 0xf214),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),
@@ -64,12 +68,17 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Location(cupertinoIcons, 0xf6ee),
     CheckMark(cupertinoIcons, 0xf3fd),
     LocationSlash(cupertinoIcons, 0xf6f6),
+    PhotoOnRectangle(cupertinoIcons, 0xf76a),
 
     // Flutter Islamic Icons
     Quran(islamicIcons, 0xe81b),
     QuranSolid(islamicIcons, 0xe83b),
     Qibla(islamicIcons, 0xe81a),
     QiblaSolid(islamicIcons, 0xe838),
+    IslamicCalendar(islamicIcons, 0xe806),
+    AllahSolid(islamicIcons, 0xe81f),
+    KaabaSolid(islamicIcons, 0xe829),
+    QuranBookSolid(islamicIcons, 0xe83a),
 }
 
 /** Draws [glyph] in a [size] square, like Flutter's `Icon`, never scaled by the font size setting. */

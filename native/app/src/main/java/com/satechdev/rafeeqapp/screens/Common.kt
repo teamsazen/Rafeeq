@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,7 +67,7 @@ val ScreenBottomPadding = 60.dp
  * arrow when [onBack] is set, the title and a hairline below.
  */
 @Composable
-fun AppBar(title: String, onBack: (() -> Unit)? = null) {
+fun AppBar(title: String, onBack: (() -> Unit)? = null, actions: @Composable RowScope.() -> Unit = {}) {
     val p = palette
     Column(Modifier.fillMaxWidth().background(p.background).statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -82,6 +83,7 @@ fun AppBar(title: String, onBack: (() -> Unit)? = null) {
                 Spacer(Modifier.width(12.dp))
             }
             Txt(title, style(18.sp, p.title, FontWeight.SemiBold), Modifier.weight(1f), maxLines = 1)
+            actions()
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(p.divider))
     }
