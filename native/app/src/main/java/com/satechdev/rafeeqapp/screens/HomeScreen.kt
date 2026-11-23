@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.screens
 
+import androidx.compose.foundation.layout.requiredSize
 import android.content.Intent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
@@ -347,12 +348,13 @@ private fun Timeline(prayers: List<TimelineItem>, onClick: () -> Unit) {
     ) {
         Box(Modifier.fillMaxWidth().height(20.dp), contentAlignment = Alignment.Center) {
             Box(Modifier.fillMaxWidth().padding(horizontal = 28.dp).height(2.dp).background(p.selectedCard))
-            Row(Modifier.fillMaxWidth()) {
+            // Each dot centred on the line; the current prayer's 24 dp dot may stand past the 20 dp row, still round.
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
                 prayers.forEach { prayer ->
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
                         val dot by animateFloatAsState(if (prayer.active) 24f else 12f, tween(AppMotion.PAGE, easing = AppMotion.easeOut), label = "dot")
                         val color = if (prayer.active) p.accent else p.selectedCard
-                        Box(Modifier.size(dot.dp).background(color, CircleShape))
+                        Box(Modifier.requiredSize(dot.dp).background(color, CircleShape))
                     }
                 }
             }
