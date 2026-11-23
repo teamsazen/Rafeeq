@@ -175,6 +175,7 @@ class _GuideStepCard extends StatelessWidget {
               style: TextStyle(
                 color: palette.title,
                 fontFamily: 'PDMS Saleem Quran',
+                letterSpacing: 0,
                 fontSize: 30,
                 height: 1.75,
               ),

@@ -220,6 +220,7 @@ class _ListenQuranHomeScreenState extends ConsumerState<ListenQuranHomeScreen> {
                             surah.name,
                             style: const TextStyle(
                               fontFamily: 'PDMS Saleem Quran',
+                              letterSpacing: 0,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),

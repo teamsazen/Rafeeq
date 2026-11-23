@@ -215,6 +215,9 @@ class _PageLines extends StatelessWidget {
           fontFamily: _quranFont,
           fontSize: fontSize,
           color: colors.text,
+          // Any letter spacing turns ligatures off, and the font makes لا
+          // with one. Without this the theme's spacing is inherited.
+          letterSpacing: 0,
         );
 
         return Directionality(

@@ -103,6 +103,7 @@ class AyahPictureCard extends StatelessWidget {
                                       style: TextStyle(
                                         color: palette.title,
                                         fontFamily: 'PDMS Saleem Quran',
+                                        letterSpacing: 0,
                                         fontSize: arabicMaxSize,
                                         height: 1.55,
                                       ),

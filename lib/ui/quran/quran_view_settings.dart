@@ -850,6 +850,7 @@ class QuranViewSettingsScreen extends ConsumerWidget {
               style: TextStyle(
                 color: palette.title,
                 fontFamily: 'PDMS Saleem Quran',
+                letterSpacing: 0,
                 fontSize: arabicFontSize,
                 height: 1.45,
               ),

@@ -577,6 +577,7 @@ class UnifiedSearchResultsView extends HookConsumerWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: 'PDMS Saleem Quran',
+                              letterSpacing: 0,
                               fontSize: 22,
                               color: theme.textColor,
                             ),

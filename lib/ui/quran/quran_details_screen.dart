@@ -48,6 +48,7 @@ TextStyle getArabicTextStyle(
 }) {
   return TextStyle(
     fontFamily: 'PDMS Saleem Quran',
+    letterSpacing: 0,
     fontSize: customFontSize ?? settings.arabicFontSize,
     color: color,
     height: 1.8,

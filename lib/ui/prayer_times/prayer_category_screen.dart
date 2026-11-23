@@ -116,6 +116,7 @@ class PrayerCategoryScreen extends HookConsumerWidget {
                   style: TextStyle(
                     color: palette.selectedTitle,
                     fontFamily: 'PDMS Saleem Quran',
+                    letterSpacing: 0,
                     fontSize: 17,
                   ),
                 ),
@@ -248,6 +249,7 @@ class _PrayerCard extends StatelessWidget {
                   prayer.arabicText,
                   style: TextStyle(
                     fontFamily: 'PDMS Saleem Quran',
+                    letterSpacing: 0,
                     fontSize: 20,
                     height: 1.6,
                     color: colorScheme.onSecondary,

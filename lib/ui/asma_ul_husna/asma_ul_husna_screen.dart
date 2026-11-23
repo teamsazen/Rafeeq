@@ -119,6 +119,7 @@ class _AsmaCard extends StatelessWidget {
                       style: TextStyle(
                         color: palette.title,
                         fontFamily: 'PDMS Saleem Quran',
+                        letterSpacing: 0,
                         fontSize: 40,
                         height: 1.75,
                       ),

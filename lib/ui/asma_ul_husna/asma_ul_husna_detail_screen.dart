@@ -132,6 +132,7 @@ class _AsmaDetailPage extends ConsumerWidget {
                       style: TextStyle(
                         color: palette.title,
                         fontFamily: 'PDMS Saleem Quran',
+                        letterSpacing: 0,
                         fontSize: 88,
                         height: 1.6,
                       ),

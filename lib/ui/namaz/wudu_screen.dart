@@ -119,6 +119,7 @@ class _WuduStepTile extends StatelessWidget {
               style: TextStyle(
                 color: palette.title,
                 fontFamily: 'PDMS Saleem Quran',
+                letterSpacing: 0,
                 fontSize: 28,
                 height: 1.75,
               ),

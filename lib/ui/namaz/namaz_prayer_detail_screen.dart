@@ -131,6 +131,7 @@ class _PrayerHeader extends StatelessWidget {
                 style: TextStyle(
                   color: palette.selectedTitle,
                   fontFamily: 'PDMS Saleem Quran',
+                  letterSpacing: 0,
                   fontSize: 22,
                 ),
               ),
@@ -253,6 +254,7 @@ class _PrayerStepCard extends StatelessWidget {
               style: TextStyle(
                 color: palette.title,
                 fontFamily: 'PDMS Saleem Quran',
+                letterSpacing: 0,
                 fontSize: 25,
                 height: 1.75,
               ),

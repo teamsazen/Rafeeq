@@ -189,6 +189,7 @@ class PrayerDetailScreen extends HookConsumerWidget {
             prayer.arabicText,
             style: TextStyle(
               fontFamily: 'PDMS Saleem Quran',
+              letterSpacing: 0,
               fontSize: 26,
               height: 1.8,
               color: colorScheme.onSurface,
