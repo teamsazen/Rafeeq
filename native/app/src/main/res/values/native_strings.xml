@@ -5,4 +5,5 @@
     <string name="nativeComingBody">This screen is still being rebuilt. It works in the current Rafeeq app.</string>
     <string name="settingsNotificationSubtitle">Prayer reminders and notification settings</string>
     <string name="settingsQuranViewSubtitle">Script, font size, translation &amp; recitation settings</string>
+    <string name="unableToPlayQuranAudio">Unable to play Quran audio right now.</string>
 </resources>

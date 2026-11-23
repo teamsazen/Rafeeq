@@ -96,7 +96,7 @@ fun PushedScreen(title: String, content: LazyListScope.() -> Unit) {
     val nav = LocalNavigator.current
     Column(Modifier.fillMaxSize().background(palette.background)) {
         AppBar(title, onBack = nav::pop)
-        CenteredList(bottom = ScreenBottomPadding, spacing = 8.dp, content = content)
+        CenteredList(bottom = playerAwareBottom, spacing = 8.dp, content = content)
     }
 }
 

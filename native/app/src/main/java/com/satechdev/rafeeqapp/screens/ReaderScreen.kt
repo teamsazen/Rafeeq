@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.screens
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
@@ -45,6 +46,8 @@ import com.satechdev.rafeeqapp.LocalNavigator
 import com.satechdev.rafeeqapp.R
 import com.satechdev.rafeeqapp.Route
 import com.satechdev.rafeeqapp.data.Settings
+import com.satechdev.rafeeqapp.data.audio.PlaybackScope
+import com.satechdev.rafeeqapp.data.audio.QuranAudio
 import com.satechdev.rafeeqapp.data.quran.Ayah
 import com.satechdev.rafeeqapp.data.quran.Editions
 import com.satechdev.rafeeqapp.data.quran.JuzNames
@@ -85,7 +88,10 @@ object ReaderState {
     var jumpTo by mutableStateOf<Int?>(null)
 }
 
-private val rtlLanguages = setOf("ar", "ur", "fa", "he", "ps", "sd", "ug", "dv", "ku", "yi")
+/** Flutter Prefs.isQuranAutoScrollEnabled; on unless turned off. */
+private const val AUTO_SCROLL = "isQuranAutoScrollEnabled"
+
+internal val rtlLanguages = setOf("ar", "ur", "fa", "he", "ps", "sd", "ug", "dv", "ku", "yi")
 
 private sealed interface ReaderItem {
     data class Header(val surah: Surah) : ReaderItem
@@ -123,6 +129,30 @@ fun ReaderScreen(route: Route.QuranReader) {
     }
     LaunchedEffect(section) { if (ReaderState.jumpTo == null) list.scrollToItem(0) }
 
+    val audio = QuranAudio.state
+    // The reader follows the recitation into the next surah or juz...
+    var lastPlaying by remember { mutableStateOf(audio.scope to audio.scopeNumber) }
+    LaunchedEffect(audio.scope, audio.scopeNumber) {
+        val playing = audio.scope to audio.scopeNumber
+        if (playing == lastPlaying) return@LaunchedEffect
+        lastPlaying = playing
+        val number = audio.scopeNumber ?: return@LaunchedEffect
+        val next = if (audio.scope == PlaybackScope.Juz) Section.OfJuz(number) else Section.OfSurah(number)
+        if (next != ReaderState.section) {
+            ReaderState.jumpTo = audio.currentAyah?.number
+            ReaderState.section = next
+        }
+    }
+    // ...and keeps the ayah being recited in view (Flutter's isQuranAutoScrollEnabled).
+    val reciting = audio.currentAyah?.number
+    LaunchedEffect(reciting) {
+        if (reciting == null || !Settings.bool(AUTO_SCROLL, true)) return@LaunchedEffect
+        val index = items.indexOfFirst { it is ReaderItem.Verse && it.ayah.number == reciting }
+        if (index >= 0 && list.layoutInfo.visibleItemsInfo.none { it.index == index && it.offset >= 0 && it.offset + it.size <= list.layoutInfo.viewportEndOffset }) {
+            list.animateScrollToItem(index, -(list.layoutInfo.viewportSize.height * .12f).toInt())
+        }
+    }
+
     Column(Modifier.fillMaxSize().background(p.background)) {
         ReaderAppBar(text, section, onBack = nav::pop)
         if (text == null) {
@@ -137,13 +167,20 @@ fun ReaderScreen(route: Route.QuranReader) {
             ) {
                 itemsIndexed(items, key = { _, item -> if (item is ReaderItem.Header) "h${item.surah.number}" else "a${(item as ReaderItem.Verse).ayah.number}" }) { _, item ->
                     when (item) {
-                        is ReaderItem.Header -> SurahHeader(item.surah)
-                        is ReaderItem.Verse -> AyahCard(item.ayah)
+                        is ReaderItem.Header -> SurahHeader(item.surah) {
+                            items.firstNotNullOfOrNull { (it as? ReaderItem.Verse)?.ayah?.takeIf { a -> a.surahNumber == item.surah.number } }
+                                ?.let { playFrom(context, section, it) }
+                        }
+                        is ReaderItem.Verse -> AyahCard(item.ayah) { playFrom(context, section, item.ayah) }
                     }
                 }
-                item { Spacer(Modifier.navigationBarsPadding()) }
+                item { Spacer(Modifier.navigationBarsPadding().height(if (audio.isVisible) MiniPlayerHeight else 0.dp)) }
             }
         }
+    }
+    // The player sits under the reader rather than over the last ayah.
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        Box(Modifier.background(if (audio.isVisible) p.card else Color.Transparent).navigationBarsPadding()) { MiniPlayerSlot(PlayerPlace.Reader) }
     }
 }
 
@@ -188,7 +225,7 @@ private fun ReaderAppBar(quran: QuranText?, section: Section, onBack: () -> Unit
                 Txt(title, style(17.sp, p.title, FontWeight.Bold), maxLines = 1)
                 Txt(subtitle, style(12.sp, p.subtitle), maxLines = 1)
             }
-            Box(Modifier.size(48.dp).pressable({ nav.push(Route.QuranAyahPicker) }, scale = .9f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(48.dp).pressable({ nav.push(Route.QuranAyahPicker()) }, scale = .9f), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.NumberedList, p.title, 24.dp)
             }
             Box(Modifier.size(48.dp).pressable({ nav.push(Route.QuranSettings) }, scale = .9f), contentAlignment = Alignment.Center) {
@@ -201,7 +238,7 @@ private fun ReaderAppBar(quran: QuranText?, section: Section, onBack: () -> Unit
 
 /** Makkah or Madinah, the meaning and the name (the surah name lands here from the list), and Play. */
 @Composable
-private fun SurahHeader(surah: Surah) {
+private fun SurahHeader(surah: Surah, onPlay: () -> Unit) {
     val p = palette
     val urdu = Settings.language.rtl
     val makki = surah.revelationType.lowercase().contains("meccan")
@@ -218,9 +255,8 @@ private fun SurahHeader(surah: Surah) {
             Modifier.hero("surah-${surah.number}"),
         )
         Spacer(Modifier.height(12.dp))
-        // Playback arrives with the audio player.
         Row(
-            Modifier.clip(RoundedCornerShape(50)).background(p.card).padding(horizontal = 12.dp, vertical = 6.dp),
+            Modifier.pressable(onPlay, scale = .95f).clip(RoundedCornerShape(50)).background(p.card).padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppIcon(Glyph.PlayCircle, p.title, 22.dp)
@@ -231,13 +267,13 @@ private fun SurahHeader(surah: Surah) {
 }
 
 /** Translations per surah, loaded once per edition and kept while the app runs. */
-private object TranslationCache {
+internal object TranslationCache {
     val texts = mutableStateMapOf<String, Map<Int, String>>()
     val failed = mutableStateMapOf<String, Boolean>()
 }
 
 @Composable
-private fun AyahCard(ayah: Ayah) {
+private fun AyahCard(ayah: Ayah, onPlay: () -> Unit) {
     val p = palette
     val context = LocalContext.current
     val view = Settings.quranView
@@ -254,17 +290,24 @@ private fun AyahCard(ayah: Ayah) {
             }
         }
     }
-    val card by animateColorAsState(p.card, tween(220, easing = AppMotion.easeOut), label = "ayah")
+    val audio = QuranAudio.state
+    // The ayah being recited is lit, and tapping it pauses.
+    val current = audio.currentAyah?.number == ayah.number
+    val pausable = current && audio.isPlaying
+    val tap = if (pausable) QuranAudio::togglePlayPause else onPlay
+    val card by animateColorAsState(if (current) p.selectedCard else p.card, tween(220, easing = AppMotion.easeOut), label = "ayah")
+    val ink by animateColorAsState(if (current) p.background else p.title, tween(220, easing = AppMotion.easeOut), label = "ink")
+    val translationInk by animateColorAsState(if (current) p.card else p.title, tween(220, easing = AppMotion.easeOut), label = "translationInk")
     val reference = if (urdu) "القرآن ${localNumber(ayah.surahNumber)}:${localNumber(ayah.numberInSurah)}" else "${ayah.surahNumber}:${ayah.numberInSurah}"
     val arabic = ayah.withoutBismillah()
 
-    Column(Modifier.fillMaxWidth().padding(bottom = 14.dp).clip(RoundedCornerShape(12.dp)).background(card)) {
+    Column(Modifier.fillMaxWidth().padding(bottom = 14.dp).clip(RoundedCornerShape(12.dp)).background(card).pressable(tap, scale = .99f)) {
         Column(Modifier.padding(12.dp)) {
-            Txt(reference, style(15.sp, p.title, FontWeight.Bold))
+            Txt(reference, style(15.sp, ink, FontWeight.Bold))
             Spacer(Modifier.height(8.dp))
             Txt(
                 arabic,
-                quranStyle(view.arabicFontSize.sp, p.title, TextAlign.Right).copy(textDirection = TextDirection.Rtl),
+                quranStyle(view.arabicFontSize.sp, ink, TextAlign.Right).copy(textDirection = TextDirection.Rtl),
                 Modifier.fillMaxWidth(),
             )
             if (view.showTranslation) {
@@ -277,7 +320,7 @@ private fun AyahCard(ayah: Ayah) {
                         Txt(
                             value,
                             style(
-                                view.translationFontSize.sp, p.title,
+                                view.translationFontSize.sp, translationInk,
                                 family = if (language == "ur") AppFonts.urdu else AppFonts.sans,
                                 lineHeight = 1.55f,
                                 align = if (rtl) TextAlign.Right else TextAlign.Left,
@@ -294,12 +337,13 @@ private fun AyahCard(ayah: Ayah) {
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(p.card.copy(alpha = .25f)))
         Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Play arrives with the audio player.
-            Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) { AppIcon(Glyph.CupertinoPlay, p.title, 22.dp) }
-            BookmarkButton(bookmarked) { Settings.toggleBookmark(ayah.surahNumber, ayah.numberInSurah) }
+            Box(Modifier.size(48.dp).pressable(tap, scale = .85f), contentAlignment = Alignment.Center) {
+                AppIcon(if (pausable) Glyph.CupertinoPause else Glyph.CupertinoPlay, ink, 22.dp)
+            }
+            BookmarkButton(bookmarked, ink) { Settings.toggleBookmark(ayah.surahNumber, ayah.numberInSurah) }
             val nav = LocalNavigator.current
             Box(Modifier.size(48.dp).pressable({ nav.push(Route.Placeholder(R.string.shareAyah)) }, scale = .85f), contentAlignment = Alignment.Center) {
-                AppIcon(Glyph.CupertinoShare, p.title, 22.dp)
+                AppIcon(Glyph.CupertinoShare, ink, 22.dp)
             }
             Spacer(Modifier.weight(1f))
         }
@@ -308,7 +352,7 @@ private fun AyahCard(ayah: Ayah) {
 
 /** Fills with a pop when an ayah is bookmarked (the favourite pop from 99 Names). */
 @Composable
-private fun BookmarkButton(bookmarked: Boolean, onClick: () -> Unit) {
+private fun BookmarkButton(bookmarked: Boolean, tint: Color, onClick: () -> Unit) {
     val p = palette
     val pop = remember { Animatable(1f) }
     var last by remember { mutableStateOf(bookmarked) }
@@ -322,7 +366,7 @@ private fun BookmarkButton(bookmarked: Boolean, onClick: () -> Unit) {
     Box(Modifier.size(48.dp).pressable(onClick, scale = .85f), contentAlignment = Alignment.Center) {
         AppIcon(
             if (bookmarked) Glyph.CupertinoBookmarkFill else Glyph.CupertinoBookmark,
-            p.title, 22.dp,
+            tint, 22.dp,
             Modifier.graphicsLayer { scaleX = pop.value; scaleY = pop.value },
         )
     }
@@ -332,40 +376,55 @@ private fun BookmarkButton(bookmarked: Boolean, onClick: () -> Unit) {
 
 /** Choose a surah or a juz for the open reader (QuranSectionPickerScreen). */
 @Composable
-fun QuranSectionPickerScreen(juz: Boolean) {
+fun QuranSectionPickerScreen(juz: Boolean, audio: Boolean = false) {
     val nav = LocalNavigator.current
     val context = LocalContext.current
     var quran by remember { mutableStateOf(QuranStore.cached) }
     LaunchedEffect(Unit) { if (quran == null) quran = QuranStore.get(context) }
-    val current = ReaderState.section
+    val playing = QuranAudio.state
+    val current = if (!audio) ReaderState.section
+    else playing.scopeNumber?.let { if (playing.scope == PlaybackScope.Juz) Section.OfJuz(it) else Section.OfSurah(it) }
+    fun choose(section: Section) {
+        if (audio) {
+            playAudio(context) {
+                when (section) {
+                    is Section.OfJuz -> QuranAudio.playJuz(context, section.number)
+                    is Section.OfSurah -> QuranAudio.playSurah(context, section.number)
+                }
+            }
+        } else {
+            ReaderState.section = section
+        }
+        nav.pop()
+    }
     PushedScreen(if (juz) "Choose Juz" else "Choose Surah") {
         if (juz) {
             items(30) { i ->
-                PickerTile("Juz ${i + 1}", selected = current == Section.OfJuz(i + 1)) {
-                    ReaderState.section = Section.OfJuz(i + 1)
-                    nav.pop()
-                }
+                PickerTile("Juz ${i + 1}", selected = current == Section.OfJuz(i + 1)) { choose(Section.OfJuz(i + 1)) }
             }
         } else {
             val surahs = quran?.surahs.orEmpty()
             items(surahs.size) { i ->
                 val surah = surahs[i]
-                PickerTile("${surah.number} - ${surah.englishName}", selected = current == Section.OfSurah(surah.number)) {
-                    ReaderState.section = Section.OfSurah(surah.number)
-                    nav.pop()
-                }
+                PickerTile("${surah.number} - ${surah.englishName}", selected = current == Section.OfSurah(surah.number)) { choose(Section.OfSurah(surah.number)) }
             }
         }
     }
 }
 
-/** Jump to an ayah of the open section (QuranAyahPickerScreen). */
+/**
+ * Jump to an ayah of the open section (QuranAyahPickerScreen). While the
+ * reader is playing it plays on from there; with [audio], from Ayah Focus,
+ * it moves the recitation to the ayah.
+ */
 @Composable
-fun QuranAyahPickerScreen() {
+fun QuranAyahPickerScreen(audio: Boolean = false) {
     val nav = LocalNavigator.current
+    val context = LocalContext.current
     val quran = QuranStore.cached
     val section = ReaderState.section
     val ayahs = when {
+        audio -> QuranAudio.state.ayahs
         quran == null -> emptyList()
         section is Section.OfSurah -> quran.surah(section.number).ayahs
         section is Section.OfJuz -> quran.juz(section.number)
@@ -376,8 +435,14 @@ fun QuranAyahPickerScreen() {
         items(ayahs.size) { i ->
             val ayah = ayahs[i]
             val title = if (many) "${quran!!.surah(ayah.surahNumber).englishName} - Ayah ${ayah.numberInSurah}" else "Ayah ${ayah.numberInSurah}"
-            PickerTile(title, selected = false) {
-                ReaderState.jumpTo = ayah.number
+            PickerTile(title, selected = audio && ayah.number == QuranAudio.state.currentAyah?.number) {
+                when {
+                    audio -> QuranAudio.jumpTo(ayah.number)
+                    else -> {
+                        ReaderState.jumpTo = ayah.number
+                        if (QuranAudio.state.isPlaying) playFrom(context, section, ayah)
+                    }
+                }
                 nav.pop()
             }
         }

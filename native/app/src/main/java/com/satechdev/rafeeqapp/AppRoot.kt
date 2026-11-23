@@ -83,6 +83,10 @@ import com.satechdev.rafeeqapp.screens.QuranSettingsScreen
 import com.satechdev.rafeeqapp.screens.TranslationPickerScreen
 import com.satechdev.rafeeqapp.screens.QuranSectionPickerScreen
 import com.satechdev.rafeeqapp.screens.ReaderScreen
+import com.satechdev.rafeeqapp.screens.AyahFocusScreen
+import com.satechdev.rafeeqapp.screens.ChooseReciterScreen
+import com.satechdev.rafeeqapp.screens.MiniPlayerSlot
+import com.satechdev.rafeeqapp.screens.PlayerPlace
 import com.satechdev.rafeeqapp.screens.SixteenLineIndexScreen
 import com.satechdev.rafeeqapp.screens.SixteenLineScreen
 import com.satechdev.rafeeqapp.screens.OnboardingScreen
@@ -136,9 +140,12 @@ sealed interface Route {
     data class QuranReader(val surah: Int? = null, val juz: Int? = null, val ayah: Int? = null) : Route {
         override val key = "reader-${surah ?: "j$juz"}"
     }
-    data class QuranSectionPicker(val juz: Boolean) : Route { override val key = "section-picker-$juz" }
-    data object QuranAyahPicker : Route { override val key = "ayah-picker" }
+    /** [audio]: the choice is played, from Ayah Focus, rather than opened in the reader. */
+    data class QuranSectionPicker(val juz: Boolean, val audio: Boolean = false) : Route { override val key = "section-picker-$juz-$audio" }
+    data class QuranAyahPicker(val audio: Boolean = false) : Route { override val key = "ayah-picker-$audio" }
     data object QuranSettings : Route { override val key = "quran-settings" }
+    data object AyahFocus : Route { override val key = "ayah-focus" }
+    data object ChooseReciter : Route { override val key = "choose-reciter" }
     data object TranslationPicker : Route { override val key = "translation-picker" }
     data object SixteenLine : Route { override val key = "sixteen-line" }
     data class SixteenLineIndex(val page: Int) : Route { override val key = "sixteen-line-index" }
@@ -354,9 +361,11 @@ fun AppRoot() {
                                         Route.CountryPicker -> CountryPickerScreen()
                                         Route.CityPicker -> CityPickerScreen()
                                         is Route.QuranReader -> ReaderScreen(route)
-                                        is Route.QuranSectionPicker -> QuranSectionPickerScreen(route.juz)
-                                        Route.QuranAyahPicker -> QuranAyahPickerScreen()
+                                        is Route.QuranSectionPicker -> QuranSectionPickerScreen(route.juz, route.audio)
+                                        is Route.QuranAyahPicker -> QuranAyahPickerScreen(route.audio)
                                         Route.QuranSettings -> QuranSettingsScreen()
+                                        Route.AyahFocus -> AyahFocusScreen()
+                                        Route.ChooseReciter -> ChooseReciterScreen()
                                         Route.TranslationPicker -> TranslationPickerScreen()
                                         Route.SixteenLine -> SixteenLineScreen()
                                         is Route.SixteenLineIndex -> SixteenLineIndexScreen(route.page)
@@ -393,6 +402,11 @@ fun AppRoot() {
                     }
                 }
             }
+
+            // The player floats over pushed screens; the tabs and the reader place it themselves.
+            val top = nav.stack.last()
+            val ownSlot = top == Route.Shell || top is Route.QuranReader || top == Route.AyahFocus || top == Route.Onboarding || top == Route.SixteenLine || top is Route.SixteenLineIndex
+            MiniPlayerSlot(PlayerPlace.Elsewhere, Modifier.align(Alignment.BottomCenter), overlay = true, show = !ownSlot)
 
             ToastHost(Modifier.align(Alignment.BottomCenter))
         }

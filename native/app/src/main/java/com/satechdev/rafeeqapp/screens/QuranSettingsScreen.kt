@@ -1,5 +1,6 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.data.audio.QuranAudio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -118,6 +119,10 @@ fun QuranSettingsScreen() {
             item(key = "edition") {
                 SettingsCard(Glyph.MenuBook, tr(R.string.translationEdition), editionName) { nav.push(Route.TranslationPicker) }
             }
+        }
+        item(key = "reciter") {
+            val reciter = QuranAudio.selectedReciter
+            SettingsCard(Glyph.RecordVoice, tr(R.string.changeReciter), if (Settings.language.rtl) reciter.nativeName else reciter.englishName) { nav.push(Route.ChooseReciter) }
         }
         item(key = "reset") {
             SettingsCard(Glyph.RestartAlt, tr(R.string.resetToDefault), tr(R.string.resetToDefaultSubtitle), foreground = redAccent) { askReset = true }

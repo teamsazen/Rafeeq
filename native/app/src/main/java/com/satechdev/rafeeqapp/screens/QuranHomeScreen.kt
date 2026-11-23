@@ -1,5 +1,9 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.data.audio.QuranAudio
+import com.satechdev.rafeeqapp.data.audio.PlaybackScope
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -224,6 +228,7 @@ private fun index(n: Int) = (if (n < 10) localNumber(0) else "") + localNumber(n
 @Composable
 private fun SurahList(quran: QuranText, query: String) {
     val nav = LocalNavigator.current
+    val context = LocalContext.current
     val urdu = Settings.language.rtl
     val q = query.trim().lowercase()
     val surahs = if (q.isEmpty()) quran.surahs else quran.surahs.filter {
@@ -238,8 +243,10 @@ private fun SurahList(quran: QuranText, query: String) {
             title = if (urdu) SurahNames.urdu[surah.number] else surah.englishName,
             subtitle = if (urdu) SurahNames.urduMeanings[surah.number] else surah.englishNameTranslation,
             onClick = { nav.push(Route.QuranReader(surah = surah.number)) },
-            // Audio comes with the player; until then the button opens the surah.
-            onPlay = { nav.push(Route.QuranReader(surah = surah.number)) },
+            playback = Playback(PlaybackScope.Surah, surah.number) {
+                nav.push(Route.QuranReader(surah = surah.number))
+                playAudio(context) { QuranAudio.playSurah(context, surah.number) }
+            },
         )
     }
 }
@@ -247,6 +254,7 @@ private fun SurahList(quran: QuranText, query: String) {
 @Composable
 private fun JuzList() {
     val nav = LocalNavigator.current
+    val context = LocalContext.current
     val urdu = Settings.language.rtl
     IndexList(30) { i ->
         val juz = i + 1
@@ -256,7 +264,10 @@ private fun JuzList() {
             title = if (urdu) JuzNames.urdu[i] else JuzNames.english[i],
             subtitle = if (urdu) JuzNames.urduOrdinal[i] else "Juz $juz",
             onClick = { nav.push(Route.QuranReader(juz = juz)) },
-            onPlay = { nav.push(Route.QuranReader(juz = juz)) },
+            playback = Playback(PlaybackScope.Juz, juz) {
+                nav.push(Route.QuranReader(juz = juz))
+                playAudio(context) { QuranAudio.playJuz(context, juz) }
+            },
         )
     }
 }
@@ -266,7 +277,7 @@ private fun IndexList(count: Int, item: @Composable (Int) -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         LazyColumn(
             Modifier.widthIn(max = 760.dp).fillMaxSize(),
-            contentPadding = PaddingValues(start = 12.dp, top = 12.dp, end = 12.dp, bottom = TabBottomPadding),
+            contentPadding = PaddingValues(start = 12.dp, top = 12.dp, end = 12.dp, bottom = TabBottomPadding + if (QuranAudio.state.isVisible) MiniPlayerHeight else 0.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(count) { item(it) }
@@ -274,9 +285,12 @@ private fun IndexList(count: Int, item: @Composable (Int) -> Unit) {
     }
 }
 
+/** A row's surah or juz, and what its play button starts when it is not the one playing. */
+private class Playback(val scope: PlaybackScope, val number: Int, val start: () -> Unit)
+
 /** A surah or juz row: number, name, meaning, and the play button. The name flies into the reader. */
 @Composable
-private fun IndexCard(heroKey: String, index: String, title: String, subtitle: String, onClick: () -> Unit, onPlay: () -> Unit) {
+private fun IndexCard(heroKey: String, index: String, title: String, subtitle: String, onClick: () -> Unit, playback: Playback) {
     val p = palette
     Row(
         Modifier.fillMaxWidth().pressable(onClick).clip(RoundedCornerShape(12.dp)).background(p.card).padding(horizontal = 12.dp, vertical = 10.dp),
@@ -290,9 +304,7 @@ private fun IndexCard(heroKey: String, index: String, title: String, subtitle: S
             Txt(subtitle, style(14.sp, p.subtitle), maxLines = 1)
         }
         Spacer(Modifier.width(12.dp))
-        Box(Modifier.size(48.dp).pressable(onPlay, scale = .85f), contentAlignment = Alignment.Center) {
-            AppIcon(Glyph.Play, p.accent.copy(alpha = .75f), 26.dp)
-        }
+        PlayAction(playback)
     }
 }
 
@@ -345,6 +357,49 @@ private fun BookmarksList(quran: QuranText) {
                 Modifier.fillMaxWidth().padding(end = 8.dp),
                 maxLines = 2,
             )
+        }
+    }
+}
+
+/**
+ * The card's play button. On the surah or juz playing it pauses and resumes,
+ * shows a wave while reciting, and offers the next one once it has ended.
+ */
+@Composable
+private fun PlayAction(playback: Playback) {
+    val p = palette
+    val context = LocalContext.current
+    val state = QuranAudio.state
+    val active = state.isVisible && state.scope == playback.scope && state.scopeNumber == playback.number
+    val showNext = active && state.isComplete && state.canPlayNextSelection
+    val onPress = {
+        when {
+            !active -> playback.start()
+            showNext -> playAudio(context) { QuranAudio.playAdjacent(context, 1) }
+            else -> QuranAudio.togglePlayPause()
+        }
+    }
+    val look = when {
+        showNext -> 3
+        active && (state.isLoading || state.isBuffering) -> 2
+        active && state.isPlaying -> 1
+        else -> 0
+    }
+    Box(Modifier.size(48.dp).pressable(onPress, scale = .85f), contentAlignment = Alignment.Center) {
+        AnimatedContent(
+            look,
+            transitionSpec = { (scaleIn(spring(dampingRatio = .55f, stiffness = 500f), .5f) + fadeIn(tween(140))) togetherWith (scaleOut(tween(110), .5f) + fadeOut(tween(110))) },
+            label = "play",
+        ) {
+            when (it) {
+                3 -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AppIcon(Glyph.SkipNext, p.title, 19.dp)
+                    Txt("Next", style(10.sp, p.title, FontWeight.SemiBold), maxLines = 1)
+                }
+                2 -> Spinner(p.accent, 18.dp, 1.8.dp)
+                1 -> PlayingWave(p.accent)
+                else -> AppIcon(Glyph.Play, p.accent.copy(alpha = .75f), 26.dp)
+            }
         }
     }
 }

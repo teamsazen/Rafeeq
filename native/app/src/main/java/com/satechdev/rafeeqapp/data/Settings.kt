@@ -288,6 +288,16 @@ object Settings {
         prefs.edit().putLong(k(key), value.toLong()).apply()
     }
 
+    /** A plain shared_preferences string, such as the chosen reciter. */
+    fun string(key: String): String? = prefs.getString(k(key), null)
+
+    fun setString(key: String, value: String) {
+        prefs.edit().putString(k(key), value).apply()
+    }
+
+    /** A plain shared_preferences bool with its default, such as isQuranAutoScrollEnabled. */
+    fun bool(key: String, default: Boolean): Boolean = prefs.getBoolean(k(key), default)
+
     /** A plain shared_preferences flag, such as a "seen" marker. */
     fun flag(key: String): Boolean = prefs.getBoolean(k(key), false)
 

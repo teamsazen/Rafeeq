@@ -106,6 +106,9 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
+    // Quran recitation, in the background and on the lock screen (docs/native-plan.md).
+    implementation("androidx.media3:media3-exoplayer:1.11.1")
+    implementation("androidx.media3:media3-session:1.11.1")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 

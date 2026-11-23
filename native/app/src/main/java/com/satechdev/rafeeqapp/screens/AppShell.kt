@@ -90,12 +90,15 @@ fun AppShell() {
                 else -> SettingsScreen(onBack = goHome)
             }
         }
-        BottomBar(
-            selected = nav.tab,
-            labels = listOf(tr(R.string.appTitle), tr(R.string.quran), tr(R.string.qibla), tr(R.string.settings)),
-            onSelect = { nav.tab = it },
-            modifier = Modifier.align(Alignment.BottomCenter),
-        )
+        // The mini player rides on the tab bar, as in Flutter's app home.
+        Column(Modifier.align(Alignment.BottomCenter)) {
+            MiniPlayerSlot(PlayerPlace.Elsewhere)
+            BottomBar(
+                selected = nav.tab,
+                labels = listOf(tr(R.string.appTitle), tr(R.string.quran), tr(R.string.qibla), tr(R.string.settings)),
+                onSelect = { nav.tab = it },
+            )
+        }
     }
 }
 

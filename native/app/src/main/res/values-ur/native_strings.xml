@@ -4,4 +4,5 @@
     <string name="nativeComingBody">یہ اسکرین ابھی نئے سرے سے بن رہی ہے۔ رفیق کی موجودہ ایپ میں یہ کام کرتی ہے۔</string>
     <string name="settingsNotificationSubtitle">نماز کی یاددہانی اور اطلاع کی ترتیب</string>
     <string name="settingsQuranViewSubtitle">خط، سائز، ترجمہ اور تلاوت کی ترتیبات</string>
+    <string name="unableToPlayQuranAudio">ابھی قرآن کی آڈیو نہیں چل سکی۔</string>
 </resources>
