@@ -171,7 +171,6 @@ Build and install: `cd native && ./gradlew :app:assembleDebug`, then
 
 Left for later phases:
 
-- Predictive back (Android 14+) on page changes.
 - The bottom bar has no backdrop blur; it uses Flutter's translucent
   gradient only. Compose has no backdrop blur before Android 12.
 - The icon fonts are cut to the glyphs used (1.9 MB to 18 KB) by
