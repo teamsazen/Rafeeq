@@ -1,6 +1,9 @@
 package com.satechdev.rafeeqapp.screens
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings as AndroidSettings
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -48,6 +51,7 @@ import com.satechdev.rafeeqapp.data.prayer.NotifKey
 import com.satechdev.rafeeqapp.data.prayer.NotificationTiming
 import com.satechdev.rafeeqapp.data.prayer.Prayer
 import com.satechdev.rafeeqapp.data.prayer.PrayerDay
+import com.satechdev.rafeeqapp.data.prayer.Reminders
 import com.satechdev.rafeeqapp.data.prayer.formatTime
 import com.satechdev.rafeeqapp.data.prayer.local
 import com.satechdev.rafeeqapp.hero
@@ -279,6 +283,14 @@ private fun rememberNotificationToggle(): (NotifKey, Boolean) -> Unit {
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         pending?.let { if (granted) Settings.setNotificationEnabled(it, true) }
         pending = null
+        // As Flutter's requestPermissions: exact alarms are asked for along with notifications (Android 12+).
+        if (granted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !Reminders.canScheduleExact(context)) {
+            runCatching {
+                context.startActivity(
+                    Intent(AndroidSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.fromParts("package", context.packageName, null)),
+                )
+            }
+        }
     }
     return { key, on ->
         val needsPermission = on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&

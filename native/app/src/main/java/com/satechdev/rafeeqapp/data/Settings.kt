@@ -14,6 +14,7 @@ import com.satechdev.rafeeqapp.data.prayer.NotificationSound
 import com.satechdev.rafeeqapp.data.prayer.NotificationTiming
 import com.satechdev.rafeeqapp.data.prayer.VolumeType
 import com.satechdev.rafeeqapp.data.prayer.PrayerCalcMethod
+import com.satechdev.rafeeqapp.data.prayer.Reminders
 import com.satechdev.rafeeqapp.data.prayer.TimeFormat
 import com.satechdev.rafeeqapp.data.prayer.UserLocation
 import org.json.JSONArray
@@ -76,7 +77,15 @@ object Settings {
     var location by mutableStateOf<UserLocation?>(null); private set
     var aboutOpened by mutableStateOf(false); private set
 
+    private lateinit var app: Context
+
+    /** Anything that changes the reminders reschedules them, as Flutter's PrayerNotificationManager listens. */
+    private fun remindersChanged() {
+        if (::app.isInitialized) Reminders.schedule(app, force = true)
+    }
+
     fun load(context: Context) {
+        app = context.applicationContext
         prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
         json(APP_SETTINGS).let {
             themeMode = ThemeMode.of(it.optString("themeMode")) ?: ThemeMode.Dark
@@ -111,26 +120,31 @@ object Settings {
     fun setLanguage(value: AppLanguage) {
         language = value
         update(APP_SETTINGS) { put("language", value.code) }
+        remindersChanged()
     }
 
     fun setHijriCorrection(value: HijriCorrection) {
         hijriCorrection = value
         update(APP_SETTINGS) { put("hijriCorrection", value.stored) }
+        remindersChanged()
     }
 
     fun setCalcMethod(value: PrayerCalcMethod) {
         calcMethod = value
         update(PRAYER_SETTINGS) { put("prayerCalcMethod", value.stored) }
+        remindersChanged()
     }
 
     fun setAsrMethod(value: AsrMethod) {
         asrMethod = value
         update(PRAYER_SETTINGS) { put("asrCalculationMethod", value.stored) }
+        remindersChanged()
     }
 
     fun setHighLatitude(value: HighLatitude) {
         highLatitude = value
         update(PRAYER_SETTINGS) { put("highLatitudeAdjustment", value.stored) }
+        remindersChanged()
     }
 
     fun setTimeFormat(value: TimeFormat) {
@@ -159,6 +173,7 @@ object Settings {
             put("notificationVolumeTypes", JSONObject().apply { value.volumes.forEach { (k, v) -> put(k.stored, v.stored) } })
             put("notificationTiming", value.timing.stored)
         }
+        remindersChanged()
     }
 
     /** As PrayerTimesSettings.fromMap, including the old index keys (0 Fajr … 5 Isha). */
@@ -200,6 +215,7 @@ object Settings {
             .put("countryCode", value.countryCode ?: JSONObject.NULL)
             .put("source", value.source ?: JSONObject.NULL)
         prefs.edit().putString(k(USER_LOCATION), map.toString()).apply()
+        Reminders.onLocationChanged(app)
     }
 
     /** A plain shared_preferences flag, such as a "seen" marker. */

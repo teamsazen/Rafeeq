@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The azan is only named in notification channels and the calligraphy path
+     is read at runtime, so resource shrinking must keep both. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/azan1,@raw/calligraphy_path" />

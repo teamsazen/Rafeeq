@@ -153,7 +153,7 @@ Flutter app comes out of the repo, as in 99 Names.
 | Phase | State |
 |---|---|
 | 1. Foundation | Done (2026-11-23), see notes |
-| 2. Home, prayer times, azan | Not started |
+| 2. Home, prayer times, azan | In progress: home, prayer times, settings, location and reminders done; onboarding and event cards left |
 | 3. Quran | Not started |
 | 4. Everything else | Not started |
 | 5. Release | Not started |
@@ -182,3 +182,19 @@ Left for later phases:
 - `strings.xml` is generated: after changing `lib/l10n/*.arb`, run
   `python3 scripts/arb_to_android_strings.py`. Native-only strings live in
   `native_strings.xml`.
+
+### Phase 2 notes (so far)
+
+- Prayer times and Hijri dates are ports of the Dart `adhan` and `hijri`
+  packages, checked against them by `AdhanTest` and `HijriTest` (data from
+  `native/tool/reference`).
+- Reminders (`data/prayer/Reminders.kt`) keep Flutter's IDs, ten days and
+  silent/default channels. The azan has new channels (`prayer_azan_alarm`,
+  `prayer_azan_notification`) that name `raw/azan1` instead of a resource
+  number; the Flutter azan channels are deleted, so anyone who changed those
+  channel settings in Android will need to again.
+- New over Flutter: a daily refresh alarm, rescheduling after reboot, update
+  and time or time zone changes, and the Flutter plugin's alarms are cleared
+  once.
+- Debug builds can fire a test reminder:
+  `adb shell am broadcast -n com.satechdev.rafeeqapp.debug/com.satechdev.rafeeqapp.DebugReminderReceiver -a test --ei seconds 60`.
