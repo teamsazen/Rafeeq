@@ -1,5 +1,29 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.ui.localNumber
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.AnimatedContent
+import android.view.View
+import android.view.HapticFeedbackConstants
+import android.os.VibratorManager
+import android.os.Vibrator
+import android.os.VibrationEffect
+import android.os.VibrationAttributes
+import android.os.SystemClock
+import android.os.Build
 import android.Manifest
 import android.content.Context
 import android.hardware.GeomagneticField
@@ -12,7 +36,6 @@ import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -50,9 +73,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -196,7 +217,7 @@ private fun NeedsLocation() {
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val diameter = min((maxWidth - 48.dp).coerceIn(180.dp, 280.dp), (maxHeight - 150.dp).coerceIn(160.dp, 280.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Dial(diameter, heading = 0f, marker = null, Modifier.alpha(.35f))
+            Dial(diameter, heading = 0f, bearing = null, modifier = Modifier.alpha(.35f))
             Spacer(Modifier.height(20.dp))
             Txt(tr(R.string.locationRequiredDescription), style(14.sp, p.subtitle, lineHeight = 1.35f, align = TextAlign.Center), Modifier.padding(horizontal = 28.dp))
             Spacer(Modifier.height(12.dp))
@@ -273,39 +294,93 @@ private fun rememberHeading(location: UserLocation): Float? {
     return heading
 }
 
+/**
+ * Haptics for the dial: a light tick like a detent as the phone turns, and a
+ * firm click when it comes to face the Qibla.
+ */
+private class DialHaptics(private val view: View) {
+    private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= 31) {
+        (view.context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        view.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+    private var lastTick = 0L
+
+    fun tick() {
+        val now = SystemClock.uptimeMillis()
+        if (now - lastTick < 45) return
+        lastTick = now
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+    }
+
+    fun lock() {
+        val v = vibrator
+        if (v == null || !v.hasVibrator()) {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            return
+        }
+        val effect = when {
+            Build.VERSION.SDK_INT >= 29 -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+            Build.VERSION.SDK_INT >= 26 -> VibrationEffect.createOneShot(45, 255)
+            else -> null
+        }
+        when {
+            effect != null && Build.VERSION.SDK_INT >= 33 -> v.vibrate(effect, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_TOUCH))
+            effect != null -> v.vibrate(effect)
+            else -> @Suppress("DEPRECATION") v.vibrate(45)
+        }
+    }
+}
+
+/** Degrees between the top of the phone and the Qibla, -180 to 180; negative means turn left. */
+private fun gap(heading: Float, bearing: Float) = ((bearing - heading) % 360 + 540) % 360 - 180
+
 @Composable
 private fun LiveCompass(location: UserLocation) {
     val p = palette
-    val haptics = LocalHapticFeedback.current
+    val view = LocalView.current
+    val haptics = remember(view) { DialHaptics(view) }
     val heading = rememberHeading(location)
     if (heading == null) {
         Spinner(p.accent, 36.dp, 3.dp)
         return
     }
-    val bearing = remember(location) { qiblaBearing(location.latitude, location.longitude) }
-    val turn = Turn.of(heading - bearing)
+    val bearing = remember(location) { qiblaBearing(location.latitude, location.longitude).toFloat() }
+    val turn = Turn.of((heading - bearing).toDouble())
     val facing = turn == Turn.Facing
-    var wasFacing by remember { mutableStateOf(false) }
+
+    // A detent every 3 degrees while turning; a firm click on reaching the Qibla.
+    var detent by remember { mutableStateOf((heading / 3).toInt()) }
+    LaunchedEffect((heading / 3).toInt()) {
+        val now = (heading / 3).toInt()
+        if (now != detent && !facing) haptics.tick()
+        detent = now
+    }
+    var wasFacing by remember { mutableStateOf(facing) }
     LaunchedEffect(facing) {
-        if (facing && !wasFacing) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        if (facing && !wasFacing) haptics.lock()
         wasFacing = facing
     }
+
     val green = compassGreen()
     val text by animateColorAsState(if (facing) green else p.title, tween(220), label = "instruction")
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        val diameter = min((maxWidth - 36.dp).coerceIn(170.dp, 380.dp), (maxHeight - 92.dp).coerceIn(160.dp, 380.dp))
+        val diameter = min((maxWidth - 40.dp).coerceIn(200.dp, 360.dp), (maxHeight - 120.dp).coerceIn(180.dp, 360.dp))
         val narrow = maxWidth < 360.dp
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Dial(diameter, heading, marker = (bearing - heading).toFloat(), facing = facing)
-            Spacer(Modifier.height(12.dp))
+            Dial(diameter, heading, bearing, facing = facing)
+            Spacer(Modifier.height(20.dp))
             Txt(
                 when (turn) {
                     Turn.Facing -> tr(R.string.qiblaFacing)
-                    is Turn.Left -> tr(R.string.qiblaTurnLeft, turn.degrees.toString())
-                    is Turn.Right -> tr(R.string.qiblaTurnRight, turn.degrees.toString())
+                    is Turn.Left -> tr(R.string.qiblaTurnLeft, localNumber(turn.degrees))
+                    is Turn.Right -> tr(R.string.qiblaTurnRight, localNumber(turn.degrees))
                 },
                 style(if (narrow) 20.sp else 24.sp, text, FontWeight.Medium, align = TextAlign.Center),
             )
+            Spacer(Modifier.height(4.dp))
+            Txt(tr(R.string.qiblaBearingFromNorth, localNumber(bearing.roundToInt())), style(14.sp, p.subtitle, align = TextAlign.Center))
         }
     }
 }
@@ -314,103 +389,119 @@ private fun LiveCompass(location: UserLocation) {
 private fun compassGreen() = if (palette.dark) Color(0xFF43807A) else Color(0xFF07524E)
 
 /**
- * The Kaaba marker's angle. While turning it simply follows the phone; when
- * the phone comes to face the Qibla it springs onto the top and stays there,
- * and on turning away it slides quickly back to the real bearing.
+ * A compass rose that turns with the phone under a fixed mark at the top.
+ * The Kaaba sits on the rim at its bearing, and an arc from the mark to it
+ * shows how far there is to turn; it closes as the phone comes round. On
+ * the Qibla the ring turns green, a soft glow breathes behind it and the
+ * Kaaba takes the middle.
  */
 @Composable
-private fun kaabaAngle(target: Float, facing: Boolean): Float {
-    val still = reducedMotion()
-    val angle = remember { Animatable(target) }
-    var settling by remember { mutableStateOf(false) }
-    fun nearest(to: Float) = angle.value + (((to - angle.value) % 360 + 540) % 360 - 180)
-    LaunchedEffect(facing) {
-        if (still) return@LaunchedEffect
-        settling = true
-        if (facing) angle.animateTo(nearest(0f), spring(dampingRatio = .45f, stiffness = 380f))
-        else angle.animateTo(nearest(target), tween(160))
-        settling = false
-    }
-    LaunchedEffect(target, facing) {
-        if (!settling && !facing || still) angle.snapTo(nearest(if (facing && !still) 0f else target))
-    }
-    return angle.value
-}
-
-/**
- * The dial: ticks, the four directions turning with the phone, the fixed
- * pointer, and the Kaaba at [marker] degrees clockwise from the top.
- */
-@Composable
-private fun Dial(size: Dp, heading: Float, marker: Float?, modifier: Modifier = Modifier, facing: Boolean = false) {
+private fun Dial(size: Dp, heading: Float, bearing: Float?, modifier: Modifier = Modifier, facing: Boolean = false) {
     val p = palette
+    val still = reducedMotion()
     val green = compassGreen()
-    val tick = if (p.dark) p.title else Color(0xFFF1DCA7)
-    // The directions follow the (already filtered) heading directly, with no lag after the phone stops.
-    val north = -heading
-    val kaaba = marker?.let { kaabaAngle(it, facing) }
-    // The Kaaba swells once when it comes to the top.
-    val pulse = remember { Animatable(1f) }
-    LaunchedEffect(facing) {
-        if (facing) {
-            pulse.snapTo(1.18f)
-            pulse.animateTo(1f, spring(dampingRatio = .35f, stiffness = 300f))
-        }
-    }
+    val tick = if (p.dark) p.title.copy(alpha = .55f) else Color(0xFFD9BF7E)
+    val ringColor by animateColorAsState(if (facing) green else p.card, tween(260), label = "ring")
+    val lock by animateFloatAsState(if (facing) 1f else 0f, if (still) tween(0) else spring(dampingRatio = .5f, stiffness = 320f), label = "lock")
+    val breathe = rememberInfiniteTransition(label = "glow")
+    val glow by breathe.animateFloat(.55f, 1f, infiniteRepeatable(tween(1400), RepeatMode.Reverse), label = "breathe")
+    val gapDeg = bearing?.let { gap(heading, it) } ?: 0f
+
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
+        // The glow on the Qibla.
         Canvas(Modifier.fillMaxSize()) {
-            val outer = this.size.minDimension / 2 - 17.dp.toPx()
-            for (i in 0 until 72) {
-                val a = i * 5 * PI / 180
-                val length = (if (i % 6 == 0) 15 else 10).dp.toPx()
-                val dir = Offset(sin(a).toFloat(), -cos(a).toFloat())
-                drawLine(tick, center + dir * (outer - length), center + dir * outer, 2.2.dp.toPx(), StrokeCap.Round)
+            if (lock > 0f) {
+                drawCircle(
+                    Brush.radialGradient(listOf(green.copy(alpha = .28f * lock * glow), Color.Transparent), center, this.size.minDimension / 2),
+                    this.size.minDimension / 2,
+                )
             }
         }
-        val radius = size * .315f
-        for ((label, bearing) in listOf("N" to 0f, "E" to 90f, "S" to 180f, "W" to 270f)) {
-            val a = (bearing + north) * PI / 180
-            Box(
-                Modifier.offset(radius * sin(a).toFloat(), -radius * cos(a).toFloat()).size(size * .09f),
-                contentAlignment = Alignment.Center,
-            ) {
-                Txt(label, style((size.value * .052f).sp, p.title, FontWeight.Medium))
+        // The ring and the arc still to turn, fixed to the phone.
+        Canvas(Modifier.fillMaxSize().padding(size * .06f)) {
+            val stroke = 10.dp.toPx()
+            val inset = stroke / 2
+            val box = Size(this.size.width - stroke, this.size.height - stroke)
+            drawArc(ringColor, 0f, 360f, false, Offset(inset, inset), box, style = Stroke(stroke))
+            if (bearing != null && !facing) {
+                drawArc(green.copy(alpha = .55f), -90f, gapDeg, false, Offset(inset, inset), box, style = Stroke(stroke, cap = StrokeCap.Round))
             }
         }
-        Pointer(size * .23f, green, p.background)
-        if (kaaba != null) {
-            val a = kaaba * PI / 180
-            val r = size / 2 - 17.dp
+        // The rose: ticks and directions turn with the phone.
+        Box(Modifier.fillMaxSize().padding(size * .06f + 14.dp).graphicsLayer { rotationZ = -heading }, contentAlignment = Alignment.Center) {
+            Canvas(Modifier.fillMaxSize()) {
+                val outer = this.size.minDimension / 2
+                for (i in 0 until 120) {
+                    val a = i * 3 * PI / 180
+                    val major = i % 10 == 0
+                    val length = (if (major) 12 else 6).dp.toPx()
+                    val dir = Offset(sin(a).toFloat(), -cos(a).toFloat())
+                    drawLine(if (i == 0) green else tick, center + dir * (outer - length), center + dir * outer, (if (major) 2.4f else 1.4f).dp.toPx(), StrokeCap.Round)
+                }
+            }
+            val r = (size * (1 - .12f) - 28.dp) / 2 - 26.dp
+            for ((label, b) in listOf("N" to 0f, "E" to 90f, "S" to 180f, "W" to 270f)) {
+                val a = b * PI / 180
+                Box(
+                    Modifier.offset(r * sin(a).toFloat(), -r * cos(a).toFloat()).size(32.dp).graphicsLayer { rotationZ = heading },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Txt(label, style((size.value * .055f).sp, if (b == 0f) green else p.title, if (b == 0f) FontWeight.Bold else FontWeight.Medium))
+                }
+            }
+        }
+        // The fixed mark at the top of the ring.
+        Canvas(Modifier.fillMaxSize()) {
+            val w = 9.dp.toPx()
+            val top = size.toPx() * .06f - 6.dp.toPx()
+            drawPath(
+                Path().apply {
+                    moveTo(center.x - w, top)
+                    lineTo(center.x + w, top)
+                    lineTo(center.x, top + w * 1.4f)
+                    close()
+                },
+                if (facing) green else p.title,
+            )
+        }
+        // The Kaaba on the rim, upright, at its bearing on the turning rose.
+        if (bearing != null) {
+            val a = (bearing - heading) * PI / 180
+            val rr = size / 2 - size * .06f - 5.dp
+            val badge = size * .15f
             Box(
-                Modifier.offset(r * sin(a).toFloat(), -r * cos(a).toFloat()).size(size * .17f)
-                    .graphicsLayer { scaleX = pulse.value; scaleY = pulse.value }
+                Modifier.offset(rr * sin(a).toFloat(), -rr * cos(a).toFloat()).size(badge)
+                    .graphicsLayer { val s = 1f + .15f * lock * (1 - lock) * 4; scaleX = s; scaleY = s }
                     .clip(CircleShape).background(green),
                 contentAlignment = Alignment.Center,
             ) {
-                AppIcon(Glyph.KaabaSolid, tick, size * .075f)
+                AppIcon(Glyph.KaabaSolid, Color(0xFFF1DCA7), badge * .5f)
             }
         }
-    }
-}
-
-/** The pointer at the middle: a ring with a point on top, fixed to the phone. */
-@Composable
-private fun Pointer(size: Dp, color: Color, hole: Color) {
-    Canvas(Modifier.size(size)) {
-        val w = this.size.width
-        val h = this.size.height
-        val r = w * .31f
-        val ring = Offset(w / 2, h / 2 + h * .12f)
-        drawPath(
-            Path().apply {
-                moveTo(w / 2, h * .02f)
-                lineTo(w / 2 + r * .62f, ring.y)
-                lineTo(w / 2 - r * .62f, ring.y)
-                close()
-            },
-            color,
-        )
-        drawCircle(color, r, ring)
-        drawCircle(hole, r * .61f, ring)
+        // The middle: degrees left to turn, or the Kaaba once facing it.
+        Box(
+            Modifier.size(size * .36f).clip(CircleShape).background(if (facing) green else p.card),
+            contentAlignment = Alignment.Center,
+        ) {
+            AnimatedContent(
+                facing,
+                transitionSpec = {
+                    (scaleIn(if (still) tween(0) else spring(dampingRatio = .55f, stiffness = 420f), .6f) + fadeIn(tween(160))) togetherWith
+                        (scaleOut(tween(120), .6f) + fadeOut(tween(120)))
+                },
+                label = "middle",
+            ) { on ->
+                if (on) {
+                    AppIcon(Glyph.KaabaSolid, Color(0xFFF1DCA7), size * .17f)
+                } else if (bearing != null) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Txt("${localNumber(abs(gapDeg).roundToInt())}°", style((size.value * .1f).sp, p.title, FontWeight.Bold))
+                        Txt(if (gapDeg < 0) "←" else "→", style((size.value * .06f).sp, p.subtitle))
+                    }
+                } else {
+                    AppIcon(Glyph.KaabaSolid, p.subtitle, size * .14f)
+                }
+            }
+        }
     }
 }

@@ -5,4 +5,5 @@
     <string name="settingsNotificationSubtitle">نماز کی یاددہانی اور اطلاع کی ترتیب</string>
     <string name="settingsQuranViewSubtitle">خط، سائز، ترجمہ اور تلاوت کی ترتیبات</string>
     <string name="unableToPlayQuranAudio">ابھی قرآن کی آڈیو نہیں چل سکی۔</string>
+    <string name="qiblaBearingFromNorth">قبلہ شمال سے %1$s° پر ہے</string>
 </resources>

@@ -6,4 +6,5 @@
     <string name="settingsNotificationSubtitle">Prayer reminders and notification settings</string>
     <string name="settingsQuranViewSubtitle">Script, font size, translation &amp; recitation settings</string>
     <string name="unableToPlayQuranAudio">Unable to play Quran audio right now.</string>
+    <string name="qiblaBearingFromNorth">Qibla is %1$s° from North</string>
 </resources>
