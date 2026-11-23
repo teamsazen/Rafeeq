@@ -174,9 +174,8 @@ Left for later phases:
 - Predictive back (Android 14+) on page changes.
 - The bottom bar has no backdrop blur; it uses Flutter's translucent
   gradient only. Compose has no backdrop blur before Android 12.
-- Material Icons ships as the full font (1.6 MB); subset the icon fonts to
-  the glyphs used before release (phase 5).
-- Credit the icon fonts in Licences (phase 4).
+- The icon fonts are cut to the glyphs used (1.9 MB to 18 KB) by
+  `scripts/subset_icon_fonts.py`; run it after adding a `Glyph`.
 - `strings.xml` is generated: after changing `lib/l10n/*.arb`, run
   `python3 scripts/arb_to_android_strings.py`. Native-only strings live in
   `native_strings.xml`.
