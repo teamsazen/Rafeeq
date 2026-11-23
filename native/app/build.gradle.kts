@@ -92,10 +92,11 @@ android {
     // are rather than copied. The azan is in res/raw for notifications instead.
     sourceSets["main"].assets.directories.add("../../assets")
 
-    // The app has English and Urdu; libraries ship no other languages.
+    // The app has English and Urdu; libraries ship no other languages. The
+    // azan, the PNG logo and the SVG wordmark have native forms in res.
     androidResources {
         localeFilters += listOf("en", "ur")
-        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:<dir>sounds"
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:<dir>sounds:logo.png:calligraphy.svg"
     }
 }
 
