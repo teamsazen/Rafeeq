@@ -49,6 +49,7 @@ import com.satechdev.rafeeqapp.LocalNavigator
 import com.satechdev.rafeeqapp.ui.AppFonts
 import com.satechdev.rafeeqapp.ui.AppIcon
 import com.satechdev.rafeeqapp.ui.AppMotion
+import com.satechdev.rafeeqapp.ui.AppSwitch
 import com.satechdev.rafeeqapp.ui.Glyph
 import com.satechdev.rafeeqapp.ui.Txt
 import com.satechdev.rafeeqapp.ui.palette
@@ -124,6 +125,7 @@ fun SettingsCard(
     title: String,
     subtitle: String? = null,
     badge: String? = null,
+    switch: Boolean? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val p = palette
@@ -147,6 +149,10 @@ fun SettingsCard(
                     Spacer(Modifier.height(4.dp))
                     Txt(subtitle, style(14.sp, p.subtitle, lineHeight = 1.2f))
                 }
+            }
+            if (switch != null) {
+                Spacer(Modifier.width(12.dp))
+                AppSwitch(switch) { onClick?.invoke() }
             }
         }
         if (badge != null) {

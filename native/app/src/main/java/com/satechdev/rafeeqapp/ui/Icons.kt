@@ -59,6 +59,11 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     Twilight(materialIcons, 0xf4bd),
     Sunny(materialIcons, 0xf4bc),
     Nightlight(materialIcons, 0xf214),
+    Cloudy(materialIcons, 0xf4b8),
+    Mosque(materialIcons, 0xf0636),
+    LocationOff(materialIcons, 0xf192),
+    NotificationsActive(materialIcons, 0xf234),
+    VolumeUp(materialIcons, 0xf4a8),
 
     // Cupertino
     Clock(cupertinoIcons, 0xf4be),
@@ -69,6 +74,9 @@ enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
     CheckMark(cupertinoIcons, 0xf3fd),
     LocationSlash(cupertinoIcons, 0xf6f6),
     PhotoOnRectangle(cupertinoIcons, 0xf76a),
+    Bell(cupertinoIcons, 0xf3e1),
+    BellFill(cupertinoIcons, 0xf3e2),
+    InfoCircle(cupertinoIcons, 0xf44c),
 
     // Flutter Islamic Icons
     Quran(islamicIcons, 0xe81b),

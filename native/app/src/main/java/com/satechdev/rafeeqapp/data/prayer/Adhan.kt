@@ -164,7 +164,7 @@ class PrayerTimes(
             val hour = solarTime.hourAngle(-1 * angle, true)
             if (hour.isFinite()) {
                 val angleBased = componentsAt(date, hour)
-                if (sunsetComponents < angleBased && tempIsha!! > angleBased) tempMaghrib = angleBased
+                if (sunsetComponents < angleBased && tempIsha > angleBased) tempMaghrib = angleBased
             }
         }
 
@@ -175,7 +175,7 @@ class PrayerTimes(
         dhuhr = roundedMinute(tempDhuhr + (a.dhuhr + m.dhuhr) * MINUTE)
         asr = roundedMinute(tempAsr + (a.asr + m.asr) * MINUTE)
         maghrib = roundedMinute(tempMaghrib + (a.maghrib + m.maghrib) * MINUTE)
-        isha = roundedMinute(tempIsha!! + (a.isha + m.isha) * MINUTE)
+        isha = roundedMinute(tempIsha + (a.isha + m.isha) * MINUTE)
     }
 
     fun timeFor(prayer: Prayer): Long? = when (prayer) {

@@ -8,6 +8,11 @@ import androidx.compose.runtime.setValue
 import com.satechdev.rafeeqapp.data.hijri.HijriCorrection
 import com.satechdev.rafeeqapp.data.prayer.AsrMethod
 import com.satechdev.rafeeqapp.data.prayer.HighLatitude
+import com.satechdev.rafeeqapp.data.prayer.NotifKey
+import com.satechdev.rafeeqapp.data.prayer.NotificationSettings
+import com.satechdev.rafeeqapp.data.prayer.NotificationSound
+import com.satechdev.rafeeqapp.data.prayer.NotificationTiming
+import com.satechdev.rafeeqapp.data.prayer.VolumeType
 import com.satechdev.rafeeqapp.data.prayer.PrayerCalcMethod
 import com.satechdev.rafeeqapp.data.prayer.TimeFormat
 import com.satechdev.rafeeqapp.data.prayer.UserLocation
@@ -65,6 +70,8 @@ object Settings {
     var highLatitude by mutableStateOf(HighLatitude.AngleBased); private set
     @set:JvmName("assignTimeFormat")
     var timeFormat by mutableStateOf(TimeFormat.TwelveHour); private set
+    @set:JvmName("assignNotifications")
+    var notifications by mutableStateOf(NotificationSettings()); private set
     @set:JvmName("assignLocation")
     var location by mutableStateOf<UserLocation?>(null); private set
     var aboutOpened by mutableStateOf(false); private set
@@ -81,6 +88,7 @@ object Settings {
             asrMethod = AsrMethod.of(it.optString("asrCalculationMethod"))
             highLatitude = HighLatitude.of(it.optString("highLatitudeAdjustment"))
             timeFormat = TimeFormat.of(it.optString("timeFormat"))
+            notifications = parseNotifications(it)
         }
         location = json(USER_LOCATION).takeIf { it.has("latitude") }?.let {
             UserLocation(
@@ -128,6 +136,57 @@ object Settings {
     fun setTimeFormat(value: TimeFormat) {
         timeFormat = value
         update(PRAYER_SETTINGS) { put("timeFormat", value.stored) }
+    }
+
+    fun setNotificationEnabled(key: NotifKey, enabled: Boolean) {
+        saveNotifications(notifications.copy(enabled = notifications.enabled + (key to enabled)))
+    }
+
+    fun setNotificationSound(key: NotifKey, sound: NotificationSound) {
+        if (sound !in key.availableSounds) return
+        saveNotifications(notifications.copy(sounds = notifications.sounds + (key to sound)))
+    }
+
+    fun setNotificationTiming(timing: NotificationTiming) {
+        saveNotifications(notifications.copy(timing = timing))
+    }
+
+    private fun saveNotifications(value: NotificationSettings) {
+        notifications = value
+        update(PRAYER_SETTINGS) {
+            put("notificationSettings", JSONObject().apply { value.enabled.forEach { (k, v) -> put(k.stored, v) } })
+            put("notificationSounds", JSONObject().apply { value.sounds.forEach { (k, v) -> put(k.stored, v.stored) } })
+            put("notificationVolumeTypes", JSONObject().apply { value.volumes.forEach { (k, v) -> put(k.stored, v.stored) } })
+            put("notificationTiming", value.timing.stored)
+        }
+    }
+
+    /** As PrayerTimesSettings.fromMap, including the old index keys (0 Fajr … 5 Isha). */
+    private fun parseNotifications(json: JSONObject): NotificationSettings {
+        val defaults = NotificationSettings()
+        val legacy = listOf(NotifKey.Fajr, NotifKey.Sunrise, NotifKey.Dhuhr, NotifKey.Asr, NotifKey.Maghrib, NotifKey.Isha)
+        val enabled = defaults.enabled.toMutableMap()
+        json.optJSONObject("notificationSettings")?.let { map ->
+            map.keys().forEach { name ->
+                val key = NotifKey.of(name) ?: name.toIntOrNull()?.let(legacy::getOrNull) ?: return@forEach
+                (map.opt(name) as? Boolean)?.let { enabled[key] = it }
+            }
+        }
+        val sounds = defaults.sounds.toMutableMap()
+        json.optJSONObject("notificationSounds")?.let { map ->
+            map.keys().forEach { name ->
+                val key = NotifKey.of(name) ?: return@forEach
+                NotificationSound.of(map.optString(name))?.let { sounds[key] = it }
+            }
+        }
+        val volumes = defaults.volumes.toMutableMap()
+        json.optJSONObject("notificationVolumeTypes")?.let { map ->
+            map.keys().forEach { name ->
+                val key = NotifKey.of(name) ?: return@forEach
+                VolumeType.of(map.optString(name))?.let { volumes[key] = it }
+            }
+        }
+        return NotificationSettings(enabled, sounds, volumes, NotificationTiming.of(json.optString("notificationTiming")))
     }
 
     /** Replaces the location, as the Flutter app's UserLocation.toMap wrote it. */

@@ -110,7 +110,7 @@ fun HomeScreen() {
     val sky = day?.let {
         SkyPhase.at(now, it.today.sunrise.local(), it.today.maghrib.local(), it.yesterday.maghrib.local(), it.tomorrow.sunrise.local())
     } ?: SkyPhase.at(now)
-    val prayerTimes = { nav.push(Route.Placeholder(R.string.prayerTimes)) }
+    val prayerTimes = { nav.push(Route.PrayerTimes) }
 
     Column(Modifier.fillMaxSize().background(p.background)) {
         AppBar(tr(R.string.appTitle)) {
@@ -183,8 +183,9 @@ fun HomeScreen() {
     }
 }
 
+/** The location chip in the home and prayer times app bars. */
 @Composable
-private fun LocationPill(label: String, onClick: () -> Unit) {
+internal fun LocationPill(label: String, onClick: () -> Unit) {
     val p = palette
     Row(
         Modifier

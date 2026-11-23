@@ -50,8 +50,8 @@ fun SettingsScreen(onBack: () -> Unit) {
             Row(Glyph.Public, tr(R.string.highLatitudeRule), tr(Settings.highLatitude.label)) { nav.push(Route.HighLatitudeRule) },
             Row(Glyph.Calendar, tr(R.string.hijriCorrection), tr(Settings.hijriCorrection.label)) { nav.push(Route.HijriCorrection) },
             Row(Glyph.Schedule, tr(R.string.timeFormat), tr(Settings.timeFormat.label)) { nav.push(Route.TimeFormat) },
-            Row(Glyph.AccessTime, tr(R.string.prayerTimes), locationLabel(), onClick = soon(R.string.prayerTimes)),
-            Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle), onClick = soon(R.string.notification)),
+            Row(Glyph.AccessTime, tr(R.string.prayerTimes), locationLabel()) { nav.push(Route.PrayerTimes) },
+            Row(Glyph.Notifications, tr(R.string.notification), tr(R.string.settingsNotificationSubtitle)) { nav.push(Route.NotificationSettings) },
         ),
         tr(R.string.quran) to listOf(
             Row(Glyph.MenuBook, tr(R.string.quranViewSettings), tr(R.string.settingsQuranViewSubtitle), onClick = soon(R.string.quranViewSettings)),
@@ -87,7 +87,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 rows.forEachIndexed { rowIndex, row ->
                     item(key = "$index-$rowIndex") {
                         if (rowIndex > 0) Spacer(Modifier.height(8.dp))
-                        SettingsCard(row.icon, row.title, row.subtitle, row.badge, row.onClick)
+                        SettingsCard(row.icon, row.title, row.subtitle, row.badge, onClick = row.onClick)
                     }
                 }
             }

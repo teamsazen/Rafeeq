@@ -71,7 +71,13 @@ import androidx.core.view.WindowCompat
 import com.satechdev.rafeeqapp.data.AppLanguage
 import com.satechdev.rafeeqapp.data.Settings
 import com.satechdev.rafeeqapp.data.ThemeMode
+import com.satechdev.rafeeqapp.data.prayer.NotifKey
 import com.satechdev.rafeeqapp.screens.AppShell
+import com.satechdev.rafeeqapp.screens.NotificationEditorScreen
+import com.satechdev.rafeeqapp.screens.NotificationSettingsScreen
+import com.satechdev.rafeeqapp.screens.NotificationSoundScreen
+import com.satechdev.rafeeqapp.screens.NotificationTimingScreen
+import com.satechdev.rafeeqapp.screens.PrayerTimesScreen
 import com.satechdev.rafeeqapp.screens.CalculationMethodScreen
 import com.satechdev.rafeeqapp.screens.CityPickerScreen
 import com.satechdev.rafeeqapp.screens.CountryPickerScreen
@@ -113,6 +119,11 @@ sealed interface Route {
     data object Location : Route { override val key = "location" }
     data object CountryPicker : Route { override val key = "country-picker" }
     data object CityPicker : Route { override val key = "city-picker" }
+    data object PrayerTimes : Route { override val key = "prayer-times" }
+    data object NotificationSettings : Route { override val key = "notification-settings" }
+    data object NotificationTiming : Route { override val key = "notification-timing" }
+    data class NotificationEditor(val notifKey: NotifKey) : Route { override val key = "notification-${notifKey.stored}" }
+    data class NotificationSound(val notifKey: NotifKey) : Route { override val key = "notification-sound-${notifKey.stored}" }
 
     /** A screen that is still Flutter only; it arrives in a later phase. */
     data class Placeholder(@StringRes val title: Int) : Route { override val key = "placeholder-$title" }
@@ -310,6 +321,11 @@ fun AppRoot() {
                                         Route.Location -> LocationScreen()
                                         Route.CountryPicker -> CountryPickerScreen()
                                         Route.CityPicker -> CityPickerScreen()
+                                        Route.PrayerTimes -> PrayerTimesScreen()
+                                        Route.NotificationSettings -> NotificationSettingsScreen()
+                                        Route.NotificationTiming -> NotificationTimingScreen()
+                                        is Route.NotificationEditor -> NotificationEditorScreen(route.notifKey)
+                                        is Route.NotificationSound -> NotificationSoundScreen(route.notifKey)
                                         is Route.Placeholder -> PlaceholderScreen(route.title)
                                     }
                                 }
