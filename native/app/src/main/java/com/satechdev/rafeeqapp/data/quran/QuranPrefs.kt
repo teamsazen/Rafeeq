@@ -14,19 +14,6 @@ enum class AyahViewMode {
     }
 }
 
-/**
- * Which writing of the Quran the reader shows. IndoPak is the script South
- * Asia reads from print (khari zabar, its own jazm and waqf signs); Uthmani
- * is the Madinah mushaf's, alquran.cloud's text.
- */
-enum class QuranScript(val stored: String) {
-    IndoPak("indopak"), Uthmani("uthmani");
-
-    companion object {
-        fun of(stored: String?) = entries.firstOrNull { it.stored == stored } ?: IndoPak
-    }
-}
-
 /** lib/ui/quran/quran_view_settings.dart's QuranViewSettings, with its defaults. */
 data class QuranViewSettings(
     val arabicFontSize: Float = 28f,
@@ -42,8 +29,6 @@ data class QuranViewSettings(
     val continueToNextSurah: Boolean = false,
     val surahRepeat: Boolean = false,
     val autoHidePlayerControls: Boolean = false,
-    /** Native only: Flutter always showed Uthmani; IndoPak is the default from 2.0. */
-    val script: QuranScript = QuranScript.IndoPak,
 )
 
 /**

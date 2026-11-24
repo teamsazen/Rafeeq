@@ -73,7 +73,6 @@ import com.satechdev.rafeeqapp.ui.palette
 import com.satechdev.rafeeqapp.ui.pressable
 import com.satechdev.rafeeqapp.ui.quranArabicStyle
 import com.satechdev.rafeeqapp.ui.quranText
-import com.satechdev.rafeeqapp.data.quran.QuranScript
 import com.satechdev.rafeeqapp.ui.style
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -308,7 +307,7 @@ private fun PictureCard(
                         BasicText(
                             arabic,
                             Modifier.fillMaxWidth().weight(arabicFlex.toFloat(), fill = false),
-                            quranArabicStyle(arabicMax.sp, p.title, TextAlign.Center).let { if (Settings.quranView.script == QuranScript.Uthmani) it.copy(lineHeight = 1.55.em) else it.copy(lineHeight = 1.9.em) },
+                            quranArabicStyle(arabicMax.sp, p.title, TextAlign.Center).copy(lineHeight = 1.9.em),
                             autoSize = TextAutoSize.StepBased(minFontSize = 4.sp, maxFontSize = arabicMax.sp, stepSize = .5.sp),
                         )
                     }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,21 +91,30 @@ fun AppSlider(value: Float, min: Float, max: Float, onChange: (Float) -> Unit, m
         val half = with(density) { (thumb / 2).toPx() }
         val steps = (max - min).toInt()
         val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
+        // The gesture handlers live for the whole drag; these keep them reading the latest value.
+        val current by rememberUpdatedState(value)
+        val report by rememberUpdatedState(onChange)
         fun set(touchX: Float) {
             var f = ((touchX - half) / trackPx).coerceIn(0f, 1f)
             if (rtl) f = 1 - f
             val v = min + Math.round(f * steps) * (max - min) / steps
-            if (v != value) {
+            if (v != current) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onChange(v)
+                report(v)
             }
         }
         val x by animateDpAsState(with(density) { (trackPx * fraction).toDp() }, spring(stiffness = Spring.StiffnessMedium), label = "slider")
         Box(
             Modifier
                 .fillMaxSize()
-                .pointerInput(value) { detectTapGestures { set(it.x) } }
-                .pointerInput(value) { detectHorizontalDragGestures { change, _ -> set(change.position.x) } },
+                // Keyed on the track only: keyed on the value, each step restarted the detector and ended the drag.
+                .pointerInput(trackPx, rtl) { detectTapGestures { set(it.x) } }
+                .pointerInput(trackPx, rtl) {
+                    detectHorizontalDragGestures(onDragStart = { set(it.x) }) { change, _ ->
+                        change.consume()
+                        set(change.position.x)
+                    }
+                },
         ) {
             Box(Modifier.align(Alignment.CenterStart).padding(horizontal = thumb / 2).fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(p.divider))
             Box(Modifier.align(Alignment.CenterStart).padding(start = thumb / 2).width(x).height(3.dp).clip(RoundedCornerShape(2.dp)).background(p.accent))
