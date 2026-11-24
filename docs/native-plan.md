@@ -156,7 +156,7 @@ Flutter app comes out of the repo, as in 99 Names.
 | 2. Home, prayer times, azan | Done (2026-11-23), see notes |
 | 3. Quran | Done (2026-11-23), see notes |
 | 4. Everything else | Done (2026-11-23), see notes |
-| 5. Release | Not started |
+| 5. Release | Ready (2026-11-24): AAB 2.0.0 (53) built; Play notes in docs/release |
 
 ### Phase 1 notes
 
@@ -196,8 +196,6 @@ Left for later phases:
 - Left out: the Ramadan calendar (only the dropped event cards opened it),
   the namaz prayer detail screen (nothing opened it), and the developer
   panel's event previews; its update dialog test comes with in-app update.
-- Before release: the Version screen still shows the 1.2.21 notes; write
-  the 2.0.0 notes (phase 5).
 
 ### Phase 3 notes
 

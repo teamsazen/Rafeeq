@@ -7,4 +7,10 @@
     <string name="qiblaBearingFromNorth">Qibla is %1$s° from North</string>
     <string name="locationServicesOff">Location is turned off. Turn it on in your phone\'s settings.</string>
     <string name="locationUnavailable">Couldn\'t find your location. Try again outside or near a window, or set it manually.</string>
+    <!-- What's new in 2.0.0, on the Version screen. -->
+    <string name="release200Intro">Rafeeq 2.0 is rebuilt from the ground up: smaller, quicker to open and smoother everywhere, with the same Rafeeq you know.</string>
+    <string name="release200FeaturesBody">• Tap any ayah in the 16 Line Quran to listen; the ayah being recited is highlighted and the page turns with it\n• Recitation keeps playing with the screen off, with controls on the lock screen\n• A new Qibla compass that turns smoothly, with a gentle tick as you turn and a firm one when you face the Qibla\n• The ruku sign now sits at the end of its ayah in the 16 Line Quran</string>
+    <string name="release200DesignBody">• Smooth page turns in the 16 Line Quran\n• A clearer highlight for the ayah being recited in dark mode\n• A solid bottom bar, and swipe between months in the Hijri calendar</string>
+    <string name="release200EnhancementsBody">• Your location is found faster, even indoors and with approximate location\n• Setting up Rafeeq no longer waits for your location\n• Paused recitation resumes where it stopped\n• All our apps in About, and a much smaller download</string>
+    <string name="release200BugFixesBody">• Fixed location sometimes not updating\n• The Hijri correction now moves the calendar\'s dates too\n• Many smaller fixes</string>
 </resources>

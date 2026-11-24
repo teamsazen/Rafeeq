@@ -280,24 +280,22 @@ private fun LinkTile(title: String, subtitle: String, @androidx.annotation.Drawa
     }
 }
 
-private const val NOTES_VERSION = "1.2.21+50"
 
 /** What changed in this release (version_screen.dart). */
 @Composable
 fun VersionScreen() {
     val p = palette
     val sections = listOf(
-        R.string.versionDetailsFeatures to R.string.versionDetailsFeaturesBody,
-        R.string.versionDetailsDesign to R.string.versionDetailsDesignBody,
-        R.string.versionDetailsEnhancements to R.string.versionDetailsEnhancementsBody,
-        R.string.versionDetailsBugFixes to R.string.versionDetailsBugFixesBody,
+        R.string.versionDetailsFeatures to R.string.release200FeaturesBody,
+        R.string.versionDetailsDesign to R.string.release200DesignBody,
+        R.string.versionDetailsEnhancements to R.string.release200EnhancementsBody,
+        R.string.versionDetailsBugFixes to R.string.release200BugFixesBody,
     )
     ReadingPage(tr(R.string.version)) {
         item {
-            // The notes below are for this release of the Flutter app; 2.0.0 needs its own before it ships.
-            Txt(NOTES_VERSION, local(24, p.title, FontWeight.Bold))
+            Txt(com.satechdev.rafeeqapp.BuildConfig.VERSION_NAME, local(24, p.title, FontWeight.Bold))
             Spacer(Modifier.height(8.dp))
-            Txt(tr(R.string.versionDetailsIntro), local(15, p.subtitle, lineHeight = 1.6f))
+            Txt(tr(R.string.release200Intro), local(15, p.subtitle, lineHeight = 1.6f))
         }
         sections.forEach { (title, body) ->
             item {
