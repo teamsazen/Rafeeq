@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -256,11 +257,14 @@ private fun WordsCanvas(
     val layouts = remember(words, fontSize) { words.map { measurer.measure(it, quranWordStyle(fontSize, Color.Black), maxLines = 1, softWrap = false) } }
     val widths = remember(layouts) { FloatArray(layouts.size) { layouts[it].size.width.toFloat() } }
     val ain = remember(fontSize, rukuWord) {
-        if (rukuWord < 0) null else measurer.measure("ع", TextStyle(fontFamily = AppFonts.urdu, fontSize = fontSize * .5f, lineHeight = 1.em), maxLines = 1, softWrap = false)
+        if (rukuWord < 0) null else measurer.measure("ع", TextStyle(fontFamily = AppFonts.urdu, fontSize = fontSize * .62f, lineHeight = 1.em), maxLines = 1, softWrap = false)
     }
     val lit = keys != null && playing != null && keys.any { it == playing }
     val glow by animateFloatAsState(if (lit) 1f else 0f, tween(260), label = "recited")
     var places by remember { mutableStateOf<WordPlaces?>(null) }
+    // The tap handler lives as long as the line; this keeps it calling the latest onAyahTap,
+    // which knows what is playing now (a stale one restarted a paused ayah's surah instead).
+    val tap by rememberUpdatedState(onAyahTap)
     Canvas(
         Modifier
             .fillMaxSize()
@@ -269,7 +273,7 @@ private fun WordsCanvas(
                     detectTapGestures { tap ->
                         val at = places ?: return@detectTapGestures
                         val i = at.lefts.indices.firstOrNull { tap.x >= at.lefts[it] - at.gap / 2 && tap.x <= at.lefts[it] + widths[it] * at.scale + at.gap / 2 }
-                        if (i != null) onAyahTap(keys[i])
+                        if (i != null) tap(keys[i])
                     }
                 },
             ),
