@@ -154,7 +154,7 @@ Thank you to everyone who contributes to Rafeeq! Listed by commit contributions,
 
 <!-- CONTRIBUTORS:START -->
 <p>
-  <a href="https://github.com/teamsazen"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/readme/contributors/98111211-dark.png"><img src=".github/readme/contributors/98111211-light.png" alt="teamsazen: 59 commits" title="teamsazen: 59 commits" width="75" height="75"></picture></a>
+  <a href="https://github.com/teamsazen"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/readme/contributors/98111211-dark.png"><img src=".github/readme/contributors/98111211-light.png" alt="teamsazen: 100 commits" title="teamsazen: 100 commits" width="78" height="75"></picture></a>
   <a href="https://github.com/abdushakoor12"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/readme/contributors/60779242-dark.png"><img src=".github/readme/contributors/60779242-light.png" alt="abdushakoor12: 2 commits" title="abdushakoor12: 2 commits" width="74" height="75"></picture></a>
 </p>
 <!-- CONTRIBUTORS:END -->
