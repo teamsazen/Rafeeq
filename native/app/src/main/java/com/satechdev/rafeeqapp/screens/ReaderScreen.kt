@@ -59,7 +59,6 @@ import com.satechdev.rafeeqapp.data.quran.QuranStore
 import com.satechdev.rafeeqapp.data.quran.QuranText
 import com.satechdev.rafeeqapp.data.quran.Surah
 import com.satechdev.rafeeqapp.data.quran.SurahNames
-import com.satechdev.rafeeqapp.data.quran.withoutBismillah
 import com.satechdev.rafeeqapp.hero
 import com.satechdev.rafeeqapp.tr
 import com.satechdev.rafeeqapp.ui.AppFonts
@@ -73,7 +72,7 @@ import com.satechdev.rafeeqapp.ui.Txt
 import com.satechdev.rafeeqapp.ui.localNumber
 import com.satechdev.rafeeqapp.ui.palette
 import com.satechdev.rafeeqapp.ui.pressable
-import com.satechdev.rafeeqapp.ui.quranStyle
+import com.satechdev.rafeeqapp.ui.QuranArabic
 import com.satechdev.rafeeqapp.ui.style
 
 /** A surah or a juz. */
@@ -304,17 +303,12 @@ private fun AyahCard(ayah: Ayah, onPlay: () -> Unit) {
     val ink by animateColorAsState(if (current) p.background else p.title, tween(220, easing = AppMotion.easeOut), label = "ink")
     val translationInk by animateColorAsState(if (current) p.card else p.title, tween(220, easing = AppMotion.easeOut), label = "translationInk")
     val reference = if (urdu) "القرآن ${localNumber(ayah.surahNumber)}:${localNumber(ayah.numberInSurah)}" else "${ayah.surahNumber}:${ayah.numberInSurah}"
-    val arabic = ayah.withoutBismillah()
 
     Column(Modifier.fillMaxWidth().padding(bottom = 14.dp).clip(RoundedCornerShape(12.dp)).background(card).pressable(tap, scale = .99f)) {
         Column(Modifier.padding(12.dp)) {
             Txt(reference, style(15.sp, ink, FontWeight.Bold))
             Spacer(Modifier.height(8.dp))
-            Txt(
-                arabic,
-                quranStyle(view.arabicFontSize.sp, ink, TextAlign.Right).copy(textDirection = TextDirection.Rtl),
-                Modifier.fillMaxWidth(),
-            )
+            QuranArabic(ayah, view.arabicFontSize.sp, ink, Modifier.fillMaxWidth())
             if (view.showTranslation) {
                 val texts = TranslationCache.texts[key]
                 when {

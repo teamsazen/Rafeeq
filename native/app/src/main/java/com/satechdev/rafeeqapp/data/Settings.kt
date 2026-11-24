@@ -10,6 +10,7 @@ import com.satechdev.rafeeqapp.data.prayer.AsrMethod
 import com.satechdev.rafeeqapp.data.quran.AyahViewMode
 import com.satechdev.rafeeqapp.data.quran.Bookmark
 import com.satechdev.rafeeqapp.data.quran.PrefsList
+import com.satechdev.rafeeqapp.data.quran.QuranScript
 import com.satechdev.rafeeqapp.data.quran.QuranViewSettings
 import com.satechdev.rafeeqapp.data.prayer.HighLatitude
 import com.satechdev.rafeeqapp.data.prayer.NotifKey
@@ -139,6 +140,7 @@ object Settings {
             put("continueToNextSurah", value.continueToNextSurah)
             put("surahRepeat", value.surahRepeat)
             put("autoHidePlayerControls", value.autoHidePlayerControls)
+            put("quranScript", value.script.stored)
         }
     }
 
@@ -169,6 +171,7 @@ object Settings {
             continueToNextSurah = bool("continueToNextSurah", d.continueToNextSurah),
             surahRepeat = bool("surahRepeat", d.surahRepeat),
             autoHidePlayerControls = bool("autoHidePlayerControls", d.autoHidePlayerControls),
+            script = QuranScript.of(j.optString("quranScript").takeIf { it.isNotEmpty() }),
         )
     }
 

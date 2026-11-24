@@ -1,5 +1,12 @@
 package com.satechdev.rafeeqapp.screens
 
+import com.satechdev.rafeeqapp.ui.AppMotion
+import com.satechdev.rafeeqapp.ui.quranArabicStyle
+import com.satechdev.rafeeqapp.data.quran.QuranScript
+import androidx.compose.ui.unit.em
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.animateColorAsState
 import com.satechdev.rafeeqapp.data.audio.QuranAudio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +63,7 @@ import com.satechdev.rafeeqapp.ui.Spinner
 import com.satechdev.rafeeqapp.ui.Txt
 import com.satechdev.rafeeqapp.ui.palette
 import com.satechdev.rafeeqapp.ui.pressable
-import com.satechdev.rafeeqapp.ui.quranStyle
+import com.satechdev.rafeeqapp.ui.QuranArabic
 import com.satechdev.rafeeqapp.ui.style
 
 private val redAccent = Color(0xFFFF5252)
@@ -96,6 +103,11 @@ fun QuranSettingsScreen() {
     fun change(update: QuranViewSettings.() -> QuranViewSettings) = Settings.setQuranView(Settings.quranView.update())
 
     PushedScreen(tr(R.string.quranViewSettings)) {
+        item(key = "script") {
+            SettingsCard(Glyph.MenuBook, tr(R.string.quranScript), tr(R.string.quranScriptExplanation), supporting = {
+                ScriptChoice(settings.script) { script -> change { copy(script = script) } }
+            })
+        }
         item(key = "arabic") {
             SettingsCard(Glyph.FormatSize, tr(R.string.arabicFontSize), settings.arabicFontSize.toInt().toString(), supporting = {
                 AyahPreview(showArabic = true)
@@ -170,12 +182,7 @@ private fun AyahPreview(showArabic: Boolean) {
         val ayah = quran?.ayahs?.firstOrNull()
         when {
             ayah == null -> Box(Modifier.fillMaxWidth().height(86.dp), contentAlignment = Alignment.Center) { Spinner(p.accent) }
-            showArabic -> Txt(
-                ayah.text,
-                quranStyle(settings.arabicFontSize.sp, p.title, TextAlign.Right).copy(textDirection = TextDirection.Rtl, lineHeight = (settings.arabicFontSize * 1.45f).sp),
-                Modifier.fillMaxWidth(),
-                maxLines = 2,
-            )
+            showArabic -> QuranArabic(ayah, settings.arabicFontSize.sp, p.title, Modifier.fillMaxWidth(), maxLines = 2)
             translation == null -> Txt("Loading translation…", style(12.sp, p.subtitle, family = AppFonts.sans))
             else -> {
                 val urduEdition = settings.translationEditionId.substringBefore('.').lowercase() == "ur"
@@ -272,6 +279,32 @@ private fun TranslationRow(title: String, urduFont: Boolean, selected: Boolean, 
             Spacer(Modifier.width(12.dp))
             Box(Modifier.width(24.dp).height(24.dp).background(p.accent, CircleShape), contentAlignment = Alignment.Center) {
                 AppIcon(Glyph.CheckMark, p.checkForeground, 15.dp)
+            }
+        }
+    }
+}
+
+/** IndoPak or Uthmani, each shown in its own writing; the chosen one slides into place. */
+@Composable
+private fun ScriptChoice(selected: QuranScript, onSelect: (QuranScript) -> Unit) {
+    val p = palette
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(p.background).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        QuranScript.entries.forEach { script ->
+            val on = script == selected
+            val fill by animateColorAsState(if (on) p.selectedCard else p.background, tween(AppMotion.FAST), label = "script")
+            val ink by animateColorAsState(if (on) p.selectedTitle else p.title, tween(AppMotion.FAST), label = "scriptInk")
+            Column(
+                Modifier.weight(1f).clip(RoundedCornerShape(9.dp)).background(fill).pressable({ onSelect(script) }, scale = .96f).padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // "In the name of Allah" in that script's own letters and font.
+                BasicText(
+                    if (script == QuranScript.IndoPak) "بِسْمِ اللّٰهِ" else "بِسْمِ ٱللَّهِ",
+                    // PDMS Saleem draws small for its size, so the Uthmani sample is set larger to match.
+                    style = quranArabicStyle(if (script == QuranScript.IndoPak) 22.sp else 30.sp, ink, TextAlign.Center, script).copy(lineHeight = 1.6.em),
+                    maxLines = 1,
+                )
+                Txt(tr(if (script == QuranScript.IndoPak) R.string.quranScriptIndoPak else R.string.quranScriptUthmani), style(13.sp, ink, FontWeight.SemiBold))
             }
         }
     }

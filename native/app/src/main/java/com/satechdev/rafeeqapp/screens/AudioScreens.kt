@@ -42,7 +42,6 @@ import com.satechdev.rafeeqapp.data.audio.QuranAudio
 import com.satechdev.rafeeqapp.data.audio.Reciter
 import com.satechdev.rafeeqapp.data.quran.Editions
 import com.satechdev.rafeeqapp.data.quran.SurahNames
-import com.satechdev.rafeeqapp.data.quran.withoutBismillah
 import com.satechdev.rafeeqapp.tr
 import com.satechdev.rafeeqapp.ui.AppFonts
 import com.satechdev.rafeeqapp.ui.AppIcon
@@ -51,7 +50,7 @@ import com.satechdev.rafeeqapp.ui.Txt
 import com.satechdev.rafeeqapp.ui.localNumber
 import com.satechdev.rafeeqapp.ui.palette
 import com.satechdev.rafeeqapp.ui.pressable
-import com.satechdev.rafeeqapp.ui.quranStyle
+import com.satechdev.rafeeqapp.ui.QuranArabic
 import com.satechdev.rafeeqapp.ui.reducedMotion
 import com.satechdev.rafeeqapp.ui.style
 
@@ -128,11 +127,7 @@ fun AyahFocusScreen() {
                         Modifier.widthIn(max = 760.dp).fillMaxSize().verticalScroll(rememberScrollState())
                             .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 12.dp),
                     ) {
-                        Txt(
-                            shown.withoutBismillah(),
-                            quranStyle((view.arabicFontSize + 8).sp, p.title, TextAlign.Right).copy(textDirection = TextDirection.Rtl),
-                            Modifier.fillMaxWidth(),
-                        )
+                        QuranArabic(shown, (view.arabicFontSize + 8).sp, p.title, Modifier.fillMaxWidth())
                         if (view.showTranslation) {
                             TranslationCache.texts["${shown.surahNumber}/$edition"]?.get(shown.number)?.let { value ->
                                 val language = edition.substringBefore('.').lowercase()

@@ -13,4 +13,8 @@
     <string name="release200DesignBody">• Smooth page turns in the 16 Line Quran\n• A clearer highlight for the ayah being recited in dark mode\n• A solid bottom bar, and swipe between months in the Hijri calendar</string>
     <string name="release200EnhancementsBody">• Your location is found faster, even indoors and with approximate location\n• Setting up Rafeeq no longer waits for your location\n• Paused recitation resumes where it stopped\n• All our apps in About, and a much smaller download</string>
     <string name="release200BugFixesBody">• Fixed location sometimes not updating\n• The Hijri correction now moves the calendar\'s dates too\n• Many smaller fixes</string>
+    <string name="quranScript">Arabic script</string>
+    <string name="quranScriptIndoPak">IndoPak</string>
+    <string name="quranScriptUthmani">Uthmani</string>
+    <string name="quranScriptExplanation">IndoPak is the script printed in Pakistan and India; Uthmani is the Madinah mushaf\'s.</string>
 </resources>

@@ -42,3 +42,28 @@ class SixteenLineIndexTest {
         assertTrue(rukus > 500)
     }
 }
+
+/** The reader's IndoPak text, built from the 16 line mushaf. */
+class IndoPakTextTest {
+    private val text = com.satechdev.rafeeqapp.data.quran.IndoPakText.build(
+        SixteenLineQuran.parse(File("../../assets/quran_16_line.json").readText()),
+    )
+
+    @Test
+    fun everyAyahHasItsWordsAndNoRing() {
+        assertEquals(6236, text.size)
+        text.forEach { (key, ayah) ->
+            assertTrue("$key is empty", ayah.any { it.code in 0x0600..0x06FF })
+            assertTrue("$key keeps its ring", ayah.none { it.code in 0xF500..0xF61E })
+        }
+    }
+
+    @Test
+    fun fatihaCountsTheBismillahAsAyahOne() {
+        assertTrue(text.getValue(1001).startsWith("بِسْمِ"))
+        assertTrue(text.getValue(1002).startsWith("اَلْحَمْدُ"))
+        assertTrue(text.getValue(1007).startsWith("صِرَاطَ"))
+        assertTrue(text.getValue(2001).isNotEmpty())
+        assertTrue(text.getValue(114006).isNotEmpty())
+    }
+}

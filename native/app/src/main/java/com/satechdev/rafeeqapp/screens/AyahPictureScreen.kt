@@ -71,7 +71,9 @@ import com.satechdev.rafeeqapp.ui.localDigits
 import com.satechdev.rafeeqapp.ui.localNumber
 import com.satechdev.rafeeqapp.ui.palette
 import com.satechdev.rafeeqapp.ui.pressable
-import com.satechdev.rafeeqapp.ui.quranStyle
+import com.satechdev.rafeeqapp.ui.quranArabicStyle
+import com.satechdev.rafeeqapp.ui.quranText
+import com.satechdev.rafeeqapp.data.quran.QuranScript
 import com.satechdev.rafeeqapp.ui.style
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -195,7 +197,7 @@ fun AyahPictureScreen(route: Route.AyahPicture) {
                     } else if (ayah != null) {
                         val ref = "${ayah.surahNumber}:${ayah.numberInSurah}"
                         PictureCard(
-                            arabic = ayah.text,
+                            arabic = quranText(ayah),
                             translation = translation?.get(ayah.number),
                             translationRtl = edition.substringBefore('.').lowercase() in rtlLanguages,
                             reference = if (useUrdu) "القرآن ${localDigits(ref, com.satechdev.rafeeqapp.data.AppLanguage.Urdu)}" else "Qur'an $ref",
@@ -306,7 +308,7 @@ private fun PictureCard(
                         BasicText(
                             arabic,
                             Modifier.fillMaxWidth().weight(arabicFlex.toFloat(), fill = false),
-                            quranStyle(arabicMax.sp, p.title, TextAlign.Center).copy(lineHeight = 1.55.em, textDirection = TextDirection.Rtl),
+                            quranArabicStyle(arabicMax.sp, p.title, TextAlign.Center).let { if (Settings.quranView.script == QuranScript.Uthmani) it.copy(lineHeight = 1.55.em) else it.copy(lineHeight = 1.9.em) },
                             autoSize = TextAutoSize.StepBased(minFontSize = 4.sp, maxFontSize = arabicMax.sp, stepSize = .5.sp),
                         )
                     }
