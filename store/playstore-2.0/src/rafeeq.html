@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rafeeq Play screenshots 2.0</title>
+<!-- Play Store screenshots (1080x1920) and feature graphic (1024x500) for
+     Rafeeq 2.0, after Exit Rush's listing-v2: rendered by ../render.mjs. -->
+<style>
+@font-face { font-family: Jakarta; src: url(fonts/PlusJakartaSans-ExtraBold.ttf); font-weight: 800; }
+@font-face { font-family: Jakarta; src: url(fonts/PlusJakartaSans-Bold.ttf); font-weight: 700; }
+@font-face { font-family: Jakarta; src: url(fonts/PlusJakartaSans-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: Outfit; src: url(fonts/outfit-800.woff2); font-weight: 800; }
+@font-face { font-family: Nastaleeq; src: url(../../../assets/fonts/JameelNooriNastaleeq.ttf); }
+/* Rafeeq's light palette: cream, teal and the brown of its cards, with a little gold. */
+:root { --bg: #FBF7EE; --ink: #1F2A28; --teal: #157E7B; --gold: #A8823A; --brown: #634E25; --star: #EFE6D2; --sub: #4E5B58; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #888; font-family: Jakarta, sans-serif; }
+.slide { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); margin-bottom: 20px; }
+.dark { --bg: #111515; --ink: #F4F2EC; --sub: #B9C2BF; --star: #1C2423; --teal: #6FB3AB; --gold: #C9A55C; }
+canvas.pat { position: absolute; inset: 0; }
+.glow { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .55; }
+.cap { position: absolute; left: 84px; right: 84px; top: 120px; color: var(--ink); z-index: 3; }
+.kick { font-weight: 700; font-size: 32px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 26px; }
+.h { font-family: Outfit, Jakarta, sans-serif; font-weight: 800; font-size: 118px; line-height: 1.02; letter-spacing: -3px; }
+.h em { font-style: normal; color: var(--teal); }
+.sub { font-weight: 600; font-size: 40px; line-height: 1.36; margin-top: 28px; color: var(--sub); max-width: 900px; }
+.brand { display: inline-flex; align-items: center; gap: 20px; font-family: Outfit; font-weight: 800; font-size: 46px; margin-bottom: 46px; color: var(--ink); letter-spacing: -1px; }
+.brand img { width: 84px; height: 84px; border-radius: 50%; box-shadow: 0 8px 20px rgba(31,42,40,.18); }
+.brand small { display: block; font-family: Jakarta; font-weight: 700; font-size: 20px; letter-spacing: 5px; color: var(--gold); margin-top: 4px; }
+.shot { position: absolute; z-index: 2; filter: drop-shadow(0 30px 40px rgba(31,42,40,.18)); }
+.chips { position: absolute; display: flex; gap: 16px; flex-wrap: wrap; z-index: 3; }
+.chip { display: inline-flex; align-items: center; gap: 14px; background: #fff; color: #1F2A28; font-weight: 700; font-size: 32px; padding: 16px 28px; border-radius: 60px; box-shadow: 0 10px 26px rgba(31,42,40,.12); }
+.chip i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+.ur { font-family: Nastaleeq; font-size: 52px; line-height: .8; padding-top: 8px; }
+.fg { position: relative; width: 1024px; height: 500px; overflow: hidden; background: var(--bg); }
+</style>
+</head>
+<body>
+
+<!-- 1. Hero: the app in hand. -->
+<div class="slide" id="s1">
+  <canvas class="pat"></canvas>
+  <div class="glow" style="left:500px; top:900px; width:700px; height:700px; background:#CFE7E3"></div>
+  <div class="cap">
+    <div class="brand"><img src="img/logo.png"><div>Rafeeq<small>MUSLIM COMPANION</small></div></div>
+    <div class="h" style="font-size:100px">Your daily<br><em>Muslim companion.</em></div>
+    <div class="sub">Prayer times, the Quran, Qibla and more, in one calm app.</div>
+  </div>
+  <img class="shot" src="comp/hero.png" style="left:-20px; top:800px; width:1140px">
+</div>
+
+<!-- 2. Prayer times and reminders. -->
+<div class="slide" id="s2">
+  <canvas class="pat"></canvas>
+  <div class="cap">
+    <div class="kick">Prayer times · Azan</div>
+    <div class="h">Never miss<br><em>a prayer.</em></div>
+    <div class="sub">Accurate times for your city, with an azan reminder for each prayer.</div>
+  </div>
+  <img class="shot" src="comp/prayer.png" style="left:-60px; top:640px; width:1200px">
+</div>
+
+<!-- 3. Read and listen. -->
+<div class="slide" id="s3">
+  <canvas class="pat"></canvas>
+  <div class="glow" style="left:-150px; top:1000px; width:700px; height:700px; background:#EADFC6"></div>
+  <div class="cap">
+    <div class="kick">Quran · 18 reciters</div>
+    <div class="h">Read and<br><em>listen along.</em></div>
+    <div class="sub">The ayah being recited lights up. It keeps playing with the screen off.</div>
+  </div>
+  <img class="shot" src="comp/reader.png" style="left:-40px; top:620px; width:1180px">
+</div>
+
+<!-- 4. The 16 line mushaf. -->
+<div class="slide" id="s4">
+  <canvas class="pat"></canvas>
+  <div class="cap">
+    <div class="kick">16 Line Quran</div>
+    <div class="h">The mushaf<br><em>you know.</em></div>
+    <div class="sub">IndoPak 16 line pages. Tap any ayah to hear it.</div>
+  </div>
+  <img class="shot" src="comp/sixteen.png" style="left:-40px; top:600px; width:1160px">
+</div>
+
+<!-- 5. Qibla. -->
+<div class="slide" id="s5">
+  <canvas class="pat"></canvas>
+  <div class="glow" style="left:400px; top:850px; width:700px; height:700px; background:#CFE7E3"></div>
+  <div class="cap">
+    <div class="kick">Qibla compass</div>
+    <div class="h">Face the Qibla,<br><em>anywhere.</em></div>
+    <div class="sub">A smooth compass that tells you which way to turn.</div>
+  </div>
+  <img class="shot" src="comp/qibla.png" style="left:-40px; top:620px; width:1180px">
+</div>
+
+<!-- 6. Ayah Picture and the 99 Names. -->
+<div class="slide" id="s6">
+  <canvas class="pat"></canvas>
+  <div class="cap">
+    <div class="kick">Ayah Picture · 99 Names</div>
+    <div class="h">Share an ayah,<br><em>beautifully.</em></div>
+    <div class="sub">Make a picture of any ayah, or of one of Allah's 99 Names.</div>
+  </div>
+  <img class="shot" src="comp/picture.png" style="left:-60px; top:640px; width:1200px">
+</div>
+
+<!-- 7. Namaz, wudu and the Hijri calendar. -->
+<div class="slide" id="s7">
+  <canvas class="pat"></canvas>
+  <div class="cap">
+    <div class="kick">Namaz · Wudu · Calendar</div>
+    <div class="h">Learn, pray,<br><em>keep track.</em></div>
+    <div class="sub">Step by step namaz and wudu, and the Hijri calendar.</div>
+  </div>
+  <img class="shot" src="comp/namaz.png" style="left:-60px; top:640px; width:1200px">
+</div>
+
+<!-- 8. Light and dark, English and Urdu. -->
+<div class="slide dark" id="s8">
+  <canvas class="pat"></canvas>
+  <div class="glow" style="left:300px; top:900px; width:800px; height:800px; background:#1F4A46"></div>
+  <div class="cap">
+    <div class="kick">Light · Dark · English · Urdu</div>
+    <div class="h">Day or night,<br><em>your way.</em></div>
+  </div>
+  <div class="chips" style="left:84px; top:470px">
+    <span class="chip"><i style="background:#F2C14E"></i>Light</span>
+    <span class="chip"><i style="background:#1F2A28"></i>Dark</span>
+    <span class="chip"><i style="background:#157E7B"></i>English</span>
+    <span class="chip"><i style="background:#A8823A"></i><span class="ur">اردو</span></span>
+  </div>
+  <img class="shot" src="comp/themes.png" style="left:-60px; top:640px; width:1200px">
+</div>
+
+<!-- Feature graphic. -->
+<div class="fg" id="fg">
+  <canvas class="pat"></canvas>
+  <div class="glow" style="left:620px; top:120px; width:420px; height:420px; background:#CFE7E3"></div>
+  <div style="position:absolute; left:64px; top:66px; width:560px; z-index:3; color:var(--ink)">
+    <div class="brand" style="font-size:40px; margin-bottom:30px"><img src="img/logo.png" style="width:74px; height:74px"><div>Rafeeq<small style="font-size:15px; letter-spacing:4px">MUSLIM COMPANION</small></div></div>
+    <div class="h" style="font-size:60px; letter-spacing:-2px">Your daily<br><em>Muslim companion.</em></div>
+    <div class="sub" style="font-size:22px; margin-top:20px">Prayer times · Quran · Qibla · English &amp; Urdu</div>
+  </div>
+  <img class="shot" src="comp/hero.png" style="left:628px; top:30px; width:460px">
+</div>
+
+<script>
+// A faint field of eight-pointed stars, the Islamic motif, seeded so every render matches.
+let seed = 11;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function star(g, x, y, r) {
+  // Two overlapping squares make the rub el hizb star.
+  for (const turn of [0, Math.PI / 4]) {
+    g.beginPath();
+    for (let i = 0; i < 4; i++) {
+      const a = turn + i * Math.PI / 2 + Math.PI / 4;
+      const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r;
+      i ? g.lineTo(px, py) : g.moveTo(px, py);
+    }
+    g.closePath(); g.stroke();
+  }
+}
+for (const c of document.querySelectorAll('canvas.pat')) {
+  const box = c.parentElement;
+  c.width = box.clientWidth; c.height = box.clientHeight;
+  const g = c.getContext('2d');
+  const small = c.height < 600, cell = small ? 70 : 130;
+  g.strokeStyle = getComputedStyle(box).getPropertyValue('--star'); g.lineWidth = small ? 3 : 5; g.lineJoin = 'round';
+  for (let y = cell / 2; y < c.height; y += cell)
+    for (let x = cell / 2 + ((y / cell) % 2 ? cell / 2 : 0); x < c.width + cell; x += cell) {
+      if (rnd() < 0.5) continue;
+      star(g, x, y, cell * (rnd() < 0.5 ? 0.22 : 0.3));
+    }
+}
+</script>
+</body>
+</html>

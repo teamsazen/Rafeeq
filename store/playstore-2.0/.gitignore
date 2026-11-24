@@ -1,0 +1,3 @@
+# Rebuilt from src/raw by tools/clean_status.py and tools/composite_screen.py.
+src/clean/
+src/comp/
