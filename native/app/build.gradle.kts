@@ -33,9 +33,9 @@ android {
         applicationId = "com.satechdev.rafeeqapp"
         minSdk = 24
         targetSdk = 36
-        // Above the Flutter app's last release (1.2.23+52); 53 was the first 2.0.0 upload.
-        versionCode = 54
-        versionName = "2.0.0"
+        // Above the Flutter app's last release (1.2.23+52); 53 and 54 were 2.0.0.
+        versionCode = 55
+        versionName = "2.0.1"
         manifestPlaceholders["appName"] = "Rafeeq"
     }
 
