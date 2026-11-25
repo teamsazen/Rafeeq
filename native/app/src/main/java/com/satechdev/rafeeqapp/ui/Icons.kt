@@ -1,26 +1,25 @@
 package com.satechdev.rafeeqapp.ui
 
-import androidx.compose.foundation.layout.Box
+import android.graphics.Paint
+import android.graphics.Rect
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
 import com.satechdev.rafeeqapp.R
 
-private val materialIcons = FontFamily(Font(R.font.material_icons))
-private val cupertinoIcons = FontFamily(Font(R.font.cupertino_icons))
-private val islamicIcons = FontFamily(Font(R.font.islamic_icons))
+private val materialIcons = R.font.material_icons
+private val cupertinoIcons = R.font.cupertino_icons
+private val islamicIcons = R.font.islamic_icons
 
 /**
  * The icons the Flutter app draws, from the same three icon fonts, by code
@@ -28,7 +27,7 @@ private val islamicIcons = FontFamily(Font(R.font.islamic_icons))
  * Islamic Icons (BSD 2-Clause). Code points are Flutter's `Icons.*`,
  * `CupertinoIcons.*` and `FlutterIslamicIcons.*`.
  */
-enum class Glyph(internal val family: FontFamily, internal val codePoint: Int) {
+enum class Glyph(internal val fontResource: Int, internal val codePoint: Int) {
     // Material
     Translate(materialIcons, 0xf45e),
     Explore(materialIcons, 0xf037),
@@ -127,19 +126,35 @@ fun AppIcon(
     modifier: Modifier = Modifier,
     shadow: Shadow? = null,
 ) {
-    val fontSize = with(LocalDensity.current) { (size.toPx() / fontScale).toSp() }
-    Box(modifier.size(size), contentAlignment = Alignment.Center) {
-        BasicText(
-            String(Character.toChars(glyph.codePoint)),
-            style = TextStyle(
-                color = color,
-                fontFamily = glyph.family,
-                fontSize = fontSize,
-                lineHeight = fontSize,
-                shadow = shadow,
-                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
-            ),
+    val context = LocalContext.current
+    val text = remember(glyph) { String(Character.toChars(glyph.codePoint)) }
+    val paint = remember(context, glyph.fontResource) {
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = requireNotNull(ResourcesCompat.getFont(context, glyph.fontResource))
+        }
+    }
+    val bounds = remember { Rect() }
+    Canvas(modifier.size(size)) {
+        paint.color = color.toArgb()
+        paint.textSize = this.size.minDimension
+        paint.getTextBounds(text, 0, text.length, bounds)
+        // Icon fonts can have ink outside their advance width or ascent/descent.
+        // Fit and centre the actual ink, rather than clipping it to a text line.
+        val inkSize = maxOf(bounds.width(), bounds.height()).toFloat()
+        if (inkSize > this.size.minDimension) {
+            paint.textSize *= this.size.minDimension / inkSize
+            paint.getTextBounds(text, 0, text.length, bounds)
+        }
+        if (shadow != null) {
+            paint.setShadowLayer(shadow.blurRadius, shadow.offset.x, shadow.offset.y, shadow.color.toArgb())
+        } else {
+            paint.clearShadowLayer()
+        }
+        drawContext.canvas.nativeCanvas.drawText(
+            text,
+            center.x - bounds.exactCenterX(),
+            center.y - bounds.exactCenterY(),
+            paint,
         )
     }
 }
