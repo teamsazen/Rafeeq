@@ -1,0 +1,10 @@
+import {chromium} from '/Users/waqas/Muzamil/Projects/Budget-AI/store-screenshots/node_modules/playwright/index.mjs';
+import {writeFileSync} from 'node:fs';
+const root=import.meta.dirname;
+const browser=await chromium.launch({channel:'chrome'});
+const page=await browser.newPage({viewport:{width:1200,height:2000},deviceScaleFactor:1});
+await page.goto('file://'+root+'/design.html');await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));
+for(const id of ['home','reader'])await page.locator('#'+id).screenshot({path:root+'/previews/'+id+'.png'});
+writeFileSync(root+'/pair.html',`<style>*{box-sizing:border-box}body{margin:0;padding:36px;background:#102c24;color:#fff5df;font-family:Arial,sans-serif}h1{font-size:28px;margin:0 0 10px}p{margin:0 0 28px;color:#bad2c5;font-size:17px}.grid{display:flex;gap:24px}img{width:540px;display:block}</style><h1>Rafeeq — In Your Hands / Emerald</h1><p>Rich green studio · Clearer typography · Real Samsung UI</p><div class="grid"><img src="previews/home.png"><img src="previews/reader.png"></div>`);
+await page.setViewportSize({width:1176,height:1120});await page.goto('file://'+root+'/pair.html');await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));await page.screenshot({path:root+'/previews/pair.png',fullPage:true});
+await browser.close();

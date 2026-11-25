@@ -1,0 +1,82 @@
+[
+  {
+    "id": "01-home",
+    "screen": "captures/home.png",
+    "plate": "green-plate.png",
+    "label": "YOUR ISLAMIC COMPANION",
+    "title": "Faith, in",
+    "accent": "your hands.",
+    "sub": "Prayer times. Quran. Qibla. Always close.",
+    "font": 116
+  },
+  {
+    "id": "02-quran",
+    "screen": "captures/reader.png",
+    "plate": "green-plate.png",
+    "label": "THE HOLY QURAN",
+    "title": "Carry the",
+    "accent": "Quran with you.",
+    "sub": "Read, listen and reflect. Wherever you are.",
+    "font": 104
+  },
+  {
+    "id": "03-prayer",
+    "screen": "captures/prayer.png",
+    "plate": "studio-plate.png",
+    "label": "PRAYER TIMES & ADHAN",
+    "title": "Make time",
+    "accent": "for every prayer.",
+    "sub": "Daily prayer times, with reminders for salah.",
+    "font": 100
+  },
+  {
+    "id": "04-mushaf",
+    "screen": "captures/mushaf-next.png",
+    "plate": "green-plate.png",
+    "label": "16-LINE QURAN",
+    "title": "The mushaf",
+    "accent": "you know.",
+    "sub": "Familiar IndoPak pages. Made for daily reading.",
+    "font": 110
+  },
+  {
+    "id": "05-qibla",
+    "screen": "captures/qibla.png",
+    "plate": "studio-plate.png",
+    "label": "QIBLA COMPASS",
+    "title": "Find your",
+    "accent": "direction.",
+    "sub": "A compass to help you face the Qibla.",
+    "font": 116
+  },
+  {
+    "id": "06-ayah",
+    "screen": "captures/ayah.png",
+    "plate": "green-plate.png",
+    "label": "AYAH PICTURE",
+    "title": "Share an ayah,",
+    "accent": "beautifully.",
+    "sub": "Turn words of faith into a picture to share.",
+    "font": 103
+  },
+  {
+    "id": "07-namaz",
+    "screen": "captures/namaz.png",
+    "plate": "studio-plate.png",
+    "label": "NAMAZ & WUDU",
+    "title": "Learn to pray,",
+    "accent": "step by step.",
+    "sub": "Follow the prayer and wudu guides with ease.",
+    "font": 104
+  },
+  {
+    "id": "08-theme",
+    "screen": "captures/dark.png",
+    "plate": "dark-plate.png",
+    "label": "LIGHT & DARK THEMES",
+    "title": "Day or night,",
+    "accent": "your way.",
+    "sub": "Switch between light and dark, whenever you like.",
+    "font": 110
+  }
+]

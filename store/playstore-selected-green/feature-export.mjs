@@ -1,0 +1,12 @@
+import {chromium} from '/Users/waqas/Muzamil/Projects/Budget-AI/store-screenshots/node_modules/playwright/index.mjs';
+import {writeFileSync} from 'node:fs';
+const root=import.meta.dirname;
+const browser=await chromium.launch({channel:'chrome'});
+const page=await browser.newPage({viewport:{width:1100,height:650},deviceScaleFactor:1});
+await page.goto('file://'+root+'/feature-graphic.html');await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));
+const safe=await page.locator('.copy').evaluate(e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,overflow:e.scrollWidth>e.clientWidth}});
+if(safe.left<154||safe.right>870||safe.top<75||safe.bottom>425||safe.overflow)throw Error('Text outside review safe area: '+JSON.stringify(safe));
+await page.locator('#feature').screenshot({path:root+'/out/feature-graphic-1024x500.png'});
+writeFileSync(root+'/feature-review.html',`<style>*{box-sizing:border-box}body{margin:0;padding:32px;background:#102c24;color:#fff4d6;font-family:Arial}h1{margin:0 0 12px;font-size:26px}p{color:#bcd2c3}img{display:block}.row{display:flex;gap:28px;align-items:flex-start;margin-top:26px}.guide{position:relative;width:1024px}.safe{position:absolute;left:154px;right:154px;top:75px;bottom:75px;border:1px dashed #fff9;pointer-events:none}.label{font-size:14px;margin-bottom:10px}</style><h1>Rafeeq — feature graphic</h1><p>Text kept inside the inset area; dashed guide is for review only.</p><div class="guide"><img src="out/feature-graphic-1024x500.png" width="1024"><div class="safe"></div></div><div class="row"><div><div class="label">Half-size · 512 × 250</div><img src="out/feature-graphic-1024x500.png" width="512"></div><div><div class="label">Small · 320 × 156</div><img src="out/feature-graphic-1024x500.png" width="320"></div></div>`);
+await page.setViewportSize({width:1088,height:950});await page.goto('file://'+root+'/feature-review.html');await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));await page.screenshot({path:root+'/previews/feature-review.png',fullPage:true});
+console.log(safe);await browser.close();

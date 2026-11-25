@@ -1,0 +1,12 @@
+import {chromium} from '/Users/waqas/Muzamil/Projects/Budget-AI/store-screenshots/node_modules/playwright/index.mjs';
+import {writeFileSync} from 'node:fs';
+const root=import.meta.dirname;
+const browser=await chromium.launch({channel:'chrome'});
+const page=await browser.newPage({viewport:{width:1200,height:2000},deviceScaleFactor:1});
+await page.goto('file://'+root+'/concepts.html');
+await page.evaluate(()=>document.fonts.ready);
+await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));
+for(const id of ['a','b','c']) await page.locator('#'+id).screenshot({path:root+'/previews/'+id+'.png'});
+writeFileSync(root+'/comparison.html',`<style>*{box-sizing:border-box}body{margin:0;padding:45px;background:#e6e6df;font-family:Arial;color:#193b35}h1{font-size:30px;margin:0 0 10px}p{margin:0 0 35px;color:#53665b}.grid{display:flex;gap:24px}.item{width:360px}h2{font-size:21px;margin:0 0 14px}img{width:360px;display:block;box-shadow:0 10px 30px #122a341a}footer{font-size:16px;padding-top:20px;line-height:1.5}</style><h1>Rafeeq — three visual directions</h1><p>Fresh Samsung captures · Corrected native build · First-slide concepts</p><div class="grid"><div class="item"><h2>A / Ivory Architecture</h2><img src="previews/a.png"><footer>Warm ivory, a quiet arch, polished metal.<br>Recommended for Rafeeq.</footer></div><div class="item"><h2>B / Everyday Teal</h2><img src="previews/b.png"><footer>Confident type, strong teal, dynamic angle.<br>The boldest storefront presence.</footer></div><div class="item"><h2>C / Sand Editorial</h2><img src="previews/c.png"><footer>Warm stone, an editorial grid, feature notes.<br>The most understated direction.</footer></div></div>`);
+await page.setViewportSize({width:1218,height:940});await page.goto('file://'+root+'/comparison.html');await page.evaluate(()=>Promise.all([...document.images].map(i=>i.decode())));await page.screenshot({path:root+'/previews/comparison.png',fullPage:true});
+await browser.close();
