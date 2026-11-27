@@ -112,7 +112,7 @@ cd native
 ./gradlew test           # unit tests
 ```
 
-Signed Play builds come from GitHub Actions: raising `versionCode` in `native/app/build.gradle.kts` on `main` (or running **Android release build** by hand) builds the AAB, APK and R8 mapping, ready to download from the run's artifacts. Publishing to Google Play is done by hand.
+Signed Play builds come from GitHub Actions: raising `versionCode` in `native/app/build.gradle.kts` on `main` (or running **Android release build** by hand) builds the AAB, APK and R8 mapping, saved to Google Play as a production draft (notes from `docs/release/<version>-whats-new.md`). The artifact is deleted once Play has the build, and kept if the upload fails. Rolling the draft out is done by hand in Play Console.
 
 ### Flutter app
 
