@@ -112,6 +112,8 @@ cd native
 ./gradlew test           # unit tests
 ```
 
+Signed Play builds come from GitHub Actions: raising `versionCode` in `native/app/build.gradle.kts` on `main` (or running **Android release build** by hand) builds the AAB, APK and R8 mapping, ready to download from the run's artifacts. Publishing to Google Play is done by hand.
+
 ### Flutter app
 
 The Firebase config files are not committed. Register the Android app (`com.satechdev.rafeeqapp`, plus `com.satechdev.rafeeqapp.debug` for debug builds) and the iOS app (`com.satechdev.rafeeqapp`) in your own Firebase project, then place the downloaded files at:
