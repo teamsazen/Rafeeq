@@ -1,20 +1,16 @@
 ---
-// An app screenshot that matches the page's theme: the light screenshot in a
-// light theme, the dark one in a dark theme (public/img, from npm run images).
+// An app screenshot in its Android phone frame (public/img/phones, from npm run
+// images). The screenshots are in light mode; theme-dark is the dark one.
 interface Props {
   name: string;
-  kind?: 'screens' | 'phones';
   alt: string;
   sizes: string;
   eager?: boolean;
   class?: string;
 }
-const { name, kind = 'screens', alt, sizes, eager = false, class: className } = Astro.props;
-const [w, h, sw] = kind === 'phones' ? [720, 1469, 360] : [600, 1305, 300];
-const set = (theme: string) => `/img/${kind}/${theme}/${name}-sm.webp ${sw}w, /img/${kind}/${theme}/${name}.webp ${w}w`;
+const { name, alt, sizes, eager = false, class: className } = Astro.props;
+// Keep in sync with PHONE in scripts/images.mjs (1162×2468, scaled to 720 wide).
+const [w, h, sw] = [720, 1529, 360];
 ---
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset={set('dark')} sizes={sizes} />
-  <img class={className} src={`/img/${kind}/light/${name}.webp`} srcset={set('light')} sizes={sizes} width={w} height={h} alt={alt}
-    loading={eager ? undefined : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
-</picture>
+<img class={className} src={`/img/phones/${name}.webp`} srcset={`/img/phones/${name}-sm.webp ${sw}w, /img/phones/${name}.webp ${w}w`} sizes={sizes}
+  width={w} height={h} alt={alt} loading={eager ? undefined : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />

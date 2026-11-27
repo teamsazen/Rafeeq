@@ -133,15 +133,15 @@ section { padding-block: clamp(56px, 8vw, 112px); }
 .ticks li::before { content: ""; width: 7px; height: 12px; border: solid var(--accent); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) translateY(-2px); }
 
 /* Showcase: coverflow of the app's screens (same idea as the teamsazen.com hero).
-   The screenshots already sit in the iPhone frame, so slides are just the images. */
-.show { --pw: clamp(200px, min(19vw, calc((100svh - 380px) / 2.1)), 300px); --spread: 1; position: relative; margin-top: clamp(32px, 4vw, 56px); display: grid; gap: clamp(18px, 2.4vw, 32px); }
-.show-stars { position: absolute; inset: 0 calc(-1 * var(--gutter)) auto; height: calc(var(--pw) * 2.1); pointer-events: none; }
+   The screenshots already sit in their Android frame, so slides are just the images. */
+.show { --pw: clamp(200px, min(19vw, calc((100svh - 380px) / 2.15)), 300px); --spread: 1; position: relative; margin-top: clamp(32px, 4vw, 56px); display: grid; gap: clamp(18px, 2.4vw, 32px); }
+.show-stars { position: absolute; inset: 0 calc(-1 * var(--gutter)) auto; height: calc(var(--pw) * 2.15); pointer-events: none; }
 .show-stars svg { position: absolute; fill: none; stroke: var(--accent); stroke-opacity: .2; stroke-width: 1.4; }
 .show-stars svg:nth-child(1) { width: clamp(120px, 14vw, 240px); left: 6%; top: 8%; }
 .show-stars svg:nth-child(2) { width: clamp(80px, 9vw, 150px); right: 9%; top: 52%; }
-.show-ghost { position: absolute; inset: 0 0 auto; height: calc(var(--pw) * 2.1); display: grid; place-items: center; overflow: hidden; pointer-events: none; }
+.show-ghost { position: absolute; inset: 0 0 auto; height: calc(var(--pw) * 2.15); display: grid; place-items: center; overflow: hidden; pointer-events: none; }
 .show-ghost span { font-size: clamp(80px, 13vw, 240px); font-weight: 800; letter-spacing: -.055em; line-height: 1; white-space: nowrap; color: var(--surface); }
-.show-stage { position: relative; height: calc(var(--pw) * 2.1); perspective: 1600px; touch-action: pan-y; }
+.show-stage { position: relative; height: calc(var(--pw) * 2.15); perspective: 1600px; touch-action: pan-y; }
 .slide { position: absolute; left: 50%; top: 0; width: var(--pw); transform: translateX(-50%) translateX(calc(var(--x) * var(--pw) * var(--spread))) rotateY(var(--ry)) scale(var(--s)); transform-origin: 50% 60%; opacity: var(--o); transition: transform 1.05s var(--ease), opacity .8s var(--ease); cursor: pointer; }
 .slide img { width: 100%; height: auto; filter: drop-shadow(0 24px 30px var(--shadow)); }
 .slide.is-active { cursor: default; }
@@ -276,6 +276,7 @@ section { padding-block: clamp(56px, 8vw, 112px); }
 .foot .wordmark span:nth-child(6) { transition-delay: .25s; }
 html:not(.js) .foot .wordmark span { transform: none; }
 .foot .copy { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin: 16px 0 0; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, .12); font-size: 14px; }
+.foot .powered a { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 
 /* ---------- Legal and 404 pages ---------- */
 .legal { padding-block: calc(110px + env(safe-area-inset-top)) clamp(60px, 8vw, 110px); }

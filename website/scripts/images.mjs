@@ -1,10 +1,9 @@
 // Makes the page's images in public/img/ from the source files.
 // Run: npm run images
 //
-// Screens: screens/light/<file>.png and screens/dark/<file>.png, the app's
-// 1206×2622 screenshots with the same file names as ../screenshots/. The page
-// shows the light set in a light theme and the dark set in a dark one; a
-// screenshot missing from one set falls back to the other, with a warning.
+// Screens: screens/android/<name>.png, 1080×2400 captures from an Android phone
+// in light mode (theme-dark.png is the one dark capture, for the theme). Each is
+// drawn into a plain Android frame with no notch or camera hole.
 // Store: screens/store/*.png, the Play Store screenshots in listing order, shown
 // side by side as one banner.
 // Qibla video: from LINKEDIN_DIR (default ~/Desktop/Rafeeq-LinkedIn).
@@ -16,50 +15,52 @@ import { join } from 'node:path';
 
 const OUT = 'public/img';
 const LINKEDIN_DIR = process.env.LINKEDIN_DIR ?? join(homedir(), 'Desktop/Rafeeq-LinkedIn');
-const THEMES = ['light', 'dark'];
 
-// Page name → screenshot file name. Each is drawn in Apple's iPhone bezel.
-const SCREENS = {
-  home: '01-home',
-  prayer: '03-home-share',
-  surahs: '04-quran-surahs',
-  reader: '07-surah-al-baqara',
-  qibla: '09-qibla',
-  language: '11-settings-language',
-  theme: '13-settings-theme',
-  namaz: '16-namaz-guide',
-  hijri: '18-hijri-calendar',
-  names: '19-asma-ul-husna',
-  ayah: '20-ayah-picture',
-  recite: '21-surah-recitation',
-};
-// The bezel's transparent screen cutout (1470×3000 frame), measured from the PNG.
-const BEZEL = { file: 'screens/iphone-bezel.png', width: 1470, height: 3000, screen: { left: 75, top: 67, width: 1320, height: 2866 } };
+// The phone: a 1080×2400 screen inside a thin, evenly rounded bezel, with the
+// volume and power keys on the right. Keep PHONE's size in sync with Shot.astro.
+const SCREEN = { width: 1080, height: 2400, radius: 92 };
+const BEZEL = 34;
+const KEY = 7; // how far the side keys stand out
+const PHONE = { width: SCREEN.width + 2 * BEZEL + 2 * KEY, height: SCREEN.height + 2 * BEZEL };
+const body = { x: KEY, y: 0, w: SCREEN.width + 2 * BEZEL, h: PHONE.height, r: SCREEN.radius + BEZEL };
+
+const frameSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${PHONE.width}" height="${PHONE.height}">
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a3d40"/><stop offset=".5" stop-color="#1c1e20"/><stop offset="1" stop-color="#2e3134"/>
+    </linearGradient>
+    <mask id="hole">
+      <rect width="100%" height="100%" fill="#fff"/>
+      <rect x="${KEY + BEZEL}" y="${BEZEL}" width="${SCREEN.width}" height="${SCREEN.height}" rx="${SCREEN.radius}" fill="#000"/>
+    </mask>
+  </defs>
+  <rect x="${body.x + body.w - 2}" y="560" width="${KEY + 2}" height="300" rx="${KEY / 2}" fill="#2a2c2f"/>
+  <rect x="${body.x + body.w - 2}" y="960" width="${KEY + 2}" height="170" rx="${KEY / 2}" fill="#2a2c2f"/>
+  <g mask="url(#hole)">
+    <rect x="${body.x}" y="${body.y}" width="${body.w}" height="${body.h}" rx="${body.r}" fill="url(#edge)"/>
+    <rect x="${body.x + 5}" y="${body.y + 5}" width="${body.w - 10}" height="${body.h - 10}" rx="${body.r - 5}" fill="#0b0c0d"/>
+  </g>
+</svg>`;
+const screenMask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${SCREEN.width}" height="${SCREEN.height}"><rect width="100%" height="100%" rx="${SCREEN.radius}" fill="#fff"/></svg>`);
 
 const webp = (input, width, file) => sharp(input).resize(width).webp({ quality: 82, effort: 6 }).toFile(file);
-const source = (theme, name) => {
-  const own = `screens/${theme}/${SCREENS[name]}.png`;
-  if (existsSync(own)) return own;
-  const other = `screens/${THEMES.find((t) => t !== theme)}/${SCREENS[name]}.png`;
-  if (!existsSync(other)) throw new Error(`no screenshot for ${name} (${SCREENS[name]}.png)`);
-  console.warn(`! ${theme}: ${SCREENS[name]}.png missing, using the other theme's`);
-  return other;
-};
 
 for (const dir of ['screens', 'phones', 'posts', 'store', 'qibla']) rmSync(join(OUT, dir), { recursive: true, force: true });
 
-for (const theme of THEMES) {
-  mkdirSync(join(OUT, 'phones', theme), { recursive: true });
-  for (const name of Object.keys(SCREENS)) {
-    const src = source(theme, name);
-    const { left, top, width, height } = BEZEL.screen;
-    const shot = await sharp(src).resize(width, height).toBuffer();
-    const framed = await sharp({ create: { width: BEZEL.width, height: BEZEL.height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
-      .composite([{ input: shot, left, top }, { input: BEZEL.file }]).png().toBuffer();
-    await webp(framed, 720, join(OUT, 'phones', theme, `${name}.webp`));
-    await webp(framed, 360, join(OUT, 'phones', theme, `${name}-sm.webp`));
-  }
+const shots = readdirSync('screens/android').filter((f) => f.endsWith('.png')).sort();
+mkdirSync(join(OUT, 'phones'), { recursive: true });
+for (const f of shots) {
+  const name = f.replace('.png', '');
+  const shot = await sharp(join('screens/android', f))
+    .resize(SCREEN.width, SCREEN.height, { fit: 'cover', position: 'top' })
+    .composite([{ input: screenMask, blend: 'dest-in' }])
+    .png().toBuffer();
+  const framed = await sharp({ create: { width: PHONE.width, height: PHONE.height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: shot, left: KEY + BEZEL, top: BEZEL }, { input: Buffer.from(frameSvg) }]).png().toBuffer();
+  await webp(framed, 720, join(OUT, 'phones', `${name}.webp`));
+  await webp(framed, 360, join(OUT, 'phones', `${name}-sm.webp`));
 }
+console.log(`${shots.length} phones, ${PHONE.width}×${PHONE.height} before scaling`);
 
 const store = existsSync('screens/store') ? readdirSync('screens/store').filter((f) => f.endsWith('.png')).sort() : [];
 if (store.length) mkdirSync(join(OUT, 'store'), { recursive: true });
