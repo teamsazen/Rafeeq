@@ -1,10 +1,14 @@
 name: Android release build
 
-# Builds the signed Play release of the native app (native/) and keeps the AAB,
-# APK and R8 mapping as a downloadable artifact. Publishing to Play stays manual.
+# Builds the signed Play release of the native app (native/), saves it to
+# Google Play as a draft on the production track (with the notes from
+# docs/release/<versionName>-whats-new.md), and keeps the AAB, APK and R8
+# mapping as an artifact until the draft is saved. Rolling the draft out in
+# Play Console stays manual. If the Play upload fails, the artifact is kept.
 #
 # Runs when a push to main changes versionCode in native/app/build.gradle.kts,
-# or by hand from the Actions tab (Run workflow).
+# or by hand from the Actions tab (Run workflow), where the Play upload can be
+# turned off to only build.
 #
 # Repository secrets (Settings → Secrets and variables → Actions):
 #   RELEASE_KEYSTORE_BASE64   the Play upload keystore, base64
@@ -12,6 +16,7 @@ name: Android release build
 #   RELEASE_KEY_ALIAS         the key alias
 #   RELEASE_KEY_PASSWORD      the key password
 #   GOOGLE_SERVICES_JSON      native/app/src/release/google-services.json
+#   PLAY_SERVICE_ACCOUNT_JSON a Google Play service account key (release manager)
 #   INDOPAK_FONT_XZ_1 … _4    AlQuranNeo5x3-Arabic.ttf, xz-compressed, base64,
 #                             in four parts (a secret holds at most 48 KB). The
 #                             font may be used but not shared, so it is never
@@ -23,9 +28,15 @@ on:
     paths:
       - 'native/app/build.gradle.kts'
   workflow_dispatch:
+    inputs:
+      play:
+        description: Save the build to Google Play as a draft
+        type: boolean
+        default: true
 
 permissions:
   contents: read
+  actions: write # to delete the artifact once Play has the build
 
 concurrency:
   group: android-release
@@ -124,15 +135,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          apk=native/app/build/outputs/apk/release/app-release.apk
+          props="$HOME/Muzamil/Keystores/rafeeq.txt"
+          get() { grep -m1 "^$1=" "$props" | cut -d= -f2-; }
+          expected=$(keytool -exportcert -keystore "$(get storeFile)" -storepass "$(get storePassword)" -alias "$(get keyAlias)" | sha256sum | cut -d' ' -f1)
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
-          cert=$("$apksigner" verify --print-certs "$apk" | grep 'SHA-256 digest')
-          if keytool -list -keystore "$HOME/Muzamil/Keystores/rafeeq.keystore" -storepass "$(grep -oP 'storePassword=\K.*' "$HOME/Muzamil/Keystores/rafeeq.txt")" -v \
-              | tr -d ':' | tr 'A-F' 'a-f' | grep -q "$(echo "$cert" | awk '{print $NF}')"; then
-            echo "Signed with the upload key." >> "$GITHUB_STEP_SUMMARY"
-          else
+          actual=$("$apksigner" verify --print-certs native/app/build/outputs/apk/release/app-release.apk | grep -m1 'SHA-256 digest' | awk '{print $NF}')
+          if [[ "$expected" != "$actual" ]]; then
             echo "::error::The APK is not signed with the upload key"; exit 1
           fi
+          echo "Signed with the upload key." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Collect the outputs
         if: steps.version.outputs.build == 'true'
@@ -147,6 +158,7 @@ jobs:
           ls -la "dist/$out" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload artifact
+        id: artifact
         if: steps.version.outputs.build == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -154,6 +166,48 @@ jobs:
           path: dist/${{ env.OUT }}/
           retention-days: 30
           if-no-files-found: error
+
+      - name: Write the Play release notes
+        if: steps.version.outputs.build == 'true' && (github.event_name == 'push' || inputs.play)
+        shell: bash
+        run: |
+          notes="docs/release/${{ steps.version.outputs.name }}-whats-new.md"
+          mkdir -p dist/whatsnew
+          if [[ -f "$notes" ]]; then
+            for lang in en-US ur; do
+              sed -n "/^<$lang>\$/,/^<\/$lang>\$/p" "$notes" | sed '1d;$d' > "dist/whatsnew/whatsnew-$lang"
+              [[ -s "dist/whatsnew/whatsnew-$lang" ]] || rm "dist/whatsnew/whatsnew-$lang"
+            done
+          fi
+          if ls dist/whatsnew/* >/dev/null 2>&1; then
+            echo "Release notes from $notes." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::No release notes in $notes; the draft has none."
+          fi
+
+      - name: Save to Google Play as a draft
+        id: play
+        if: steps.version.outputs.build == 'true' && (github.event_name == 'push' || inputs.play)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.satechdev.rafeeqapp
+          releaseFiles: dist/${{ env.OUT }}/${{ env.OUT }}.aab
+          mappingFile: dist/${{ env.OUT }}/mapping.txt
+          whatsNewDirectory: dist/whatsnew
+          releaseName: ${{ steps.version.outputs.code }} (${{ steps.version.outputs.name }})
+          track: production
+          status: draft
+
+      - name: Delete the artifact now that Play has the build
+        if: steps.play.outcome == 'success'
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: ${{ env.OUT }}
+
+      - name: Summary
+        if: steps.play.outcome == 'success'
+        run: echo "Saved to Google Play as a production draft. Review and roll it out in Play Console." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Remove the signing key and font from the runner
         if: always()
