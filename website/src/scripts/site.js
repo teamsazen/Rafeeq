@@ -79,8 +79,9 @@ if (show) {
   let active = Number(show.dataset.active) || 0;
   let timer = 0, paused = false, visible = true;
   const place = (raw) => {
-    const d = ((raw % n) + n + 4) % n - 4;
-    const a = Math.abs(d);
+    const half = Math.floor(n / 2);
+    const d = ((raw % n) + n + half) % n - half;
+    const a = Math.min(Math.abs(d), 4);
     return { x: [0, .78, 1.45, 1.95, 2.3][a] * Math.sign(d), ry: -d * 16, s: [1, .84, .7, .6, .5][a], o: [1, .92, .5, 0, 0][a], z: 10 - a, far: a >= 2 };
   };
   const restart = () => {

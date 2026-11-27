@@ -10,24 +10,27 @@ import { icons, chevron, star } from '../data/icons';
 const slides: [string, string, string, string][] = [
   ['prayer', 'Prayer times', 'Accurate times for your location', 'Today’s prayer times for Jhelum with the forbidden times around sunrise, noon and sunset'],
   ['home', 'Home', 'The next prayer, under a sky that follows the day', 'The Rafeeq home screen: the Hijri date, a countdown to the next prayer under a sky that follows the time of day, and the Explore shortcuts'],
-  ['reader', 'The Qur’an', 'Arabic with an English or Urdu translation', 'Reading Surah Al-Baqarah in Arabic with its Urdu translation'],
+  ['reader', 'The Qur’an', 'Arabic with an English or Urdu translation', 'Reading Surah Al-Faatiha in Arabic with its English translation'],
+  ['mushaf', '16 Line Quran', 'The IndoPak mushaf, as printed in Pakistan and India', 'A page of the 16 Line IndoPak Quran in the app'],
   ['qibla', 'Qibla', 'A live compass that points to the Kaaba', 'The Qibla compass in the app'],
   ['namaz', 'Namaz & Wudu', 'Every step of salah, with its meaning', 'The Namaz guide in the app'],
   ['names', 'Asma ul Husna', 'The 99 Names of Allah, with meanings', 'Asma ul Husna in the app'],
   ['hijri', 'Hijri calendar', 'The Islamic month next to the Gregorian dates', 'The Hijri calendar in the app'],
   ['ayah', 'Ayah pictures', 'Any ayah as a picture to save or send', 'Ayah pictures in the app'],
   ['surahs', 'The Qur’an', 'All 114 surahs', 'The list of surahs in the app'],
+  ['theme-dark', 'Dark theme', 'Easy on the eyes, from Isha to Fajr', 'The Rafeeq home screen in the dark theme'],
 ];
 const active = 1;
 // Coverflow placement for a slide d steps from the active one (kept in sync with site.js).
 const place = (raw: number) => {
   const n = slides.length;
-  const d = ((raw % n) + n + 4) % n - 4;
-  const a = Math.abs(d);
+  const half = Math.floor(n / 2);
+  const d = ((raw % n) + n + half) % n - half;
+  const a = Math.min(Math.abs(d), 4);
   return { x: [0, .78, 1.45, 1.95, 2.3][a] * Math.sign(d), ry: -d * 16, s: [1, .84, .7, .6, .5][a], o: [1, .92, .5, 0, 0][a], z: 10 - a, far: a >= 2 };
 };
 
-const marquee = ['The Qur’an', 'Prayer times', 'Qibla', 'Namaz & Wudu', 'Hijri calendar', 'Ayah pictures', 'Asma ul Husna', 'English & Urdu'];
+const marquee = ['The Qur’an', '16 Line Quran', 'Prayer times', 'Qibla', 'Namaz & Wudu', 'Hijri calendar', 'Ayah pictures', 'Asma ul Husna', 'English & Urdu'];
 
 // The rest of the app, short versions of each feature's own text.
 const features: [keyof typeof icons, string, string][] = [
@@ -76,7 +79,7 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
             const p = place(i - active);
             return (
               <div class:list={['slide', { 'is-active': i === active }]} data-far={p.far ? '' : undefined} style={`--x:${p.x};--ry:${p.ry}deg;--s:${p.s};--o:${p.o};z-index:${p.z}`}>
-                <Shot kind="phones" name={name} sizes="(max-width: 700px) 42vw, 300px" eager={!p.far} alt={alt} />
+                <Shot name={name} sizes="(max-width: 700px) 42vw, 300px" eager={!p.far} alt={alt} />
               </div>
             );
           })}
@@ -119,7 +122,7 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
             <p>Accurate times for your location, calculated on your phone, with an adhan or a gentle reminder for each salah. Rafeeq also shows the forbidden times around sunrise, noon and sunset, plus Suhoor and Iftar.</p>
             <a class="more" href="#qibla">Find the Qibla</a>
           </div>
-          <div class="peek"><Shot kind="phones" name="prayer" sizes="(max-width: 600px) 56vw, 280px" alt="Today’s prayer times with the forbidden times around sunrise, noon and sunset" /></div>
+          <div class="peek"><Shot name="prayer" sizes="(max-width: 600px) 56vw, 280px" alt="Today’s prayer times with the forbidden times around sunrise, noon and sunset" /></div>
         </article>
         <article class="tile tile-gold">
           <div class="tile-copy">
@@ -127,7 +130,7 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
             <p>Turn any ayah into a clean picture with its Arabic and translation, in an English or Urdu layout, ready to save or send to the people you love.</p>
             <a class="more" href="#screens">See the screens</a>
           </div>
-          <div class="peek"><Shot kind="phones" name="ayah" sizes="(max-width: 600px) 56vw, 280px" alt="An ayah turned into a picture with its Arabic and translation" /></div>
+          <div class="peek"><Shot name="ayah" sizes="(max-width: 600px) 56vw, 280px" alt="An ayah turned into a picture with its Arabic and translation" /></div>
         </article>
       </div>
     </div>
@@ -136,16 +139,17 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
   <section class="row" id="quran">
     <div class="wrap row-grid">
       <div class="pair">
-        <Shot kind="phones" name="surahs" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="The list of surahs in the app" />
-        <Shot kind="phones" name="recite" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Reading Surah Al-Baqarah with its Urdu translation while Abdullah Basfar recites" />
+        <Shot name="mushaf" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="A page of the 16 Line IndoPak Quran" />
+        <Shot name="recite" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Reading Surah Al-Baqarah with its English translation while the recitation plays, the ayah highlighted" />
       </div>
       <div class="row-copy">
         <p class="eyebrow">The Qur’an</p>
         <h2>Read it, hear it,<br>keep your place.</h2>
-        <p class="sub">Every surah with its Arabic, an English or Urdu translation, and recitations from renowned qaris. Set the Arabic and the translation to their own sizes, and keep listening with the mini-player.</p>
+        <p class="sub">Every surah with its Arabic, an English or Urdu translation, and recitations from renowned qaris. Read the 16 Line IndoPak mushaf as it is printed in Pakistan and India, and keep listening with the mini-player, even with the screen off.</p>
         <ul class="facts">
           <li><b>114</b> surahs, with translation</li>
           <li><b>2</b> translations: English and Urdu</li>
+          <li>16 Line IndoPak mushaf</li>
           <li>Choice of reciter</li>
           <li>Search and bookmarks</li>
         </ul>
@@ -158,7 +162,7 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
       <div class="head">
         <p class="eyebrow">Everything in the app</p>
         <h2>One calm app<br>for every day.</h2>
-        <p class="sub">Each part of Rafeeq, and what it does. The screenshots on this page follow your light or dark setting.</p>
+        <p class="sub">Each part of Rafeeq, and what it does.</p>
       </div>
       <div class="adv-list">
         {features.map(([icon, title, text]) => (
@@ -232,8 +236,8 @@ const store = existsSync('public/img/store') ? readdirSync('public/img/store').f
           <div class="links"><a href={site.githubUrl} rel="noopener">See the code on GitHub</a><a href={site.privacyUrl}>Read the privacy policy</a></div>
         </div>
         <div class="pair">
-          <Shot kind="phones" name="hijri" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="The Hijri calendar in the app" />
-          <Shot kind="phones" name="names" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Asma ul Husna in the app" />
+          <Shot name="hijri" class="ph-side" sizes="(max-width: 900px) 42vw, 260px" alt="The Hijri calendar in the app" />
+          <Shot name="names" class="ph-main" sizes="(max-width: 900px) 46vw, 300px" alt="Asma ul Husna in the app" />
         </div>
       </div>
     </div>
